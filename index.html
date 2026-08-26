@@ -4,9 +4,10 @@
 <meta charset="UTF-8">
 <title>Portfolio Immobiliare</title>
 <link rel="manifest" href="manifest.webmanifest">
-<meta name="theme-color" content="#17140F">
+<meta name="theme-color" content="#12302C">
 <link rel="icon" href="icon-192.png" sizes="192x192" type="image/png">
 <link rel="apple-touch-icon" href="apple-touch-icon.png">
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@tabler/icons-webfont@2.47.0/tabler-icons.min.css">
 <meta name="mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
@@ -16,23 +17,26 @@
   @import url('https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,400;9..144,500;9..144,600;9..144,700&family=IBM+Plex+Sans:wght@400;500;600&family=IBM+Plex+Mono:wght@400;500&display=swap');
 
   :root{
-    --ink:#1C1A17;
-    --ink-soft:#6B6255;
-    --paper:#F4EFE4;
-    --paper-raised:#FBF8F1;
-    --brass:#B08D57;
-    --brass-soft:#E7D9BC;
-    --brass-deep:#8C6D3F;
-    --terracotta:#A63D2F;
-    --sage:#3F5C4A;
-    --line:#DCD3BF;
-    --line-soft:#E9E2D2;
-    --surface-dark:#17140F;
-    --surface-dark-2:#221E17;
-    --text-on-dark:#EFE6D3;
-    --text-on-dark-soft:#B4A891;
+    --ink:#241F1A;
+    --ink-soft:#6E6558;
+    --paper:#F5EFE0;
+    --paper-raised:#FFFCF5;
+    --brass:#2FB8AA;
+    --brass-soft:#BEEFE8;
+    --brass-deep:#0F6E64;
+    --terracotta:#D6503F;
+    --sage:#3E8C6E;
+    --line:#E6DCC2;
+    --line-soft:#EFE7D2;
+    --surface-dark:#12302C;
+    --surface-dark-2:#193B36;
+    --text-on-dark:#EAF6F3;
+    --text-on-dark-soft:#9AC7C0;
+    --tiffany:#4FD1C5;
+    --coral:#F4845F;
   }
   *{box-sizing:border-box;}
+  .ti{vertical-align:-2px; margin-right:3px; font-size:1em;}
   body{
     margin:0;
     background:var(--paper);
@@ -54,7 +58,7 @@
   }
   .topnav-tabs{display:flex; gap:6px; flex-wrap:wrap;}
   .tab-btn{
-    background:none; border:1px solid rgba(176,141,87,0.35); padding:8px 16px; border-radius:20px;
+    background:none; border:1px solid rgba(47,184,170,0.35); padding:8px 16px; border-radius:8px;
     font-size:12px; cursor:pointer; color:var(--text-on-dark-soft); font-family:'IBM Plex Sans',sans-serif;
     letter-spacing:.03em; transition:all .15s ease;
   }
@@ -206,6 +210,13 @@
     opacity:.9;
   }
   .stamp.ok{color:var(--sage);}
+  .seal{
+    display:inline-flex; align-items:center; justify-content:center;
+    width:20px; height:20px; border-radius:50%;
+    border:1.3px dashed var(--sage); color:var(--sage);
+    font-size:11px; flex-shrink:0; transform:rotate(-6deg);
+    margin-right:5px; vertical-align:-5px;
+  }
   .stamp.prog{color:var(--brass-deep);}
   .stamp.att{color:var(--terracotta);}
 
@@ -225,7 +236,7 @@
     background:var(--paper-raised); border:1px solid var(--line-soft); border-radius:6px;
     overflow:hidden; margin-bottom:12px; display:flex; gap:0;
   }
-  .foto-card img{width:110px; height:100px; object-fit:cover; flex-shrink:0;}
+  .foto-card img{width:110px; height:100px; object-fit:cover; flex-shrink:0; border-radius:6px 0 0 6px;}
   .foto-card-body{padding:10px 14px; flex:1; display:flex; flex-direction:column; justify-content:center; gap:6px;}
   .foto-card-desc{font-size:13px; color:var(--ink);}
   .foto-card-actions{display:flex; gap:10px; align-items:center; flex-wrap:wrap;}
@@ -235,7 +246,7 @@
   }
   .prop-cover{width:100%; height:130px; object-fit:cover; border-radius:6px 6px 0 0; margin:-20px -20px 14px -20px; width:calc(100% + 40px);}
   .icon-btn{
-    background:none; border:1px solid var(--line); border-radius:20px;
+    background:none; border:1px solid var(--line); border-radius:8px;
     padding:7px 14px; font-size:12px; cursor:pointer; color:var(--ink-soft);
     font-family:'IBM Plex Sans',sans-serif; letter-spacing:.02em;
     transition:all .15s ease;
@@ -270,8 +281,7 @@
 
   .add-inline{
     background:none; border:1px dashed var(--brass-soft); color:var(--brass-deep);
-    border-radius:20px; padding:9px 16px; font-size:12.5px; cursor:pointer;
-    margin-bottom:36px; font-family:'IBM Plex Sans',sans-serif; letter-spacing:.02em;
+    border-radius:8px; padding:9px 16px; font-size:12.5px; cursor:pointer; margin-bottom:36px; font-family:'IBM Plex Sans',sans-serif; letter-spacing:.02em;
     transition:all .15s ease;
   }
   .add-inline:hover{border-color:var(--brass); background:var(--brass-soft);}
@@ -300,14 +310,14 @@
   .field-row{display:grid; grid-template-columns:1fr 1fr; gap:12px;}
   .modal-actions{display:flex; justify-content:flex-end; gap:10px; margin-top:24px;}
   .btn-primary{
-    background:var(--ink); color:var(--brass-soft); border:1px solid var(--ink);
-    padding:11px 20px; border-radius:20px; cursor:pointer; font-size:13px; font-weight:600;
+    background:var(--coral); color:#fff; border:1px solid var(--coral);
+    padding:11px 20px; border-radius:8px; cursor:pointer; font-size:13px; font-weight:600;
     letter-spacing:.03em; transition:all .15s ease;
   }
-  .btn-primary:hover{background:#000; border-color:#000;}
+  .btn-primary:hover{background:#E06B42; border-color:#E06B42;}
   .btn-secondary{
     background:none; border:1px solid var(--line); color:var(--ink-soft);
-    padding:11px 20px; border-radius:20px; cursor:pointer; font-size:13px; letter-spacing:.02em;
+    padding:11px 20px; border-radius:8px; cursor:pointer; font-size:13px; letter-spacing:.02em;
     transition:all .15s ease;
   }
   .btn-secondary:hover{border-color:var(--ink-soft); color:var(--ink);}
@@ -318,7 +328,7 @@
   .empty-state .big{font-family:'Fraunces',serif; font-size:19px; color:var(--ink); margin-bottom:6px;}
 
   .tenant-card{
-    background:var(--paper-raised); border:1px solid var(--line-soft); border-radius:6px;
+    background:var(--paper-raised); border:1px solid var(--line-soft); border-left:3px solid var(--terracotta); border-radius:6px;
     padding:18px 20px; margin-bottom:18px; display:flex; justify-content:space-between; align-items:flex-start; gap:14px; flex-wrap:wrap;
     box-shadow:0 1px 3px rgba(28,26,23,0.05);
   }
@@ -334,7 +344,7 @@
   /* WhatsApp */
   .wa-btn{
     display:inline-flex; align-items:center; gap:6px; background:#3F6B4E; color:#fff;
-    border:none; padding:8px 15px; border-radius:20px; font-size:12px; cursor:pointer;
+    border:none; padding:8px 15px; border-radius:8px; font-size:12px; cursor:pointer;
     text-decoration:none; font-family:'IBM Plex Sans',sans-serif; white-space:nowrap;
     transition:background .15s ease;
   }
@@ -361,7 +371,7 @@
     cursor:pointer; display:flex; align-items:center; justify-content:center;
   }
   .prop-gallery{display:flex; gap:10px; overflow-x:auto; margin:16px 0 26px 0; padding-bottom:4px;}
-  .prop-gallery img{width:150px; height:106px; object-fit:cover; border-radius:6px; border:1px solid var(--line-soft); flex-shrink:0;}
+  .prop-gallery img{width:150px; height:106px; object-fit:cover; border-radius:8px; border:1.5px solid var(--brass-soft); flex-shrink:0;}
 
   .commitment-box{
     background:var(--paper-raised); border:1px solid var(--brass-soft); border-radius:6px;
@@ -375,13 +385,13 @@
   .commitment-box li::before{content:'✓'; color:var(--brass-deep); font-weight:700; flex-shrink:0;}
 
   .checkin-row{
-    background:var(--paper-raised); border:1px solid var(--line-soft); border-radius:6px;
+    background:var(--paper-raised); border:1px solid var(--line-soft); border-left:3px solid var(--sage); border-radius:6px;
     padding:14px 16px; margin-bottom:10px;
   }
   .checkin-date{font-family:'IBM Plex Mono',monospace; font-size:11px; color:var(--brass-deep); text-transform:uppercase; letter-spacing:.04em; margin-bottom:6px;}
 
   .intervento-card{
-    background:var(--paper-raised); border:1px solid var(--line-soft); border-radius:6px;
+    background:var(--paper-raised); border:1px solid var(--line-soft); border-left:3px solid var(--brass); border-radius:6px;
     padding:16px 18px; margin-bottom:12px; box-shadow:0 1px 3px rgba(28,26,23,0.05);
   }
   .intervento-titolo{font-family:'Fraunces',serif; font-weight:600; font-size:15px; margin-bottom:4px;}
@@ -390,8 +400,8 @@
     background:var(--brass-soft); border-radius:6px; padding:12px 14px; margin:10px 0; font-size:13px;
   }
   .preventivo-box .importo{font-family:'Fraunces',serif; font-weight:600; font-size:17px; color:var(--brass-deep);}
-  .btn-approva{background:var(--sage); color:#fff; border:none; padding:8px 16px; border-radius:20px; font-size:12.5px; font-weight:600; cursor:pointer; margin-right:8px;}
-  .btn-rifiuta{background:none; border:1px solid var(--terracotta); color:var(--terracotta); padding:8px 16px; border-radius:20px; font-size:12.5px; cursor:pointer;}
+  .btn-approva{background:var(--sage); color:#fff; border:none; padding:8px 16px; border-radius:8px; font-size:12.5px; font-weight:600; cursor:pointer; margin-right:8px;}
+  .btn-rifiuta{background:none; border:1px solid var(--terracotta); color:var(--terracotta); padding:8px 16px; border-radius:8px; font-size:12.5px; cursor:pointer;}
   .storico-list{margin-top:10px; padding-top:10px; border-top:1px dashed var(--line);}
   .storico-item{font-size:11.5px; color:var(--ink-soft); padding:3px 0;}
   .storico-item .storico-data{font-family:'IBM Plex Mono',monospace; color:var(--brass-deep); margin-right:6px;}
@@ -1627,7 +1637,7 @@ function renderSpesaCard(e, role){
       <img src="${e.ricevuta.url}">
       <div class="foto-card-body">
         <div class="foto-card-desc">${e.ricevuta.descrizione || 'Ricevuta'}</div>
-        <a class="link-btn" href="${e.ricevuta.url}" download="ricevuta-${e.data}.jpg" style="align-self:flex-start;">⬇ Scarica ricevuta</a>
+        <a class="link-btn" href="${e.ricevuta.url}" download="ricevuta-${e.data}.jpg" style="align-self:flex-start;"><i class="ti ti-download"></i> Scarica ricevuta</a>
       </div>
     </div>` : '';
 
@@ -1745,7 +1755,7 @@ function renderInterventoCard(m, p, role){
   }
 
   const programmazioneBlock = m.dataProgrammazione
-    ? `<div style="font-size:12.5px;color:var(--brass-deep);margin-top:6px;">📅 Programmato per il ${fmtDate(m.dataProgrammazione)}</div>`
+    ? `<div style="font-size:12.5px;color:var(--brass-deep);margin-top:6px;"><i class="ti ti-calendar"></i> Programmato per il ${fmtDate(m.dataProgrammazione)}</div>`
     : '';
 
   const storico = (m.storico||[]).slice().reverse();
@@ -1756,7 +1766,7 @@ function renderInterventoCard(m, p, role){
       <span class="status-pill ${m.stato}" data-cycle-status="${m.id}" style="cursor:pointer">${m.stato.replace('-',' ')}</span>
       <button class="icon-btn" data-add-foto-intervento="${m.id}">+ Foto</button>
       ${!m.preventivo ? `<button class="icon-btn" data-add-preventivo="${m.id}">+ Aggiungi preventivo</button>` : ''}
-      ${m.stato!=='completata' ? `<button class="icon-btn" data-programma-intervento="${m.id}">📅 Programma</button>` : ''}
+      ${m.stato!=='completata' ? `<button class="icon-btn" data-programma-intervento="${m.id}"><i class="ti ti-calendar"></i> Programma</button>` : ''}
       ${m.stato!=='completata' ? `<button class="icon-btn" data-complete-intervento="${m.id}">Segna completato</button>` : ''}
       <button class="link-btn" data-del-maint="${m.id}">rimuovi</button>
     </div>` : '';
@@ -1843,7 +1853,7 @@ function renderPrenotazioni(p){
           ${b.indirizzo ? `<div style="font-size:12px;color:var(--ink-soft);">Residenza: ${b.indirizzo}</div>` : ''}
           ${(b.adulti || b.bambini || b.animali) ? `<div style="font-size:12px;color:var(--ink-soft);">${b.adulti||1} adult${(b.adulti||1)===1?'o':'i'}${b.bambini?`, ${b.bambini} bambin${b.bambini===1?'o':'i'}`:''}${b.animali?`, ${b.animali} animal${b.animali===1?'e':'i'}`:''}</div>` : ''}
           ${b.note ? `<div style="font-size:12px;color:var(--ink-soft);">Nota: ${b.note}</div>` : ''}
-          ${(b.dichiaraPagato && !b.pagamentoRicevuto) ? `<div style="font-size:11.5px;color:var(--brass-deep);font-weight:600;margin-top:4px;">💳 il cliente dichiara di aver pagato — verifica e conferma</div>` : ''}
+          ${(b.dichiaraPagato && !b.pagamentoRicevuto) ? `<div style="font-size:11.5px;color:var(--brass-deep);font-weight:600;margin-top:4px;"><i class="ti ti-credit-card"></i> il cliente dichiara di aver pagato — verifica e conferma</div>` : ''}
           ${b.documento ? `<img class="doc-preview" src="${b.documento}">` : ''}
         </div>
         <div style="display:flex;flex-direction:column;gap:6px;align-items:flex-end;">
@@ -1933,8 +1943,8 @@ function renderSidebar(){
       <div class="nav-section-label">Immobili (${state.properties.length})</div>
       ${items || '<div style="font-size:12.5px;color:var(--ink-soft);padding:8px 12px;">Nessun immobile ancora.</div>'}
       <button class="btn-new" data-action="new-property">+ Nuovo immobile</button>
-      <div class="nav-item" data-action="open-settings" style="margin-top:18px;border-top:1px solid var(--line);padding-top:14px;">⚙ Impostazioni agenzia</div>
-      ${state.settings.passwordGestore ? `<div class="nav-item" data-action="logout-gestore" style="color:var(--terracotta);">⎋ Esci</div>` : ''}
+      <div class="nav-item" data-action="open-settings" style="margin-top:18px;border-top:1px solid var(--line);padding-top:14px;"><i class="ti ti-settings"></i> Impostazioni agenzia</div>
+      ${state.settings.passwordGestore ? `<div class="nav-item" data-action="logout-gestore" style="color:var(--terracotta);"><i class="ti ti-logout"></i> Esci</div>` : ''}
     </div>
   `;
 }
@@ -2021,7 +2031,7 @@ function renderOverview(){
     const rentLine = rent.rented
       ? `<div class="prop-rent ${rent.expiring?'expiring':''}">Affittato · ${fmtCurrency(p.locazione.canone)}/mese${rent.expiring?` · scade tra ${rent.giorni}gg`:''}</div>`
       : `<div class="prop-rent vacant">Libero</div>`;
-    const bookableLine = p.disponibilePrenotazioni ? `<div class="prop-bookable">● Prenotabile online</div>` : '';
+    const bookableLine = p.disponibilePrenotazioni ? `<div class="prop-bookable"><i class="ti ti-circle-check-filled"></i> Prenotabile online</div>` : '';
     const copertina = getCoverPhotoUrl(p);
     return `
       <div class="prop-card" data-nav="${p.id}">
@@ -2056,7 +2066,7 @@ function renderOverview(){
   const alertPortfolio = calcolaAlertPortfolio();
   const alertBanner = alertPortfolio.totale>0 ? `
     <div class="alert-banner">
-      <div class="alert-banner-title">⚠ ${alertPortfolio.totale} cosa${alertPortfolio.totale>1?'e':''} da controllare</div>
+      <div class="alert-banner-title"><i class="ti ti-alert-triangle"></i> ${alertPortfolio.totale} cosa${alertPortfolio.totale>1?'e':''} da controllare</div>
       ${alertPortfolio.prenotazioniPendenti>0 ? `<div class="alert-banner-item clickable" data-goto-alert="prenotazioni"><b>${alertPortfolio.prenotazioniPendenti}</b> richiest${alertPortfolio.prenotazioniPendenti>1?'e':'a'} di prenotazione da confermare o rifiutare</div>` : ''}
       ${alertPortfolio.spesePagare>0 ? `<div class="alert-banner-item clickable" data-goto-alert="spese"><b>${alertPortfolio.spesePagare}</b> spes${alertPortfolio.spesePagare>1?'e':'a'} approvat${alertPortfolio.spesePagare>1?'e':'a'} da pagare</div>` : ''}
       ${alertPortfolio.controlliRitardo>0 ? `<div class="alert-banner-item clickable" data-goto-alert="controlli"><b>${alertPortfolio.controlliRitardo}</b> immobil${alertPortfolio.controlliRitardo>1?'i':'e'} con controllo periodico in ritardo</div>` : ''}
@@ -2114,7 +2124,7 @@ function renderControlloCard(c, p, editable){
           const interventoCollegato = v.interventoId ? (p.manutenzioni||[]).find(m=>m.id===v.interventoId) : null;
           if(interventoCollegato){
             azioneIntervento = interventoCollegato.stato==='completata'
-              ? `<span style="color:var(--sage);font-size:11.5px;margin-left:8px;">✓ intervento risolto</span>`
+              ? `<span style="color:var(--sage);font-size:11.5px;margin-left:8px;"><span class="seal" style="width:16px;height:16px;font-size:9px;">✓</span>intervento risolto</span>`
               : `<span class="status-pill ${interventoCollegato.stato}" style="margin-left:8px;">intervento ${interventoCollegato.stato.replace('-',' ')}</span>`;
           } else if(editable){
             azioneIntervento = `<button class="link-btn" data-crea-intervento-da-controllo="${c.id}::${encodeURIComponent(v.voce)}" style="margin-left:8px;">apri intervento</button>`;
@@ -2489,7 +2499,7 @@ function renderProprietariView(){
     const alertProprietario = calcolaAlertProprietario(p);
     const alertBannerProprietario = alertProprietario.totale>0 ? `
       <div class="alert-banner">
-        <div class="alert-banner-title">⚠ ${alertProprietario.totale} cosa${alertProprietario.totale>1?'e':''} da controllare</div>
+        <div class="alert-banner-title"><i class="ti ti-alert-triangle"></i> ${alertProprietario.totale} cosa${alertProprietario.totale>1?'e':''} da controllare</div>
         ${alertProprietario.preventiviInAttesa>0 ? `<div class="alert-banner-item clickable" data-goto-owner-alert="interventi"><b>${alertProprietario.preventiviInAttesa}</b> preventiv${alertProprietario.preventiviInAttesa>1?'i':'o'} in attesa della tua approvazione</div>` : ''}
         ${alertProprietario.speseInAttesa>0 ? `<div class="alert-banner-item clickable" data-goto-owner-alert="spese"><b>${alertProprietario.speseInAttesa}</b> spes${alertProprietario.speseInAttesa>1?'e':'a'} in attesa della tua approvazione</div>` : ''}
         ${alertProprietario.controlloInRitardo>0 ? `<div class="alert-banner-item clickable" data-goto-owner-alert="controlli">Controllo periodico in ritardo</div>` : ''}
@@ -2508,7 +2518,7 @@ function renderProprietariView(){
       </div>
       <div style="display:flex;gap:10px;flex-wrap:wrap;margin-bottom:20px;">
         ${waButton(state.settings.telefonoGestore, `Salve, sono il proprietario di ${p.nome}, avrei bisogno di parlare con voi.`, "Contatta l'agenzia su WhatsApp")}
-        <button class="icon-btn" data-action="scarica-report">⬇ Scarica report</button>
+        <button class="icon-btn" data-action="scarica-report"><i class="ti ti-download"></i> Scarica report</button>
       </div>
       ${renderImpegnoServizio()}
       <p class="section-label" style="margin-top:24px;">Contratto di gestione</p>
@@ -2637,7 +2647,7 @@ function renderGestisciPrenotazione(){
     </div>
 
     ${b.pagamentoRicevuto
-      ? `<p style="color:var(--sage);font-size:13.5px;font-weight:500;margin-bottom:16px;">✓ Pagamento ricevuto</p>`
+      ? `<p style="color:var(--sage);font-size:13.5px;font-weight:500;margin-bottom:16px;"><span class="seal">✓</span>Pagamento ricevuto</p>`
       : (p.linkPagamento && b.totale && b.stato==='confermata'
           ? `<a class="btn-primary" href="${p.linkPagamento}" target="_blank" rel="noopener" style="text-decoration:none;display:inline-block;margin-bottom:16px;">Paga ora</a>`
           : '')}
@@ -2698,8 +2708,8 @@ function renderOspitiView(){
       const cop = getCoverPhotoUrl(p);
       const calcolo = calcTotale(p, gd.checkin, gd.checkout);
       const caratteristiche = [
-        (p.capacitaAdulti||p.capacitaBambini) ? `👤 fino a ${p.capacitaAdulti||0} adult${p.capacitaAdulti===1?'o':'i'}${p.capacitaBambini?` + ${p.capacitaBambini} bambin${p.capacitaBambini===1?'o':'i'}`:''}` : null,
-        p.animaliAmmessi ? '🐾 animali ammessi' : null
+        (p.capacitaAdulti||p.capacitaBambini) ? `<i class="ti ti-user"></i> fino a ${p.capacitaAdulti||0} adult${p.capacitaAdulti===1?'o':'i'}${p.capacitaBambini?` + ${p.capacitaBambini} bambin${p.capacitaBambini===1?'o':'i'}`:''}` : null,
+        p.animaliAmmessi ? '<i class="ti ti-dog"></i> animali ammessi' : null
       ].filter(Boolean).join(' · ');
       return `<div class="portal-pick-card" data-guest-pick="${p.id}">
         <div style="display:flex;align-items:center;gap:12px;">
@@ -2740,8 +2750,8 @@ function renderOspitiView(){
       <p class="page-sub">${p.indirizzo||'—'} · ${p.tipo}</p>
       ${renderPhotoGallery(fotoPubbliche(p))}
       <div style="display:flex;gap:16px;flex-wrap:wrap;font-size:12.5px;color:var(--ink-soft);margin-bottom:20px;">
-        ${(p.capacitaAdulti||p.capacitaBambini) ? `<span>👤 Fino a ${p.capacitaAdulti||0} adult${p.capacitaAdulti===1?'o':'i'}${p.capacitaBambini?` + ${p.capacitaBambini} bambin${p.capacitaBambini===1?'o':'i'}`:''}</span>` : ''}
-        <span>${p.animaliAmmessi ? '🐾 Animali ammessi' : '🚫 Animali non ammessi'}</span>
+        ${(p.capacitaAdulti||p.capacitaBambini) ? `<span><i class="ti ti-user"></i> Fino a ${p.capacitaAdulti||0} adult${p.capacitaAdulti===1?'o':'i'}${p.capacitaBambini?` + ${p.capacitaBambini} bambin${p.capacitaBambini===1?'o':'i'}`:''}</span>` : ''}
+        <span>${p.animaliAmmessi ? '<i class="ti ti-dog"></i> Animali ammessi' : '<i class="ti ti-ban"></i> Animali non ammessi'}</span>
       </div>
       <p class="section-label" style="margin-top:20px;">Il tuo soggiorno</p>
       <table>
@@ -3278,7 +3288,7 @@ function render(){
     else main = renderOverview();
     content = `<div class="app">${renderSidebar()}<main>${main}</main></div>`;
   }
-  const errorBanner = state.error ? `<div style="background:#F1DAD1;color:#A63D2F;padding:10px 20px;font-size:13px;text-align:center;">${state.error} <button data-clear-error style="background:none;border:none;color:#A63D2F;text-decoration:underline;cursor:pointer;margin-left:8px;">chiudi</button></div>` : '';
+  const errorBanner = state.error ? `<div style="background:#FBEAEA;color:#D6503F;padding:10px 20px;font-size:13px;text-align:center;">${state.error} <button data-clear-error style="background:none;border:none;color:#D6503F;text-decoration:underline;cursor:pointer;margin-left:8px;">chiudi</button></div>` : '';
   root.innerHTML = renderTopNav() + errorBanner + content + renderModal();
   attachHandlers();
 }

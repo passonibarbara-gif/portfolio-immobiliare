@@ -3,6 +3,15 @@
 <head>
 <meta charset="UTF-8">
 <title>Portfolio Immobiliare</title>
+<link rel="manifest" href="manifest.webmanifest">
+<meta name="theme-color" content="#17140F">
+<link rel="icon" href="icon-192.png" sizes="192x192" type="image/png">
+<link rel="apple-touch-icon" href="apple-touch-icon.png">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="Portfolio Imm.">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <style>
   @import url('https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,400;9..144,500;9..144,600;9..144,700&family=IBM+Plex+Sans:wght@400;500;600&family=IBM+Plex+Mono:wght@400;500&display=swap');
 
@@ -539,8 +548,11 @@ let state = {
   ownerDossierTab: 'panoramica', // tab attiva nell'area proprietari
   dashboardCalendarOffset: 0,
   guestWizardStep: 1,
-  guestDates: {checkin:'', checkout:''},
-  guestBookingData: {nomeProprio:'', cognome:'', telefono:'', indirizzo:'', note:'', documento:null},
+  guestDates: {checkin:'', checkout:'', adulti:1, bambini:0, animali:0},
+  guestBookingData: {nomeProprio:'', cognome:'', telefono:'', indirizzo:'', note:'', documento:null, adulti:1, bambini:0, animali:0},
+  gestoreRecuperoMode: false,
+  ownerRecuperoMode: false,
+  ownerRecuperoTelefono: null,
   selectedClienteId: null, // scheda cliente selezionata lato gestore (CRM)
   ownerPropId: null, // immobile selezionato lato proprietario
   ownerAuth: null, // {telefono, password} una volta autenticato
@@ -1368,10 +1380,13 @@ function getBookedDaysMap(prenotazioni){
   return {confirmed, pending};
 }
 
-function propertyAvailableForDates(p, checkin, checkout){
+function propertyAvailableForDates(p, checkin, checkout, adulti, bambini, animali){
   if(!p.disponibilePrenotazioni) return false;
   const calcolo = calcTotale(p, checkin, checkout);
   if(!calcolo || calcolo.sottoMinimo) return false;
+  const capacitaTotale = (p.capacitaAdulti||0) + (p.capacitaBambini||0);
+  if(capacitaTotale>0 && ((adulti||0)+(bambini||0)) > capacitaTotale) return false;
+  if((animali||0)>0 && !p.animaliAmmessi) return false;
   const {confirmed} = getBookedDaysMap(p.prenotazioni);
   for(let d=new Date(checkin); d<new Date(checkout); d.setDate(d.getDate()+1)){
     if(confirmed.has(d.toISOString().slice(0,10))) return false;
@@ -1826,6 +1841,7 @@ function renderPrenotazioni(p){
           <div style="font-family:'Fraunces',serif;font-weight:600;font-size:15px;">${b.nome}</div>
           <div style="font-size:12px;color:var(--ink-soft);margin:4px 0;">${fmtDate(b.checkin)} → ${fmtDate(b.checkout)} · ${b.telefono||'—'}</div>
           ${b.indirizzo ? `<div style="font-size:12px;color:var(--ink-soft);">Residenza: ${b.indirizzo}</div>` : ''}
+          ${(b.adulti || b.bambini || b.animali) ? `<div style="font-size:12px;color:var(--ink-soft);">${b.adulti||1} adult${(b.adulti||1)===1?'o':'i'}${b.bambini?`, ${b.bambini} bambin${b.bambini===1?'o':'i'}`:''}${b.animali?`, ${b.animali} animal${b.animali===1?'e':'i'}`:''}</div>` : ''}
           ${b.note ? `<div style="font-size:12px;color:var(--ink-soft);">Nota: ${b.note}</div>` : ''}
           ${(b.dichiaraPagato && !b.pagamentoRicevuto) ? `<div style="font-size:11.5px;color:var(--brass-deep);font-weight:600;margin-top:4px;">💳 il cliente dichiara di aver pagato — verifica e conferma</div>` : ''}
           ${b.documento ? `<img class="doc-preview" src="${b.documento}">` : ''}
@@ -1860,6 +1876,29 @@ function renderLoginScreen(formId, title, subtitle, backAttr){
       <div class="field"><label>Password</label><input type="password" name="password" required autofocus></div>
       <button type="submit" class="btn-primary" style="width:100%;">Accedi</button>
     </form>
+    <button class="link-btn" data-gestore-recupero style="margin-top:16px;">Password dimenticata?</button>
+  </div>`;
+}
+
+function renderRecuperoGestore(){
+  const s = state.settings;
+  if(!s.domandaSicurezza){
+    return `<div class="portal-shell" style="text-align:center;">
+      <h1 class="page-title">Recupero password</h1>
+      <p class="page-sub">Non hai impostato una domanda di sicurezza, quindi non posso farti recuperare la password da qui.</p>
+      <p style="font-size:12.5px;color:var(--ink-soft);">Se hai accesso al database Supabase collegato a questa piattaforma, puoi aggiornare il campo "passwordGestore" direttamente lì. In alternativa chiedi assistenza a chi ha creato la piattaforma.</p>
+      <button class="link-btn" data-gestore-recupero-exit style="margin-top:16px;">← Torna al login</button>
+    </div>`;
+  }
+  return `<div class="portal-shell" style="text-align:center;">
+    <h1 class="page-title">Recupero password</h1>
+    <p class="page-sub">Rispondi alla tua domanda di sicurezza per impostarne una nuova.</p>
+    <form id="recuperoGestoreForm" style="max-width:300px;margin:0 auto;text-align:left;">
+      <div class="field"><label>${s.domandaSicurezza}</label><input name="risposta" required autofocus></div>
+      <div class="field"><label>Nuova password</label><input type="password" name="nuovaPassword" required minlength="4"></div>
+      <button type="submit" class="btn-primary" style="width:100%;">Reimposta password</button>
+    </form>
+    <button class="link-btn" data-gestore-recupero-exit style="margin-top:16px;">← Torna al login</button>
   </div>`;
 }
 
@@ -2235,6 +2274,11 @@ function renderDossier(p){
           <button class="icon-btn" data-action="send-owner-credentials">Invia credenziali</button>
         </div>
       ` : ''}
+      <p class="section-label">Caratteristiche</p>
+      <div class="stat-row" style="margin-bottom:24px;">
+        <div class="stat-card"><div class="stat-label">Ospiti massimi</div><div class="stat-value" style="font-size:17px;">${(p.capacitaAdulti||p.capacitaBambini) ? `${p.capacitaAdulti||0} adult${p.capacitaAdulti===1?'o':'i'}${p.capacitaBambini?` + ${p.capacitaBambini} bambin${p.capacitaBambini===1?'o':'i'}`:''}` : '—'}</div></div>
+        <div class="stat-card"><div class="stat-label">Animali domestici</div><div class="stat-value" style="font-size:17px;">${p.animaliAmmessi ? 'Ammessi' : 'Non ammessi'}</div></div>
+      </div>
       <p class="section-label">Contratto di gestione</p>
       ${renderContrattoGestione(p)}
     `;
@@ -2334,8 +2378,43 @@ function renderDossier(p){
   `;
 }
 
+function renderRecuperoProprietario(){
+  if(!state.ownerRecuperoTelefono){
+    return `<div class="portal-shell" style="text-align:center;">
+      <h1 class="page-title">Recupero password</h1>
+      <p class="page-sub">Inserisci il numero di telefono con cui ti sei registrato.</p>
+      <form id="ownerRecuperoTelefonoForm" style="max-width:300px;margin:0 auto;text-align:left;">
+        <div class="field"><label>Telefono</label><input name="telefono" required autofocus placeholder="+39..."></div>
+        <button type="submit" class="btn-primary" style="width:100%;">Continua</button>
+      </form>
+      <button class="link-btn" data-owner-recupero-exit style="margin-top:16px;">← Torna al login</button>
+    </div>`;
+  }
+  const cliente = state.clienti.find(c=>c.telefono===state.ownerRecuperoTelefono);
+  if(!cliente || !cliente.domandaSicurezza){
+    return `<div class="portal-shell" style="text-align:center;">
+      <h1 class="page-title">Recupero non disponibile</h1>
+      <p class="page-sub">Non risulta una domanda di sicurezza impostata per questo numero. Contatta l'agenzia per farti inviare di nuovo le credenziali.</p>
+      ${waButton(state.settings.telefonoGestore, `Ciao, ho dimenticato la password della mia area proprietario (telefono: ${state.ownerRecuperoTelefono}). Potete inviarmela di nuovo?`, "Contatta l'agenzia su WhatsApp")}
+      <br><br>
+      <button class="link-btn" data-owner-recupero-exit>← Torna al login</button>
+    </div>`;
+  }
+  return `<div class="portal-shell" style="text-align:center;">
+    <h1 class="page-title">Recupero password</h1>
+    <p class="page-sub">Rispondi alla tua domanda di sicurezza per impostarne una nuova.</p>
+    <form id="ownerRecuperoForm" style="max-width:300px;margin:0 auto;text-align:left;">
+      <div class="field"><label>${cliente.domandaSicurezza}</label><input name="risposta" required autofocus></div>
+      <div class="field"><label>Nuova password</label><input type="password" name="nuovaPassword" required minlength="4"></div>
+      <button type="submit" class="btn-primary" style="width:100%;">Reimposta password</button>
+    </form>
+    <button class="link-btn" data-owner-recupero-exit style="margin-top:16px;">← Torna al login</button>
+  </div>`;
+}
+
 // ---------- Vista Area Proprietari ----------
 function renderProprietariView(){
+  if(state.ownerRecuperoMode) return renderRecuperoProprietario();
   if(!state.ownerAuth){
     return `<div class="portal-shell" style="text-align:center;">
       <h1 class="page-title">Area Proprietari</h1>
@@ -2345,6 +2424,7 @@ function renderProprietariView(){
         <div class="field"><label>Password</label><input type="password" name="password" required></div>
         <button type="submit" class="btn-primary" style="width:100%;">Accedi</button>
       </form>
+      <button class="link-btn" data-owner-recupero style="margin-top:16px;">Password dimenticata?</button>
     </div>`;
   }
 
@@ -2594,12 +2674,17 @@ function renderOspitiView(){
       <h1 class="page-title">Prenota un soggiorno</h1>
       <button class="link-btn" data-guest-goto-manage style="margin-bottom:20px;display:block;">Hai già prenotato? Gestisci la tua prenotazione →</button>
       ${renderWizardSteps(1)}
-      <p class="page-sub">Scegli le date del tuo soggiorno.</p>
+      <p class="page-sub">Scegli le date e chi viaggia con te.</p>
       <form id="guestDatesForm" style="max-width:400px;">
         <div class="field-row">
           <div class="field"><label>Check-in</label><input type="date" name="checkin" required value="${state.guestDates.checkin}"></div>
           <div class="field"><label>Check-out</label><input type="date" name="checkout" required value="${state.guestDates.checkout}"></div>
         </div>
+        <div class="field-row">
+          <div class="field"><label>Adulti</label><input type="number" name="adulti" min="1" required value="${state.guestDates.adulti||1}"></div>
+          <div class="field"><label>Bambini</label><input type="number" name="bambini" min="0" value="${state.guestDates.bambini||0}"></div>
+        </div>
+        <div class="field"><label>Animali domestici al seguito</label><input type="number" name="animali" min="0" value="${state.guestDates.animali||0}"></div>
         <button type="submit" class="btn-primary" style="width:100%;margin-top:8px;">Cerca immobili disponibili</button>
       </form>
     </div>`;
@@ -2607,27 +2692,36 @@ function renderOspitiView(){
 
   // ---- Step 2: immobili disponibili ----
   if(step===2){
-    const bookable = state.properties.filter(p=>propertyAvailableForDates(p, state.guestDates.checkin, state.guestDates.checkout));
+    const gd = state.guestDates;
+    const bookable = state.properties.filter(p=>propertyAvailableForDates(p, gd.checkin, gd.checkout, gd.adulti, gd.bambini, gd.animali));
     const cards = bookable.map(p=>{
       const cop = getCoverPhotoUrl(p);
-      const calcolo = calcTotale(p, state.guestDates.checkin, state.guestDates.checkout);
+      const calcolo = calcTotale(p, gd.checkin, gd.checkout);
+      const caratteristiche = [
+        (p.capacitaAdulti||p.capacitaBambini) ? `👤 fino a ${p.capacitaAdulti||0} adult${p.capacitaAdulti===1?'o':'i'}${p.capacitaBambini?` + ${p.capacitaBambini} bambin${p.capacitaBambini===1?'o':'i'}`:''}` : null,
+        p.animaliAmmessi ? '🐾 animali ammessi' : null
+      ].filter(Boolean).join(' · ');
       return `<div class="portal-pick-card" data-guest-pick="${p.id}">
         <div style="display:flex;align-items:center;gap:12px;">
           ${cop ? `<img src="${cop}" style="width:52px;height:52px;object-fit:cover;border-radius:6px;flex-shrink:0;">` : ''}
-          <div><div style="font-family:'Fraunces',serif;font-weight:600;">${p.nome}</div><div style="font-size:12px;color:var(--ink-soft);">${p.indirizzo||'—'} · ${p.tipo}</div></div>
+          <div>
+            <div style="font-family:'Fraunces',serif;font-weight:600;">${p.nome}</div>
+            <div style="font-size:12px;color:var(--ink-soft);">${p.indirizzo||'—'} · ${p.tipo}</div>
+            ${caratteristiche ? `<div style="font-size:11px;color:var(--ink-soft);margin-top:2px;">${caratteristiche}</div>` : ''}
+          </div>
         </div>
         <div style="text-align:right;">
           <div style="font-family:'Fraunces',serif;font-weight:600;">${fmtCurrency(calcolo.totale)}</div>
           <div style="font-size:11px;color:var(--ink-soft);">${calcolo.notti} notti</div>
         </div>
       </div>`;
-    }).join('') || '<p style="color:var(--ink-soft);">Nessun immobile disponibile per queste date. Prova con altre date.</p>';
+    }).join('') || '<p style="color:var(--ink-soft);">Nessun immobile disponibile per queste date e per il numero di ospiti/animali indicato. Prova a cambiare i criteri.</p>';
 
     return `<div class="portal-shell">
-      <button class="link-btn" data-guest-wizard-back="1" style="margin-bottom:16px;">← Cambia date</button>
+      <button class="link-btn" data-guest-wizard-back="1" style="margin-bottom:16px;">← Cambia criteri</button>
       ${renderWizardSteps(2)}
       <h1 class="page-title">Immobili disponibili</h1>
-      <p class="page-sub">${fmtDate(state.guestDates.checkin)} → ${fmtDate(state.guestDates.checkout)}</p>
+      <p class="page-sub">${fmtDate(gd.checkin)} → ${fmtDate(gd.checkout)} · ${gd.adulti} adult${gd.adulti===1?'o':'i'}${gd.bambini?`, ${gd.bambini} bambin${gd.bambini===1?'o':'i'}`:''}${gd.animali?`, ${gd.animali} animal${gd.animali===1?'e':'i'}`:''}</p>
       <div class="portal-picker">${cards}</div>
     </div>`;
   }
@@ -2645,6 +2739,10 @@ function renderOspitiView(){
       <h1 class="page-title">${p.nome}</h1>
       <p class="page-sub">${p.indirizzo||'—'} · ${p.tipo}</p>
       ${renderPhotoGallery(fotoPubbliche(p))}
+      <div style="display:flex;gap:16px;flex-wrap:wrap;font-size:12.5px;color:var(--ink-soft);margin-bottom:20px;">
+        ${(p.capacitaAdulti||p.capacitaBambini) ? `<span>👤 Fino a ${p.capacitaAdulti||0} adult${p.capacitaAdulti===1?'o':'i'}${p.capacitaBambini?` + ${p.capacitaBambini} bambin${p.capacitaBambini===1?'o':'i'}`:''}</span>` : ''}
+        <span>${p.animaliAmmessi ? '🐾 Animali ammessi' : '🚫 Animali non ammessi'}</span>
+      </div>
       <p class="section-label" style="margin-top:20px;">Il tuo soggiorno</p>
       <table>
         <tbody>
@@ -2672,6 +2770,7 @@ function renderOspitiView(){
         </div>
         <div class="field"><label>Telefono</label><input name="telefono" required value="${bd.telefono||''}" placeholder="+39..."></div>
         <div class="field"><label>Indirizzo di residenza</label><input name="indirizzo" required value="${bd.indirizzo||''}" placeholder="Via, città, provincia"></div>
+        <p style="font-size:12px;color:var(--ink-soft);margin:-6px 0 14px 0;">${state.guestDates.adulti} adult${state.guestDates.adulti===1?'o':'i'}${state.guestDates.bambini?`, ${state.guestDates.bambini} bambin${state.guestDates.bambini===1?'o':'i'}`:''}${state.guestDates.animali?`, ${state.guestDates.animali} animal${state.guestDates.animali===1?'e':'i'}`:''} · <button type="button" class="link-btn" data-guest-wizard-back="1" style="font-size:12px;">modifica</button></p>
         <div class="field"><label>Note (facoltativo)</label><input name="note" value="${bd.note||''}" placeholder="Richieste particolari"></div>
         <div class="field"><label>Copia del documento d'identità</label><input type="file" name="documento" accept="image/*" ${bd.documento?'':'required'}></div>
         ${bd.documento ? `<p style="font-size:11px;color:var(--sage);margin:-10px 0 14px 0;">✓ Documento già caricato — ricaricalo solo se vuoi sostituirlo.</p>` : `<p style="font-size:11px;color:var(--ink-soft);margin:-10px 0 14px 0;">Richiesto per la registrazione degli ospiti, come da normativa.</p>`}
@@ -2693,6 +2792,7 @@ function renderOspitiView(){
       <div style="font-size:13px;color:var(--ink-soft);margin-top:8px;">${fmtDate(state.guestDates.checkin)} → ${fmtDate(state.guestDates.checkout)} · ${calcolo.notti} nott${calcolo.notti===1?'e':'i'}</div>
       <div style="font-size:13px;color:var(--ink-soft);margin-top:8px;">${bd.nomeProprio} ${bd.cognome} · ${bd.telefono}</div>
       <div style="font-size:13px;color:var(--ink-soft);">${bd.indirizzo}</div>
+      <div style="font-size:13px;color:var(--ink-soft);margin-top:8px;">${state.guestDates.adulti} adult${state.guestDates.adulti===1?'o':'i'}${state.guestDates.bambini?`, ${state.guestDates.bambini} bambin${state.guestDates.bambini===1?'o':'i'}`:''}${state.guestDates.animali?`, ${state.guestDates.animali} animal${state.guestDates.animali===1?'e':'i'} domestic${state.guestDates.animali===1?'o':'i'}`:''}</div>
       ${bd.note ? `<div style="font-size:13px;color:var(--ink-soft);margin-top:4px;">Nota: ${bd.note}</div>` : ''}
       <div style="font-family:'Fraunces',serif;font-weight:600;font-size:22px;margin-top:14px;">Totale: ${fmtCurrency(calcolo.totale)}</div>
     </div>
@@ -2740,6 +2840,8 @@ function renderModal(){
           <div class="field"><label>Email (facoltativa)</label><input type="email" name="email" value="${c.email||''}" placeholder="nome@esempio.it"></div>
           <div class="field"><label>Indirizzo di residenza (facoltativo)</label><input name="indirizzo" value="${c.indirizzo||''}" placeholder="Via, città"></div>
           <div class="field"><label>Password area proprietario</label><input name="password" value="${c.password||''}" placeholder="Lascia vuoto: la genero io"></div>
+          <div class="field"><label>Domanda di sicurezza (per il recupero password)</label><input name="domandaSicurezza" value="${c.domandaSicurezza||''}" placeholder="es. Nome del tuo primo animale"></div>
+          <div class="field"><label>Risposta</label><input name="rispostaSicurezza" value="${c.rispostaSicurezza||''}" placeholder="La sua risposta"></div>
           <div class="field"><label>Documento d'identità (facoltativo)</label><input type="file" name="documenti" accept="image/*" multiple></div>
           ${(c.documenti && c.documenti.length) ? `<div class="photo-strip" style="margin-bottom:14px;">${c.documenti.map((f,i)=>`
             <span class="photo-thumb-wrap">
@@ -2806,6 +2908,14 @@ function renderModal(){
           <div class="field"><label>Nome immobile</label><input name="nome" required value="${p.nome||''}" placeholder="es. Bilocale Via Roma"></div>
           <div class="field"><label>Indirizzo</label><input name="indirizzo" value="${p.indirizzo||''}" placeholder="Via, città"></div>
           <div class="field"><label>Tipo</label><select name="tipo">${TIPI_IMMOBILE.map(t=>`<option ${p.tipo===t?'selected':''}>${t}</option>`).join('')}</select></div>
+          <div class="field-row">
+            <div class="field"><label>Ospiti massimi — adulti</label><input type="number" name="capacitaAdulti" min="0" value="${p.capacitaAdulti||''}" placeholder="es. 4"></div>
+            <div class="field"><label>Ospiti massimi — bambini</label><input type="number" name="capacitaBambini" min="0" value="${p.capacitaBambini||''}" placeholder="es. 2"></div>
+          </div>
+          <div class="field" style="display:flex;align-items:center;gap:8px;">
+            <input type="checkbox" name="animaliAmmessi" id="animaliCheck" ${p.animaliAmmessi?'checked':''}>
+            <label for="animaliCheck" style="margin:0;text-transform:none;font-family:'IBM Plex Sans',sans-serif;font-size:13px;color:var(--ink);">Animali domestici ammessi</label>
+          </div>
           <div class="field"><label>Cliente</label>
             <select name="clienteId" id="clienteSelect">
               <option value="">+ Nuovo cliente</option>
@@ -3097,6 +3207,8 @@ function renderModal(){
           <div class="field"><label>Nome agenzia</label><input name="nomeAgenzia" value="${s.nomeAgenzia||''}"></div>
           <div class="field"><label>Telefono WhatsApp gestore</label><input name="telefonoGestore" value="${s.telefonoGestore||''}" placeholder="+39 333 1234567"></div>
           <div class="field"><label>Password area gestore (facoltativa)</label><input name="passwordGestore" value="${s.passwordGestore||''}" placeholder="Lascia vuoto per nessuna password"></div>
+          <div class="field"><label>Domanda di sicurezza (per recuperare la password)</label><input name="domandaSicurezza" value="${s.domandaSicurezza||''}" placeholder="es. Nome della mia prima attività"></div>
+          <div class="field"><label>Risposta</label><input name="rispostaSicurezza" value="${s.rispostaSicurezza||''}" placeholder="La tua risposta"></div>
           <div class="field"><label>Impegno di servizio (una riga per punto)</label><textarea name="impegnoServizio" rows="4" placeholder="es.&#10;Rispondiamo entro 24 ore&#10;Controllo dell'immobile ogni 2 mesi con foto&#10;Ci occupiamo noi di tasse e adempimenti">${s.impegnoServizio||''}</textarea></div>
           <div class="modal-actions">
             <button type="button" class="btn-secondary" data-close>Annulla</button>
@@ -3148,13 +3260,15 @@ function render(){
     content = `<div class="portal-shell" style="text-align:center;">
       <h1 class="page-title">Benvenuto</h1>
       <p class="page-sub">Per proteggere l'area gestore, imposta subito una password di accesso.</p>
-      <form id="setupGestorePasswordForm" style="max-width:280px;margin:0 auto;text-align:left;">
+      <form id="setupGestorePasswordForm" style="max-width:300px;margin:0 auto;text-align:left;">
         <div class="field"><label>Nuova password</label><input type="password" name="password" required autofocus minlength="4"></div>
+        <div class="field"><label>Domanda di sicurezza (per recuperarla se la dimentichi)</label><input name="domanda" placeholder="es. Nome della mia prima attività"></div>
+        <div class="field"><label>Risposta</label><input name="risposta" placeholder="La tua risposta"></div>
         <button type="submit" class="btn-primary" style="width:100%;">Imposta e accedi</button>
       </form>
     </div>`;
   } else if(!state.gestoreUnlocked){
-    content = renderLoginScreen('gestoreLoginForm', 'Area Gestore', 'Inserisci la password per accedere.');
+    content = state.gestoreRecuperoMode ? renderRecuperoGestore() : renderLoginScreen('gestoreLoginForm', 'Area Gestore', 'Inserisci la password per accedere.');
   } else {
     const selected = state.properties.find(p=>p.id===state.selectedId);
     const clienteSelezionato = state.selectedClienteId ? state.clienti.find(c=>c.id===state.selectedClienteId) : null;
@@ -3455,11 +3569,32 @@ function attachHandlers(){
     else alert('Password errata.');
   });
 
+  const gestoreRecuperoBtn = document.querySelector('[data-gestore-recupero]');
+  if(gestoreRecuperoBtn) gestoreRecuperoBtn.addEventListener('click', ()=>{ state.gestoreRecuperoMode = true; render(); });
+  const gestoreRecuperoExitBtn = document.querySelector('[data-gestore-recupero-exit]');
+  if(gestoreRecuperoExitBtn) gestoreRecuperoExitBtn.addEventListener('click', ()=>{ state.gestoreRecuperoMode = false; render(); });
+
+  const recuperoGestoreForm = document.getElementById('recuperoGestoreForm');
+  if(recuperoGestoreForm) recuperoGestoreForm.addEventListener('submit', ev=>{
+    ev.preventDefault();
+    const fd = new FormData(recuperoGestoreForm);
+    const risposta = (fd.get('risposta')||'').trim().toLowerCase();
+    const rispostaCorretta = (state.settings.rispostaSicurezza||'').trim().toLowerCase();
+    if(risposta !== rispostaCorretta || !rispostaCorretta){ alert('Risposta non corretta.'); return; }
+    state.settings.passwordGestore = fd.get('nuovaPassword');
+    saveSettingsData();
+    state.gestoreRecuperoMode = false;
+    state.gestoreUnlocked = true;
+    render();
+  });
+
   const setupGestorePasswordForm = document.getElementById('setupGestorePasswordForm');
   if(setupGestorePasswordForm) setupGestorePasswordForm.addEventListener('submit', ev=>{
     ev.preventDefault();
     const fd = new FormData(setupGestorePasswordForm);
     state.settings.passwordGestore = fd.get('password');
+    state.settings.domandaSicurezza = fd.get('domanda') || '';
+    state.settings.rispostaSicurezza = fd.get('risposta') || '';
     saveSettingsData();
     state.gestoreUnlocked = true;
     render();
@@ -3474,6 +3609,37 @@ function attachHandlers(){
     const match = state.clienti.some(c => c.telefono === telefono && c.password === password);
     if(match){ state.ownerAuth = {telefono, password}; state.ownerPropId = null; render(); }
     else alert('Telefono o password non corretti.');
+  });
+
+  const ownerRecuperoBtn = document.querySelector('[data-owner-recupero]');
+  if(ownerRecuperoBtn) ownerRecuperoBtn.addEventListener('click', ()=>{ state.ownerRecuperoMode = true; render(); });
+  const ownerRecuperoExitBtn = document.querySelector('[data-owner-recupero-exit]');
+  if(ownerRecuperoExitBtn) ownerRecuperoExitBtn.addEventListener('click', ()=>{ state.ownerRecuperoMode = false; state.ownerRecuperoTelefono = null; render(); });
+
+  const ownerRecuperoTelefonoForm = document.getElementById('ownerRecuperoTelefonoForm');
+  if(ownerRecuperoTelefonoForm) ownerRecuperoTelefonoForm.addEventListener('submit', ev=>{
+    ev.preventDefault();
+    const fd = new FormData(ownerRecuperoTelefonoForm);
+    state.ownerRecuperoTelefono = (fd.get('telefono')||'').trim();
+    render();
+  });
+
+  const ownerRecuperoForm = document.getElementById('ownerRecuperoForm');
+  if(ownerRecuperoForm) ownerRecuperoForm.addEventListener('submit', ev=>{
+    ev.preventDefault();
+    const fd = new FormData(ownerRecuperoForm);
+    const cliente = state.clienti.find(c=>c.telefono===state.ownerRecuperoTelefono);
+    if(!cliente){ alert('Cliente non trovato.'); return; }
+    const risposta = (fd.get('risposta')||'').trim().toLowerCase();
+    const rispostaCorretta = (cliente.rispostaSicurezza||'').trim().toLowerCase();
+    if(risposta !== rispostaCorretta || !rispostaCorretta){ alert('Risposta non corretta.'); return; }
+    cliente.password = fd.get('nuovaPassword');
+    saveData();
+    state.ownerRecuperoMode = false;
+    state.ownerRecuperoTelefono = null;
+    state.ownerAuth = {telefono: cliente.telefono, password: cliente.password};
+    state.ownerPropId = null;
+    render();
   });
 
   const ownerLogoutBtn = document.querySelector('[data-owner-logout]');
@@ -3521,7 +3687,7 @@ function attachHandlers(){
     state.guestSubmitted = false;
     state.guestPropId = null;
     state.guestWizardStep = 1;
-    state.guestDates = {checkin:'', checkout:''};
+    state.guestDates = {checkin:'', checkout:'', adulti:1, bambini:0, animali:0};
     state.guestBookingData = {nomeProprio:'', cognome:'', telefono:'', indirizzo:'', note:'', documento:null};
     render();
   });
@@ -3532,7 +3698,12 @@ function attachHandlers(){
     const fd = new FormData(guestDatesForm);
     const checkin = fd.get('checkin'), checkout = fd.get('checkout');
     if(new Date(checkout) <= new Date(checkin)){ alert('La data di check-out deve essere successiva al check-in.'); return; }
-    state.guestDates = { checkin, checkout };
+    state.guestDates = {
+      checkin, checkout,
+      adulti: Number(fd.get('adulti'))||1,
+      bambini: Number(fd.get('bambini'))||0,
+      animali: Number(fd.get('animali'))||0
+    };
     state.guestWizardStep = 2;
     render();
   });
@@ -3558,17 +3729,19 @@ function attachHandlers(){
   const guestConfirmSubmit = document.getElementById('guestConfirmSubmit');
   if(guestConfirmSubmit) guestConfirmSubmit.addEventListener('click', ()=>{
     const bd = state.guestBookingData;
+    const gd = state.guestDates;
     const prop = state.properties.find(x=>x.id===state.guestPropId);
     const nomeCompleto = `${bd.nomeProprio||''} ${bd.cognome||''}`.trim();
     submitBooking(state.guestPropId, {
       nome: nomeCompleto, cognome: bd.cognome, telefono: bd.telefono,
       indirizzo: bd.indirizzo,
-      checkin: state.guestDates.checkin, checkout: state.guestDates.checkout,
+      checkin: gd.checkin, checkout: gd.checkout,
       note: bd.note, documento: bd.documento,
+      adulti: gd.adulti||1, bambini: gd.bambini||0, animali: gd.animali||0,
       dichiaraPagato: !!(prop && prop.linkPagamento)
     });
     state.guestWizardStep = 1;
-    state.guestDates = {checkin:'', checkout:''};
+    state.guestDates = {checkin:'', checkout:'', adulti:1, bambini:0, animali:0};
     state.guestBookingData = {nomeProprio:'', cognome:'', telefono:'', indirizzo:'', note:'', documento:null};
   });
 
@@ -3659,7 +3832,10 @@ function attachHandlers(){
         clienteId,
         percentualeProprietario: (percentualeRaw!==null && percentualeRaw!=='') ? Number(percentualeRaw) : 100,
         prezzoNotte: Number(fd.get('prezzoNotte'))||0,
-        disponibilePrenotazioni: fd.get('disponibilePrenotazioni')==='on'
+        disponibilePrenotazioni: fd.get('disponibilePrenotazioni')==='on',
+        capacitaAdulti: Number(fd.get('capacitaAdulti'))||0,
+        capacitaBambini: Number(fd.get('capacitaBambini'))||0,
+        animaliAmmessi: fd.get('animaliAmmessi')==='on'
       }, (state.modal.editing && state.modal.editing.id) ? state.modal.editing.id : null);
     });
   }
@@ -3738,6 +3914,7 @@ function attachHandlers(){
     const cliente = saveCliente({
       nome: fd.get('nome'), telefono: fd.get('telefono'), password,
       email: fd.get('email')||'', indirizzo: fd.get('indirizzo')||'',
+      domandaSicurezza: fd.get('domandaSicurezza')||'', rispostaSicurezza: fd.get('rispostaSicurezza')||'',
       documenti: existingDocumenti.concat(nuoviDocumenti)
     }, editingId);
     saveData(); closeModal();
@@ -3883,7 +4060,7 @@ function attachHandlers(){
   if(settingsForm) settingsForm.addEventListener('submit', ev=>{
     ev.preventDefault();
     const fd = new FormData(settingsForm);
-    state.settings = { nomeAgenzia: fd.get('nomeAgenzia') || 'Property Manager', telefonoGestore: fd.get('telefonoGestore') || '', passwordGestore: fd.get('passwordGestore') || '', impegnoServizio: fd.get('impegnoServizio') || '' };
+    state.settings = { nomeAgenzia: fd.get('nomeAgenzia') || 'Property Manager', telefonoGestore: fd.get('telefonoGestore') || '', passwordGestore: fd.get('passwordGestore') || '', domandaSicurezza: fd.get('domandaSicurezza') || '', rispostaSicurezza: fd.get('rispostaSicurezza') || '', impegnoServizio: fd.get('impegnoServizio') || '' };
     saveSettingsData();
     closeModal();
   });
@@ -3895,6 +4072,13 @@ function attachHandlers(){
 render();
 loadData();
 })();
+</script>
+<script>
+if('serviceWorker' in navigator){
+  window.addEventListener('load', ()=>{
+    navigator.serviceWorker.register('sw.js').catch(()=>{ /* installazione non riuscita, l'app funziona comunque online */ });
+  });
+}
 </script>
 </body>
 </html>

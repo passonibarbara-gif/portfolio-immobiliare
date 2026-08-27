@@ -1172,8 +1172,16 @@ function calcolaAlertImmobile(p){
   const prenotazioniPendenti = (p.prenotazioni||[]).filter(b=>b.stato==='richiesta').length;
   const spesePagare = (p.spese||[]).filter(e=>(e.stato||'in-attesa')==='approvata').length;
   const controlloInRitardo = calcProssimoControllo(p).inRitardo ? 1 : 0;
-  const totale = prenotazioniPendenti + spesePagare + controlloInRitardo;
-  return { totale, prenotazioniPendenti, spesePagare, controlloInRitardo };
+  const preventiviRisposti = (p.manutenzioni||[]).filter(m =>
+    m.preventivo && m.stato!=='completata' &&
+    ((m.preventivo.stato==='approvato' && !m.dataProgrammazione) || m.preventivo.stato==='rifiutato')
+  ).length;
+  const messaggiProprieta = (p.messaggi||[]).filter(m=>m.autore!=='gestore' && !m.letto).length;
+  const messaggiPrenotazioni = (p.prenotazioni||[]).reduce((s,b)=>s+(b.messaggiOspite||[]).filter(m=>m.autore!=='gestore' && !m.letto).length, 0);
+  const messaggiNonLetti = messaggiProprieta + messaggiPrenotazioni;
+  const interventiDaTriage = (p.manutenzioni||[]).filter(m => m.stato==='programmata' && !m.preventivo && !m.dataProgrammazione).length;
+  const totale = prenotazioniPendenti + spesePagare + controlloInRitardo + preventiviRisposti + messaggiNonLetti + interventiDaTriage;
+  return { totale, prenotazioniPendenti, spesePagare, controlloInRitardo, preventiviRisposti, messaggiNonLetti, interventiDaTriage };
 }
 function calcolaAlertProprietario(p){
   const preventiviInAttesa = (p.manutenzioni||[]).filter(m=>m.preventivo && m.preventivo.stato==='in-attesa').length;
@@ -1183,19 +1191,35 @@ function calcolaAlertProprietario(p){
   return { totale, preventiviInAttesa, speseInAttesa, controlloInRitardo };
 }
 function calcolaAlertPortfolio(){
-  let prenotazioniPendenti=0, spesePagare=0, controlliRitardo=0;
+  let prenotazioniPendenti=0, spesePagare=0, controlliRitardo=0, preventiviRisposti=0, messaggiNonLetti=0, interventiDaTriage=0;
   state.properties.forEach(p=>{
     const a = calcolaAlertImmobile(p);
     prenotazioniPendenti += a.prenotazioniPendenti;
     spesePagare += a.spesePagare;
     controlliRitardo += a.controlloInRitardo;
+    preventiviRisposti += a.preventiviRisposti;
+    messaggiNonLetti += a.messaggiNonLetti;
+    interventiDaTriage += a.interventiDaTriage;
   });
-  return { totale: prenotazioniPendenti+spesePagare+controlliRitardo, prenotazioniPendenti, spesePagare, controlliRitardo };
+  return {
+    totale: prenotazioniPendenti+spesePagare+controlliRitardo+preventiviRisposti+messaggiNonLetti+interventiDaTriage,
+    prenotazioniPendenti, spesePagare, controlliRitardo, preventiviRisposti, messaggiNonLetti, interventiDaTriage
+  };
 }
 function trovaPrimoImmobileConAlert(tipo){
   if(tipo==='prenotazioni') return state.properties.find(p=>(p.prenotazioni||[]).some(b=>b.stato==='richiesta'));
   if(tipo==='spese') return state.properties.find(p=>(p.spese||[]).some(e=>(e.stato||'in-attesa')==='approvata'));
   if(tipo==='controlli') return state.properties.find(p=>calcProssimoControllo(p).inRitardo);
+  if(tipo==='interventi') return state.properties.find(p=>(p.manutenzioni||[]).some(m =>
+    m.preventivo && m.stato!=='completata' &&
+    ((m.preventivo.stato==='approvato' && !m.dataProgrammazione) || m.preventivo.stato==='rifiutato')
+  ));
+  if(tipo==='interventi-nuovi') return state.properties.find(p=>(p.manutenzioni||[]).some(m => m.stato==='programmata' && !m.preventivo && !m.dataProgrammazione));
+  if(tipo==='messaggi') return state.properties.find(p=>{
+    const nelleMessaggi = (p.messaggi||[]).some(m=>m.autore!=='gestore' && !m.letto);
+    const nellePrenotazioni = (p.prenotazioni||[]).some(b=>(b.messaggiOspite||[]).some(m=>m.autore!=='gestore' && !m.letto));
+    return nelleMessaggi || nellePrenotazioni;
+  });
   return null;
 }
 
@@ -1338,8 +1362,24 @@ function deleteBooking(propId, bookingId){
 function sendMessage(propId, autore, testo){
   const p = state.properties.find(x=>x.id===propId);
   if(!p.messaggi) p.messaggi = [];
-  p.messaggi.push({id:uid(), autore, testo, data:new Date().toISOString()});
+  p.messaggi.push({id:uid(), autore, testo, data:new Date().toISOString(), letto: autore==='gestore'});
   saveData(); render();
+}
+function segnaMessaggiLetti(propId){
+  const p = state.properties.find(x=>x.id===propId);
+  if(!p || !p.messaggi) return;
+  let cambiato = false;
+  p.messaggi.forEach(m=>{ if(!m.letto){ m.letto = true; cambiato = true; } });
+  if(cambiato) saveData();
+}
+function segnaMessaggiBookingLetti(propId){
+  const p = state.properties.find(x=>x.id===propId);
+  if(!p) return;
+  let cambiato = false;
+  (p.prenotazioni||[]).forEach(b=>{
+    (b.messaggiOspite||[]).forEach(m=>{ if(!m.letto){ m.letto = true; cambiato = true; } });
+  });
+  if(cambiato) saveData();
 }
 
 // ---------- Chat e pagamento per singola prenotazione ----------
@@ -1347,7 +1387,7 @@ function sendMessageBooking(propId, bookingId, autore, testo){
   const p = state.properties.find(x=>x.id===propId);
   const b = p.prenotazioni.find(x=>x.id===bookingId);
   if(!b.messaggiOspite) b.messaggiOspite = [];
-  b.messaggiOspite.push({id:uid(), autore, testo, data:new Date().toISOString()});
+  b.messaggiOspite.push({id:uid(), autore, testo, data:new Date().toISOString(), letto: autore==='gestore'});
   saveData(); render();
 }
 function segnaPagamentoBooking(propId, bookingId, ricevuta){
@@ -2070,6 +2110,9 @@ function renderOverview(){
       ${alertPortfolio.prenotazioniPendenti>0 ? `<div class="alert-banner-item clickable" data-goto-alert="prenotazioni"><b>${alertPortfolio.prenotazioniPendenti}</b> richiest${alertPortfolio.prenotazioniPendenti>1?'e':'a'} di prenotazione da confermare o rifiutare</div>` : ''}
       ${alertPortfolio.spesePagare>0 ? `<div class="alert-banner-item clickable" data-goto-alert="spese"><b>${alertPortfolio.spesePagare}</b> spes${alertPortfolio.spesePagare>1?'e':'a'} approvat${alertPortfolio.spesePagare>1?'e':'a'} da pagare</div>` : ''}
       ${alertPortfolio.controlliRitardo>0 ? `<div class="alert-banner-item clickable" data-goto-alert="controlli"><b>${alertPortfolio.controlliRitardo}</b> immobil${alertPortfolio.controlliRitardo>1?'i':'e'} con controllo periodico in ritardo</div>` : ''}
+      ${alertPortfolio.preventiviRisposti>0 ? `<div class="alert-banner-item clickable" data-goto-alert="interventi"><b>${alertPortfolio.preventiviRisposti}</b> preventiv${alertPortfolio.preventiviRisposti>1?'i':'o'} con risposta del proprietario da gestire</div>` : ''}
+      ${alertPortfolio.interventiDaTriage>0 ? `<div class="alert-banner-item clickable" data-goto-alert="interventi-nuovi"><b>${alertPortfolio.interventiDaTriage}</b> nuov${alertPortfolio.interventiDaTriage>1?'i':'o'} intervent${alertPortfolio.interventiDaTriage>1?'i':'o'} da valutare</div>` : ''}
+      ${alertPortfolio.messaggiNonLetti>0 ? `<div class="alert-banner-item clickable" data-goto-alert="messaggi"><b>${alertPortfolio.messaggiNonLetti}</b> messagg${alertPortfolio.messaggiNonLetti>1?'i':'io'} non lett${alertPortfolio.messaggiNonLetti>1?'i':'o'}</div>` : ''}
     </div>
   ` : '';
 
@@ -3326,7 +3369,12 @@ function attachHandlers(){
       if(!p) return;
       state.selectedId = p.id;
       state.selectedClienteId = null;
-      state.dossierTab = tipo === 'controlli' ? 'controlli' : tipo === 'spese' ? 'spese' : 'prenotazioni';
+      const tabPerTipo = {
+        controlli: 'controlli', spese: 'spese', prenotazioni: 'prenotazioni',
+        interventi: 'interventi', 'interventi-nuovi': 'interventi', messaggi: 'messaggi'
+      };
+      state.dossierTab = tabPerTipo[tipo] || 'anagrafica';
+      if(tipo==='messaggi'){ segnaMessaggiLetti(p.id); segnaMessaggiBookingLetti(p.id); }
       render();
     });
   });
@@ -3381,8 +3429,13 @@ function attachHandlers(){
         const a = p ? calcolaAlertImmobile(p) : null;
         state.dossierTab = (a && a.prenotazioniPendenti>0) ? 'prenotazioni'
           : (a && a.spesePagare>0) ? 'spese'
+          : (a && a.preventiviRisposti>0) ? 'interventi'
+          : (a && a.interventiDaTriage>0) ? 'interventi'
+          : (a && a.messaggiNonLetti>0) ? 'messaggi'
           : (a && a.controlloInRitardo>0) ? 'controlli'
           : 'anagrafica';
+        if(state.dossierTab==='messaggi'){ segnaMessaggiLetti(state.selectedId); segnaMessaggiBookingLetti(state.selectedId); }
+        if(state.dossierTab==='prenotazioni'){ segnaMessaggiBookingLetti(state.selectedId); }
       } else {
         state.dossierTab = 'anagrafica';
       }
@@ -3392,7 +3445,10 @@ function attachHandlers(){
 
   document.querySelectorAll('[data-dossier-tab]').forEach(b=>{
     b.addEventListener('click', ()=>{
-      state.dossierTab = b.getAttribute('data-dossier-tab');
+      const nuovaTab = b.getAttribute('data-dossier-tab');
+      state.dossierTab = nuovaTab;
+      if(state.selectedId && nuovaTab==='messaggi') segnaMessaggiLetti(state.selectedId);
+      if(state.selectedId && nuovaTab==='prenotazioni') segnaMessaggiBookingLetti(state.selectedId);
       render();
     });
   });

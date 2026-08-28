@@ -566,6 +566,7 @@ let state = {
   guestWizardStep: 1,
   guestDates: {checkin:'', checkout:'', adulti:1, bambini:0, animali:0},
   guestBookingData: {nomeProprio:'', cognome:'', telefono:'', indirizzo:'', note:'', documento:null, adulti:1, bambini:0, animali:0},
+  vistaGestore: 'overview', // 'overview' | 'tutte-prenotazioni'
   gestoreRecuperoMode: false,
   ownerRecuperoMode: false,
   ownerRecuperoTelefono: null,
@@ -585,6 +586,10 @@ let state = {
   guestManagePhone: null,
   guestManageSelected: null,
   gestoreUnlocked: false,
+  gestoreAuthUser: null, // email dell'utente autenticato, una volta loggato
+  gestoreResetInviato: false,
+  gestoreRecoveryMode: false, // true quando si arriva da un link di reimpostazione password via email
+  gestoreSetupFatto: false,
   modal: null, // {type, editing, propId, context}
   error: null
 };
@@ -665,13 +670,105 @@ function applyLinkParams(){
     const params = new URLSearchParams(window.location.search);
     const prenota = params.get('prenota');
     const proprietario = params.get('proprietario');
+    const prenotazioni = params.get('prenotazioni');
     if(prenota && state.properties.some(p=>p.id===prenota)){
       state.view = 'ospiti';
       state.guestPropId = prenota;
     } else if(proprietario){
       state.view = 'proprietari';
+    } else if(prenotazioni){
+      state.view = 'gestore';
+      state.vistaGestore = 'tutte-prenotazioni';
     }
   }catch(e){ /* URL non disponibile, ignoro */ }
+}
+
+// ---------- Autenticazione gestore (Supabase Auth) ----------
+async function checkAuthSession(){
+  if(!SUPABASE_CONFIGURED || SUPABASE_LIB_ERROR || !supabase) return;
+  try{
+    const { data } = await supabase.auth.getSession();
+    if(data && data.session && data.session.user){
+      state.gestoreUnlocked = true;
+      state.gestoreAuthUser = data.session.user.email;
+      render();
+    }
+  }catch(e){ /* nessuna sessione attiva, resta al login */ }
+
+  supabase.auth.onAuthStateChange((event, session)=>{
+    if(event === 'PASSWORD_RECOVERY'){
+      state.gestoreRecoveryMode = true;
+      render();
+    }
+    if(event === 'SIGNED_IN' && session && session.user){
+      state.gestoreUnlocked = true;
+      state.gestoreAuthUser = session.user.email;
+    }
+    if(event === 'SIGNED_OUT'){
+      state.gestoreUnlocked = false;
+      state.gestoreAuthUser = null;
+    }
+  });
+}
+async function signUpGestore(email, password){
+  try{
+    const { data, error } = await supabase.auth.signUp({ email, password });
+    if(error) throw error;
+    state.settings.gestoreEmail = email;
+    saveSettingsData();
+    state.error = null;
+    if(data && data.session){
+      // conferma email disattivata sul progetto: accesso immediato
+      state.gestoreUnlocked = true;
+      state.gestoreAuthUser = email;
+    } else {
+      // Supabase richiede la conferma via email prima di attivare l'account
+      state.gestoreSetupFatto = true;
+    }
+    render();
+  }catch(e){
+    state.error = 'Impossibile creare l\'accesso: ' + (e && e.message ? e.message : 'errore sconosciuto');
+    render();
+  }
+}
+async function signInGestore(email, password){
+  try{
+    const { data, error } = await supabase.auth.signInWithPassword({ email, password });
+    if(error) throw error;
+    state.gestoreUnlocked = true;
+    state.gestoreAuthUser = email;
+    state.error = null;
+    render();
+  }catch(e){
+    alert('Accesso non riuscito: email o password non corrette.');
+  }
+}
+async function signOutGestore(){
+  try{ await supabase.auth.signOut(); }catch(e){}
+  state.gestoreUnlocked = false;
+  state.gestoreAuthUser = null;
+  render();
+}
+async function requestPasswordReset(email){
+  try{
+    const { error } = await supabase.auth.resetPasswordForEmail(email, { redirectTo: window.location.href.split('#')[0] });
+    if(error) throw error;
+    state.gestoreResetInviato = true;
+    render();
+  }catch(e){
+    alert('Non sono riuscito a inviare l\'email di recupero: ' + (e && e.message ? e.message : 'riprova più tardi'));
+  }
+}
+async function updatePasswordAfterRecovery(newPassword){
+  try{
+    const { error } = await supabase.auth.updateUser({ password: newPassword });
+    if(error) throw error;
+    state.gestoreRecoveryMode = false;
+    state.gestoreUnlocked = true;
+    render();
+  }catch(e){
+    alert('Non sono riuscito a impostare la nuova password: ' + (e && e.message ? e.message : 'riprova'));
+  }
 }
 
 async function loadData(){
@@ -1923,41 +2020,6 @@ function renderPrenotazioni(p){
   return rows;
 }
 
-function renderLoginScreen(formId, title, subtitle, backAttr){
-  return `<div class="portal-shell" style="text-align:center;">
-    ${backAttr ? `<button class="link-btn" ${backAttr} style="margin-bottom:16px;">← Cambia immobile</button>` : ''}
-    <h1 class="page-title">${title}</h1>
-    <p class="page-sub">${subtitle}</p>
-    <form id="${formId}" style="max-width:280px;margin:0 auto;text-align:left;">
-      <div class="field"><label>Password</label><input type="password" name="password" required autofocus></div>
-      <button type="submit" class="btn-primary" style="width:100%;">Accedi</button>
-    </form>
-    <button class="link-btn" data-gestore-recupero style="margin-top:16px;">Password dimenticata?</button>
-  </div>`;
-}
-
-function renderRecuperoGestore(){
-  const s = state.settings;
-  if(!s.domandaSicurezza){
-    return `<div class="portal-shell" style="text-align:center;">
-      <h1 class="page-title">Recupero password</h1>
-      <p class="page-sub">Non hai impostato una domanda di sicurezza, quindi non posso farti recuperare la password da qui.</p>
-      <p style="font-size:12.5px;color:var(--ink-soft);">Se hai accesso al database Supabase collegato a questa piattaforma, puoi aggiornare il campo "passwordGestore" direttamente lì. In alternativa chiedi assistenza a chi ha creato la piattaforma.</p>
-      <button class="link-btn" data-gestore-recupero-exit style="margin-top:16px;">← Torna al login</button>
-    </div>`;
-  }
-  return `<div class="portal-shell" style="text-align:center;">
-    <h1 class="page-title">Recupero password</h1>
-    <p class="page-sub">Rispondi alla tua domanda di sicurezza per impostarne una nuova.</p>
-    <form id="recuperoGestoreForm" style="max-width:300px;margin:0 auto;text-align:left;">
-      <div class="field"><label>${s.domandaSicurezza}</label><input name="risposta" required autofocus></div>
-      <div class="field"><label>Nuova password</label><input type="password" name="nuovaPassword" required minlength="4"></div>
-      <button type="submit" class="btn-primary" style="width:100%;">Reimposta password</button>
-    </form>
-    <button class="link-btn" data-gestore-recupero-exit style="margin-top:16px;">← Torna al login</button>
-  </div>`;
-}
-
 // ---------- Vista Gestore ----------
 function renderSidebar(){
   const alertPortfolio = calcolaAlertPortfolio();
@@ -1982,7 +2044,8 @@ function renderSidebar(){
     <div class="sidebar">
       <p class="brand">Portfolio Immobiliare</p>
       <p class="brand-sub">Schedario proprietà</p>
-      <div class="nav-item ${state.selectedId===null && !state.selectedClienteId?'active':''}" data-nav="overview"><div>Panoramica${alertPortfolio.totale>0?`<span class="nav-badge">${alertPortfolio.totale}</span>`:''}</div></div>
+      <div class="nav-item ${state.selectedId===null && !state.selectedClienteId && state.vistaGestore!=='tutte-prenotazioni'?'active':''}" data-nav="overview"><div>Panoramica${alertPortfolio.totale>0?`<span class="nav-badge">${alertPortfolio.totale}</span>`:''}</div></div>
+      <div class="nav-item ${state.selectedId===null && !state.selectedClienteId && state.vistaGestore==='tutte-prenotazioni'?'active':''}" data-nav-prenotazioni><div>Tutte le prenotazioni${alertPortfolio.prenotazioniPendenti>0?`<span class="nav-badge">${alertPortfolio.prenotazioniPendenti}</span>`:''}</div></div>
       <div class="nav-section-label">Clienti (${state.clienti.length})</div>
       ${clientiItems || '<div style="font-size:12.5px;color:var(--ink-soft);padding:8px 12px;">Nessun cliente ancora.</div>'}
       <button class="btn-new" data-action="new-cliente">+ Nuovo cliente</button>
@@ -1990,7 +2053,7 @@ function renderSidebar(){
       ${items || '<div style="font-size:12.5px;color:var(--ink-soft);padding:8px 12px;">Nessun immobile ancora.</div>'}
       <button class="btn-new" data-action="new-property">+ Nuovo immobile</button>
       <div class="nav-item" data-action="open-settings" style="margin-top:18px;border-top:1px solid var(--line);padding-top:14px;"><i class="ti ti-settings"></i> Impostazioni agenzia</div>
-      ${state.settings.passwordGestore ? `<div class="nav-item" data-action="logout-gestore" style="color:var(--terracotta);"><i class="ti ti-logout"></i> Esci</div>` : ''}
+      ${state.gestoreUnlocked ? `<div class="nav-item" data-action="logout-gestore" style="color:var(--terracotta);"><i class="ti ti-logout"></i> Esci</div>` : ''}
     </div>
   `;
 }
@@ -2045,6 +2108,53 @@ function renderClienteCRM(c){
 
     <p class="section-label">Attività recente su tutti gli immobili</p>
     <div class="storico-list" style="border-top:none;padding-top:0;">${eventiHtml}</div>
+  `;
+}
+
+function renderTuttePrenotazioni(){
+  const righe = [];
+  state.properties.forEach(p=>{
+    (p.prenotazioni||[]).forEach(b=>{
+      righe.push({p, b});
+    });
+  });
+  righe.sort((a,b)=>new Date(b.b.createdAt)-new Date(a.b.createdAt));
+
+  if(!righe.length){
+    return `
+      <h1 class="page-title">Tutte le prenotazioni</h1>
+      <p class="page-sub">Le richieste di prenotazione di tutti gli immobili, in un unico posto.</p>
+      <div class="empty-inline">Nessuna prenotazione ricevuta ancora, su nessun immobile.</div>
+    `;
+  }
+
+  const cards = righe.map(({p, b})=>`
+    <div class="booking-row">
+      <div style="display:flex;justify-content:space-between;align-items:flex-start;gap:12px;flex-wrap:wrap;">
+        <div>
+          <div style="font-family:'IBM Plex Mono',monospace;font-size:10px;color:var(--brass-deep);text-transform:uppercase;letter-spacing:.04em;margin-bottom:4px;">${p.nome}</div>
+          <div style="font-family:'Fraunces',serif;font-weight:600;font-size:15px;">${b.nome}</div>
+          <div style="font-size:12px;color:var(--ink-soft);margin:4px 0;">${fmtDate(b.checkin)} → ${fmtDate(b.checkout)} · ${b.telefono||'—'}</div>
+          ${(b.adulti || b.bambini || b.animali) ? `<div style="font-size:12px;color:var(--ink-soft);">${b.adulti||1} adult${(b.adulti||1)===1?'o':'i'}${b.bambini?`, ${b.bambini} bambin${b.bambini===1?'o':'i'}`:''}${b.animali?`, ${b.animali} animal${b.animali===1?'e':'i'}`:''}</div>` : ''}
+        </div>
+        <div style="display:flex;flex-direction:column;gap:6px;align-items:flex-end;">
+          <span class="booking-status ${b.stato}">${b.stato}</span>
+          ${b.pagamentoRicevuto ? `<span style="font-size:11px;color:var(--sage);font-weight:600;"><i class="ti ti-check"></i>pagato</span>` : ''}
+          <button class="link-btn" data-vai-a-immobile="${p.id}">Vedi immobile →</button>
+        </div>
+      </div>
+      ${b.stato==='richiesta' ? `
+        <div style="display:flex;gap:8px;margin-top:10px;">
+          <button class="icon-btn" data-confirm-booking-global="${p.id}::${b.id}">Conferma</button>
+          <button class="icon-btn danger" data-reject-booking-global="${p.id}::${b.id}">Rifiuta</button>
+        </div>` : ''}
+    </div>
+  `).join('');
+
+  return `
+    <h1 class="page-title">Tutte le prenotazioni</h1>
+    <p class="page-sub">Le richieste di prenotazione di tutti gli immobili, in un unico posto.</p>
+    ${cards}
   `;
 }
 
@@ -3265,9 +3375,7 @@ function renderModal(){
         <form id="settingsForm">
           <div class="field"><label>Nome agenzia</label><input name="nomeAgenzia" value="${s.nomeAgenzia||''}"></div>
           <div class="field"><label>Telefono WhatsApp gestore</label><input name="telefonoGestore" value="${s.telefonoGestore||''}" placeholder="+39 333 1234567"></div>
-          <div class="field"><label>Password area gestore (facoltativa)</label><input name="passwordGestore" value="${s.passwordGestore||''}" placeholder="Lascia vuoto per nessuna password"></div>
-          <div class="field"><label>Domanda di sicurezza (per recuperare la password)</label><input name="domandaSicurezza" value="${s.domandaSicurezza||''}" placeholder="es. Nome della mia prima attività"></div>
-          <div class="field"><label>Risposta</label><input name="rispostaSicurezza" value="${s.rispostaSicurezza||''}" placeholder="La tua risposta"></div>
+          <p style="font-size:12px;color:var(--ink-soft);margin:-4px 0 14px 0;">Accesso gestore: <strong>${s.gestoreEmail||'—'}</strong> (per cambiarla, scrivimi in chat)</p>
           <div class="field"><label>Impegno di servizio (una riga per punto)</label><textarea name="impegnoServizio" rows="4" placeholder="es.&#10;Rispondiamo entro 24 ore&#10;Controllo dell'immobile ogni 2 mesi con foto&#10;Ci occupiamo noi di tasse e adempimenti">${s.impegnoServizio||''}</textarea></div>
           <div class="modal-actions">
             <button type="button" class="btn-secondary" data-close>Annulla</button>
@@ -3315,25 +3423,46 @@ function render(){
     content = renderProprietariView();
   } else if(state.view==='ospiti'){
     content = renderOspitiView();
-  } else if(!state.settings.passwordGestore){
+  } else if(state.gestoreRecoveryMode){
+    content = `<div class="portal-shell" style="text-align:center;">
+      <h1 class="page-title">Imposta una nuova password</h1>
+      <p class="page-sub">Sei arrivata qui dal link inviato via email. Scegli la nuova password.</p>
+      <form id="nuovaPasswordRecoveryForm" style="max-width:300px;margin:0 auto;text-align:left;">
+        <div class="field"><label>Nuova password</label><input type="password" name="password" required autofocus minlength="6"></div>
+        <button type="submit" class="btn-primary" style="width:100%;">Salva nuova password</button>
+      </form>
+    </div>`;
+  } else if(!state.settings.gestoreEmail){
     content = `<div class="portal-shell" style="text-align:center;">
       <h1 class="page-title">Benvenuto</h1>
-      <p class="page-sub">Per proteggere l'area gestore, imposta subito una password di accesso.</p>
-      <form id="setupGestorePasswordForm" style="max-width:300px;margin:0 auto;text-align:left;">
-        <div class="field"><label>Nuova password</label><input type="password" name="password" required autofocus minlength="4"></div>
-        <div class="field"><label>Domanda di sicurezza (per recuperarla se la dimentichi)</label><input name="domanda" placeholder="es. Nome della mia prima attività"></div>
-        <div class="field"><label>Risposta</label><input name="risposta" placeholder="La tua risposta"></div>
-        <button type="submit" class="btn-primary" style="width:100%;">Imposta e accedi</button>
+      <p class="page-sub">Configura il tuo accesso sicuro all'area gestore.</p>
+      <form id="setupGestoreAuthForm" style="max-width:300px;margin:0 auto;text-align:left;">
+        <div class="field"><label>Email</label><input type="email" name="email" required autofocus value="passoni.barbara@gmail.com"></div>
+        <div class="field"><label>Password (almeno 6 caratteri)</label><input type="password" name="password" required minlength="6"></div>
+        <button type="submit" class="btn-primary" style="width:100%;">Crea accesso e continua</button>
       </form>
     </div>`;
   } else if(!state.gestoreUnlocked){
-    content = state.gestoreRecuperoMode ? renderRecuperoGestore() : renderLoginScreen('gestoreLoginForm', 'Area Gestore', 'Inserisci la password per accedere.');
+    content = `<div class="portal-shell" style="text-align:center;">
+      <h1 class="page-title">Area Gestore</h1>
+      <p class="page-sub">Accedi con la tua email e password.</p>
+      ${state.gestoreSetupFatto ? `<p style="font-size:12.5px;color:var(--brass-deep);background:var(--brass-soft);padding:10px 14px;border-radius:8px;margin:0 0 16px 0;">Account creato! Se Supabase richiede una conferma, controlla la tua email prima di accedere.</p>` : ''}
+      <form id="gestoreLoginForm" style="max-width:300px;margin:0 auto;text-align:left;">
+        <div class="field"><label>Email</label><input type="email" name="email" required autofocus value="${state.settings.gestoreEmail||''}"></div>
+        <div class="field"><label>Password</label><input type="password" name="password" required></div>
+        <button type="submit" class="btn-primary" style="width:100%;">Accedi</button>
+      </form>
+      ${state.gestoreResetInviato
+        ? `<p style="font-size:12.5px;color:var(--sage);margin-top:16px;">Email inviata — controlla la posta e segui il link per reimpostare la password.</p>`
+        : `<button class="link-btn" data-gestore-recupero style="margin-top:16px;">Password dimenticata?</button>`}
+    </div>`;
   } else {
     const selected = state.properties.find(p=>p.id===state.selectedId);
     const clienteSelezionato = state.selectedClienteId ? state.clienti.find(c=>c.id===state.selectedClienteId) : null;
     let main;
     if(selected) main = renderDossier(selected);
     else if(clienteSelezionato) main = renderClienteCRM(clienteSelezionato);
+    else if(state.vistaGestore==='tutte-prenotazioni') main = renderTuttePrenotazioni();
     else main = renderOverview();
     content = `<div class="app">${renderSidebar()}<main>${main}</main></div>`;
   }
@@ -3428,6 +3557,7 @@ function attachHandlers(){
       const id = node.getAttribute('data-nav');
       state.selectedId = id==='overview' ? null : id;
       state.selectedClienteId = null;
+      state.vistaGestore = 'overview';
       state.calendarOffset = 0;
       state.priceCalendarOffset = 0;
       if(state.selectedId){
@@ -3448,6 +3578,31 @@ function attachHandlers(){
       render();
     });
   });
+
+  const navPrenotazioniBtn = document.querySelector('[data-nav-prenotazioni]');
+  if(navPrenotazioniBtn) navPrenotazioniBtn.addEventListener('click', ()=>{
+    state.selectedId = null;
+    state.selectedClienteId = null;
+    state.vistaGestore = 'tutte-prenotazioni';
+    render();
+  });
+
+  document.querySelectorAll('[data-vai-a-immobile]').forEach(b=>b.addEventListener('click', ()=>{
+    state.selectedId = b.getAttribute('data-vai-a-immobile');
+    state.vistaGestore = 'overview';
+    state.dossierTab = 'prenotazioni';
+    segnaMessaggiBookingLetti(state.selectedId);
+    render();
+  }));
+
+  document.querySelectorAll('[data-confirm-booking-global]').forEach(b=>b.addEventListener('click', ()=>{
+    const [propId, bookingId] = b.getAttribute('data-confirm-booking-global').split('::');
+    updateBookingStatus(propId, bookingId, 'confermata');
+  }));
+  document.querySelectorAll('[data-reject-booking-global]').forEach(b=>b.addEventListener('click', ()=>{
+    const [propId, bookingId] = b.getAttribute('data-reject-booking-global').split('::');
+    updateBookingStatus(propId, bookingId, 'rifiutata');
+  }));
 
   document.querySelectorAll('[data-dossier-tab]').forEach(b=>{
     b.addEventListener('click', ()=>{
@@ -3631,45 +3786,35 @@ function attachHandlers(){
   if(settingsBtn) settingsBtn.addEventListener('click', ()=>openModal('settings', state.settings));
 
   const logoutGestoreBtn = document.querySelector('[data-action="logout-gestore"]');
-  if(logoutGestoreBtn) logoutGestoreBtn.addEventListener('click', ()=>{ state.gestoreUnlocked = false; render(); });
+  if(logoutGestoreBtn) logoutGestoreBtn.addEventListener('click', signOutGestore);
 
   const gestoreLoginForm = document.getElementById('gestoreLoginForm');
   if(gestoreLoginForm) gestoreLoginForm.addEventListener('submit', ev=>{
     ev.preventDefault();
     const fd = new FormData(gestoreLoginForm);
-    if(fd.get('password') === state.settings.passwordGestore){ state.gestoreUnlocked = true; render(); }
-    else alert('Password errata.');
+    signInGestore(fd.get('email'), fd.get('password'));
   });
 
   const gestoreRecuperoBtn = document.querySelector('[data-gestore-recupero]');
-  if(gestoreRecuperoBtn) gestoreRecuperoBtn.addEventListener('click', ()=>{ state.gestoreRecuperoMode = true; render(); });
-  const gestoreRecuperoExitBtn = document.querySelector('[data-gestore-recupero-exit]');
-  if(gestoreRecuperoExitBtn) gestoreRecuperoExitBtn.addEventListener('click', ()=>{ state.gestoreRecuperoMode = false; render(); });
-
-  const recuperoGestoreForm = document.getElementById('recuperoGestoreForm');
-  if(recuperoGestoreForm) recuperoGestoreForm.addEventListener('submit', ev=>{
-    ev.preventDefault();
-    const fd = new FormData(recuperoGestoreForm);
-    const risposta = (fd.get('risposta')||'').trim().toLowerCase();
-    const rispostaCorretta = (state.settings.rispostaSicurezza||'').trim().toLowerCase();
-    if(risposta !== rispostaCorretta || !rispostaCorretta){ alert('Risposta non corretta.'); return; }
-    state.settings.passwordGestore = fd.get('nuovaPassword');
-    saveSettingsData();
-    state.gestoreRecuperoMode = false;
-    state.gestoreUnlocked = true;
-    render();
+  if(gestoreRecuperoBtn) gestoreRecuperoBtn.addEventListener('click', ()=>{
+    const emailInput = gestoreLoginForm ? gestoreLoginForm.querySelector('[name=email]') : null;
+    const email = (emailInput && emailInput.value.trim()) || state.settings.gestoreEmail;
+    if(!email){ alert('Inserisci prima la tua email nel campo sopra.'); return; }
+    requestPasswordReset(email);
   });
 
-  const setupGestorePasswordForm = document.getElementById('setupGestorePasswordForm');
-  if(setupGestorePasswordForm) setupGestorePasswordForm.addEventListener('submit', ev=>{
+  const nuovaPasswordRecoveryForm = document.getElementById('nuovaPasswordRecoveryForm');
+  if(nuovaPasswordRecoveryForm) nuovaPasswordRecoveryForm.addEventListener('submit', ev=>{
     ev.preventDefault();
-    const fd = new FormData(setupGestorePasswordForm);
-    state.settings.passwordGestore = fd.get('password');
-    state.settings.domandaSicurezza = fd.get('domanda') || '';
-    state.settings.rispostaSicurezza = fd.get('risposta') || '';
-    saveSettingsData();
-    state.gestoreUnlocked = true;
-    render();
+    const fd = new FormData(nuovaPasswordRecoveryForm);
+    updatePasswordAfterRecovery(fd.get('password'));
+  });
+
+  const setupGestoreAuthForm = document.getElementById('setupGestoreAuthForm');
+  if(setupGestoreAuthForm) setupGestoreAuthForm.addEventListener('submit', ev=>{
+    ev.preventDefault();
+    const fd = new FormData(setupGestoreAuthForm);
+    signUpGestore(fd.get('email'), fd.get('password'));
   });
 
   const ownerLoginForm = document.getElementById('ownerLoginForm');
@@ -4132,7 +4277,7 @@ function attachHandlers(){
   if(settingsForm) settingsForm.addEventListener('submit', ev=>{
     ev.preventDefault();
     const fd = new FormData(settingsForm);
-    state.settings = { nomeAgenzia: fd.get('nomeAgenzia') || 'Property Manager', telefonoGestore: fd.get('telefonoGestore') || '', passwordGestore: fd.get('passwordGestore') || '', domandaSicurezza: fd.get('domandaSicurezza') || '', rispostaSicurezza: fd.get('rispostaSicurezza') || '', impegnoServizio: fd.get('impegnoServizio') || '' };
+    state.settings = { nomeAgenzia: fd.get('nomeAgenzia') || 'Property Manager', telefonoGestore: fd.get('telefonoGestore') || '', gestoreEmail: state.settings.gestoreEmail || '', impegnoServizio: fd.get('impegnoServizio') || '' };
     saveSettingsData();
     closeModal();
   });
@@ -4143,6 +4288,7 @@ function attachHandlers(){
 
 render();
 loadData();
+checkAuthSession();
 })();
 </script>
 <script>

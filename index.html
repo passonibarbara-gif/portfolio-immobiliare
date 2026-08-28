@@ -770,6 +770,19 @@ async function updatePasswordAfterRecovery(newPassword){
     alert('Non sono riuscito a impostare la nuova password: ' + (e && e.message ? e.message : 'riprova'));
   }
 }
+async function cambiaEmailGestore(nuovaEmail){
+  try{
+    const { error } = await supabase.auth.updateUser({ email: nuovaEmail });
+    if(error) throw error;
+    state.settings.gestoreEmail = nuovaEmail;
+    saveSettingsData();
+    alert('Controlla la posta: ti abbiamo mandato un link di conferma al nuovo indirizzo (e forse anche al vecchio). L\'email cambierà davvero solo dopo aver confermato.');
+    closeModal();
+    render();
+  }catch(e){
+    alert('Non sono riuscita a cambiare l\'email: ' + (e && e.message ? e.message : 'riprova'));
+  }
+}
 
 async function loadData(){
   if(!SUPABASE_CONFIGURED){
@@ -3375,7 +3388,13 @@ function renderModal(){
         <form id="settingsForm">
           <div class="field"><label>Nome agenzia</label><input name="nomeAgenzia" value="${s.nomeAgenzia||''}"></div>
           <div class="field"><label>Telefono WhatsApp gestore</label><input name="telefonoGestore" value="${s.telefonoGestore||''}" placeholder="+39 333 1234567"></div>
-          <p style="font-size:12px;color:var(--ink-soft);margin:-4px 0 14px 0;">Accesso gestore: <strong>${s.gestoreEmail||'—'}</strong> (per cambiarla, scrivimi in chat)</p>
+          <div class="field">
+            <label>Email di accesso gestore</label>
+            <div style="display:flex;gap:8px;align-items:center;">
+              <span style="font-size:13px;">${s.gestoreEmail||'—'}</span>
+              <button type="button" class="link-btn" data-action="cambia-email-gestore">cambia</button>
+            </div>
+          </div>
           <div class="field"><label>Impegno di servizio (una riga per punto)</label><textarea name="impegnoServizio" rows="4" placeholder="es.&#10;Rispondiamo entro 24 ore&#10;Controllo dell'immobile ogni 2 mesi con foto&#10;Ci occupiamo noi di tasse e adempimenti">${s.impegnoServizio||''}</textarea></div>
           <div class="modal-actions">
             <button type="button" class="btn-secondary" data-close>Annulla</button>
@@ -3784,6 +3803,13 @@ function attachHandlers(){
 
   const settingsBtn = document.querySelector('[data-action="open-settings"]');
   if(settingsBtn) settingsBtn.addEventListener('click', ()=>openModal('settings', state.settings));
+
+  const cambiaEmailBtn = document.querySelector('[data-action="cambia-email-gestore"]');
+  if(cambiaEmailBtn) cambiaEmailBtn.addEventListener('click', ()=>{
+    const nuovaEmail = prompt('Nuova email di accesso:', state.settings.gestoreEmail||'');
+    if(!nuovaEmail || !nuovaEmail.trim()) return;
+    cambiaEmailGestore(nuovaEmail.trim());
+  });
 
   const logoutGestoreBtn = document.querySelector('[data-action="logout-gestore"]');
   if(logoutGestoreBtn) logoutGestoreBtn.addEventListener('click', signOutGestore);

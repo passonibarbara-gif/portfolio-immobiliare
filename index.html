@@ -915,8 +915,12 @@ async function loginOwner(telefono, password){
     // non ha ancora un accesso vero: proviamo la migrazione automatica se la vecchia password combacia
     if(cliente && cliente.password === password){
       try{
-        const { error: signupError } = await supabase.auth.signUp({ email: emailAuth, password });
+        const { data: signupData, error: signupError } = await supabase.auth.signUp({ email: emailAuth, password });
         if(signupError) throw signupError;
+        if(!signupData || !signupData.session){
+          alert('Il tuo accesso sicuro è stato creato: controlla la tua email (' + emailAuth + ') e conferma l\'account, poi accedi di nuovo con telefono e password.');
+          return;
+        }
         state.ownerAuth = { telefono };
         state.ownerPropId = null;
         state.error = null;

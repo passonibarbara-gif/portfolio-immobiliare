@@ -19,21 +19,22 @@
   :root{
     --ink:#241F1A;
     --ink-soft:#6E6558;
-    --paper:#F5EFE0;
-    --paper-raised:#FFFCF5;
-    --brass:#2FB8AA;
-    --brass-soft:#BEEFE8;
-    --brass-deep:#0F6E64;
-    --terracotta:#D6503F;
+    --paper:#F3EFE7;
+    --paper-raised:#FBF9F4;
+    --brass:#0ABAB5;
+    --brass-soft:#D6EFEC;
+    --brass-deep:#0F8C86;
+    --terracotta:#BC4632;
     --sage:#3E8C6E;
-    --line:#E6DCC2;
-    --line-soft:#EFE7D2;
+    --line:#DEDACB;
+    --line-soft:#E9E4D5;
     --surface-dark:#12302C;
     --surface-dark-2:#193B36;
     --text-on-dark:#EAF6F3;
     --text-on-dark-soft:#9AC7C0;
-    --tiffany:#4FD1C5;
+    --tiffany:#7FEDE0;
     --coral:#F4845F;
+    --brand-gradient: linear-gradient(120deg, var(--brass-deep) 0%, var(--brass) 55%, var(--tiffany) 100%);
   }
   *{box-sizing:border-box;}
   .ti{vertical-align:-2px; margin-right:3px; font-size:1em;}
@@ -316,11 +317,11 @@
   .field-row{display:grid; grid-template-columns:1fr 1fr; gap:12px;}
   .modal-actions{display:flex; justify-content:flex-end; gap:10px; margin-top:24px;}
   .btn-primary{
-    background:var(--coral); color:#fff; border:1px solid var(--coral);
+    background:var(--brand-gradient); color:#fff; border:1px solid transparent;
     padding:11px 20px; border-radius:8px; cursor:pointer; font-size:13px; font-weight:600;
-    letter-spacing:.03em; transition:all .15s ease;
+    letter-spacing:.03em; transition:filter .15s ease, transform .15s ease;
   }
-  .btn-primary:hover{background:#E06B42; border-color:#E06B42;}
+  .btn-primary:hover{filter:brightness(1.06); transform:translateY(-1px);}
   .btn-secondary{
     background:none; border:1px solid var(--line); color:var(--ink-soft);
     padding:11px 20px; border-radius:8px; cursor:pointer; font-size:13px; letter-spacing:.02em;
@@ -399,11 +400,33 @@
   .intervento-card{
     background:var(--paper-raised); border:1px solid var(--line-soft); border-left:3px solid var(--brass); border-radius:6px;
     padding:16px 18px; margin-bottom:12px; box-shadow:0 1px 3px rgba(28,26,23,0.05);
+    position:relative; overflow:visible;
   }
   .intervento-titolo{font-family:'Fraunces',serif; font-weight:600; font-size:15px; margin-bottom:4px;}
   .intervento-meta{font-size:11px; color:var(--ink-soft); margin-bottom:8px;}
   .preventivo-box{
     background:var(--brass-soft); border-radius:6px; padding:12px 14px; margin:10px 0; font-size:13px;
+    position:relative; overflow:visible;
+  }
+
+  /* ---- timbro animato di conferma/rifiuto ---- */
+  .stamp-mark{
+    display:flex; align-items:center; justify-content:center; text-align:center; line-height:1.1;
+    width:58px; height:58px; border-radius:50%; border:2px solid currentColor;
+    font-family:'IBM Plex Mono',monospace; font-size:8px; font-weight:600; letter-spacing:.02em; text-transform:uppercase;
+    position:absolute; right:8px; top:8px; pointer-events:none; z-index:5;
+    background:rgba(255,255,255,.85);
+    box-shadow:0 4px 14px rgba(28,26,23,.15);
+    opacity:0; transform:scale(2.4) rotate(-16deg);
+  }
+  .stamp-mark::before{ content:''; position:absolute; inset:3px; border:1px solid currentColor; border-radius:50%; opacity:.6; }
+  .stamp-mark.ok{ color:var(--sage); }
+  .stamp-mark.crit{ color:var(--terracotta); }
+  .stamp-mark.show{ animation:stampIn .55s cubic-bezier(.22,1.6,.4,1) forwards; }
+  @keyframes stampIn{
+    0%{ opacity:0; transform:scale(2.8) rotate(-16deg); }
+    55%{ opacity:1; transform:scale(.9) rotate(-9deg); }
+    100%{ opacity:1; transform:scale(1) rotate(-11deg); }
   }
   .preventivo-box .importo{font-family:'Fraunces',serif; font-weight:600; font-size:17px; color:var(--brass-deep);}
   .btn-approva{background:var(--sage); color:#fff; border:none; padding:8px 16px; border-radius:8px; font-size:12.5px; font-weight:600; cursor:pointer; margin-right:8px;}
@@ -448,7 +471,7 @@
   .dash-item .dash-value.warn{color:#E8A67A;}
   .doc-preview{width:100px; border-radius:4px; border:1px solid var(--line-soft); margin-top:8px; display:block;}
 
-  .booking-row{background:var(--paper-raised); border:1px solid var(--line-soft); border-radius:4px; padding:14px 16px; margin-bottom:10px;}
+  .booking-row{background:var(--paper-raised); border:1px solid var(--line-soft); border-radius:4px; padding:14px 16px; margin-bottom:10px; position:relative; overflow:visible;}
   .booking-status{font-family:'IBM Plex Mono',monospace; font-size:10px; text-transform:uppercase; padding:3px 9px; border-radius:20px; white-space:nowrap;}
   .booking-status.richiesta{background:#EFE3C8; color:#8A6423;}
   .booking-status.confermata{background:#DCE6DE; color:var(--sage);}
@@ -479,8 +502,9 @@
     max-height:280px; overflow-y:auto; border:1px solid var(--line-soft); border-radius:4px;
     padding:12px; margin-bottom:10px; background:#fff; display:flex; flex-direction:column; gap:8px;
   }
-  .msg-bubble{max-width:78%; padding:8px 12px; border-radius:10px; font-size:13px; background:var(--paper); align-self:flex-start;}
+  .msg-bubble{max-width:78%; padding:8px 12px; border-radius:10px; font-size:13px; background:var(--paper); align-self:flex-start; opacity:0; transform:translateY(8px); animation:msgIn .35s cubic-bezier(.2,.7,.2,1) forwards;}
   .msg-bubble.own{align-self:flex-end; background:var(--brass-soft);}
+  @keyframes msgIn{ to{ opacity:1; transform:none; } }
   .msg-meta{font-size:10px; color:var(--ink-soft); margin-bottom:3px; font-family:'IBM Plex Mono',monospace; text-transform:uppercase; letter-spacing:.03em;}
   .msg-form{display:flex; gap:8px; margin-bottom:30px;}
   .msg-form input{flex:1; padding:9px 10px; border:1px solid var(--line); border-radius:3px; font-size:13.5px; font-family:'IBM Plex Sans',sans-serif;}
@@ -597,8 +621,18 @@ let state = {
   gestoreRecoveryMode: false, // true quando si arriva da un link di reimpostazione password via email
   gestoreSetupFatto: false,
   modal: null, // {type, editing, propId, context}
+  stampFlash: null, // {key, kind:'ok'|'crit'} — timbro animato da mostrare al prossimo render
   error: null
 };
+function flashStamp(key, kind){
+  state.stampFlash = {key, kind};
+  setTimeout(()=>{ if(state.stampFlash && state.stampFlash.key===key) state.stampFlash=null; }, 50);
+}
+function stampMarkHtml(key){
+  if(!state.stampFlash || state.stampFlash.key!==key) return '';
+  const kind = state.stampFlash.kind;
+  return `<div class="stamp-mark ${kind} show" aria-hidden="true">${kind==='ok'?'Confermato':'Rifiutato'}</div>`;
+}
 
 const CATEGORIE_SPESA = ['Tasse (IMU/TARI)','Condominio','Manutenzione','Assicurazione','Utenze','Altro'];
 const TIPI_IMMOBILE = ['Appartamento','Villa','Box/Garage','Negozio','Ufficio','Terreno'];
@@ -1127,6 +1161,7 @@ function rispondiSpesa(propId, expId, esito){
   const e = p.spese.find(x=>x.id===expId);
   e.stato = esito;
   logStoricoSpesa(e, esito==='approvata' ? 'Spesa approvata dal proprietario.' : 'Spesa rifiutata dal proprietario.');
+  flashStamp('spesa:'+expId, esito==='approvata'?'ok':'crit');
   saveData(); render();
 }
 function pagaSpesa(propId, expId, data){
@@ -1191,6 +1226,7 @@ function rispondiPreventivo(propId, mId, esito){
   m.preventivo.stato = esito;
   if(esito==='approvato'){ m.stato='in-corso'; logStorico(m, 'Preventivo approvato dal proprietario.'); }
   else { logStorico(m, 'Preventivo rifiutato dal proprietario.'); }
+  flashStamp('preventivo:'+mId, esito==='approvato'?'ok':'crit');
   saveData(); render();
 }
 function programmaIntervento(propId, mId, data){
@@ -1641,6 +1677,7 @@ function updateBookingStatus(propId, bookingId, stato){
   const p = state.properties.find(x=>x.id===propId);
   const b = p.prenotazioni.find(x=>x.id===bookingId);
   b.stato = stato;
+  if(stato==='confermata' || stato==='rifiutata') flashStamp('booking:'+bookingId, stato==='confermata'?'ok':'crit');
   saveData(); render();
 }
 function deleteBooking(propId, bookingId){
@@ -1988,6 +2025,7 @@ function renderSpesaCard(e, role){
   const storicoBlock = storico.length ? `<div class="storico-list">${storico.map(s=>`<div class="storico-item"><span class="storico-data">${fmtDate(s.data)}</span>${s.testo}</div>`).join('')}</div>` : '';
 
   return `<div class="intervento-card">
+    ${stampMarkHtml('spesa:'+e.id)}
     <div class="intervento-titolo">${e.categoria} — ${fmtCurrency(e.importo)}</div>
     <div class="intervento-meta">${fmtDate(e.data)}${e.descrizione?(' · '+e.descrizione):''} <span class="status-pill ${statoInfo.cls}">${statoInfo.label}</span></div>
     ${ricevutaBlock}
@@ -2068,6 +2106,7 @@ function renderInterventoCard(m, p, role){
     const pv = m.preventivo;
     const statoLabel = pv.stato==='in-attesa' ? 'in attesa di approvazione' : pv.stato;
     preventivoBlock = `<div class="preventivo-box">
+      ${stampMarkHtml('preventivo:'+m.id)}
       Preventivo — <strong>${pv.fornitore}</strong>: <span class="importo">${fmtCurrency(pv.importo)}</span>
       ${pv.note ? `<div style="font-size:12px;margin-top:4px;">${pv.note}</div>` : ''}
       <div style="margin-top:8px;">
@@ -2177,6 +2216,7 @@ function renderPrenotazioni(p){
   if(!list.length) return `<p style="font-size:12.5px;color:var(--ink-soft);margin:-6px 0 30px 0;">Nessuna richiesta di prenotazione ricevuta.</p>`;
   const rows = list.map(b=>`
     <div class="booking-row">
+      ${stampMarkHtml('booking:'+b.id)}
       <div style="display:flex;justify-content:space-between;align-items:flex-start;gap:12px;flex-wrap:wrap;">
         <div>
           <div style="font-family:'Fraunces',serif;font-weight:600;font-size:15px;">${b.nome}</div>
@@ -2334,6 +2374,7 @@ function renderTuttePrenotazioni(){
 
   const cards = righe.map(({p, b})=>`
     <div class="booking-row">
+      ${stampMarkHtml('booking:'+b.id)}
       <div style="display:flex;justify-content:space-between;align-items:flex-start;gap:12px;flex-wrap:wrap;">
         <div>
           <div style="font-family:'IBM Plex Mono',monospace;font-size:10px;color:var(--brass-deep);text-transform:uppercase;letter-spacing:.04em;margin-bottom:4px;">${p.nome}</div>

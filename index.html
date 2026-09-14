@@ -592,6 +592,8 @@ let state = {
   operatoreAttivo: null, // oggetto operatore corrente, se il ruolo è 'operatore'
   gestoreAccessNegato: false, // true se autenticato ma non autorizzato su questa piattaforma
   gestoreAuthMode: 'login', // 'login' | 'operatore-signup'
+  ownerResetInviato: false,
+  ownerRecoveryTelefono: null,
   gestoreResetInviato: false,
   gestoreRecoveryMode: false, // true quando si arriva da un link di reimpostazione password via email
   gestoreSetupFatto: false,
@@ -727,7 +729,14 @@ async function checkAuthSession(){
 
   supabase.auth.onAuthStateChange((event, session)=>{
     if(event === 'PASSWORD_RECOVERY'){
-      state.gestoreRecoveryMode = true;
+      const recEmail = (session && session.user && session.user.email || '').toLowerCase();
+      if(state.settings.gestoreEmail && recEmail === state.settings.gestoreEmail.toLowerCase()){
+        state.gestoreRecoveryMode = true;
+      } else {
+        const cli = state.clienti.find(c => (c.email||'').toLowerCase() === recEmail);
+        state.ownerRecoveryMode = true;
+        state.ownerRecoveryTelefono = cli ? cli.telefono : null;
+      }
       render();
     }
     if(event === 'SIGNED_IN' && session && session.user){
@@ -808,6 +817,7 @@ async function signOutGestore(){
   state.gestoreAuthUser = null;
   state.gestoreRole = null;
   state.operatoreAttivo = null;
+  state.gestoreAccessNegato = false;
   render();
 }
 async function requestPasswordReset(email){
@@ -879,6 +889,74 @@ function eliminaOperatore(id){
   state.operatori = state.operatori.filter(o=>o.id!==id);
   saveData();
   render();
+}
+
+// ---------- Autenticazione vera dei proprietari (email sintetica dal telefono) ----------
+function telefonoToSyntheticEmail(telefono){
+  const cifre = (telefono||'').replace(/[^0-9]/g, '');
+  return `owner${cifre}@viverepm-auth.local`;
+}
+function getAuthEmailForCliente(cliente){
+  if(cliente && cliente.email && cliente.email.trim()) return cliente.email.trim();
+  return telefonoToSyntheticEmail(cliente ? cliente.telefono : '');
+}
+async function loginOwner(telefono, password){
+  const cliente = state.clienti.find(c => c.telefono === telefono);
+  const emailAuth = getAuthEmailForCliente(cliente || {telefono});
+  try{
+    const { error } = await supabase.auth.signInWithPassword({ email: emailAuth, password });
+    if(error) throw error;
+    state.ownerAuth = { telefono };
+    state.ownerPropId = null;
+    state.error = null;
+    render();
+    return;
+  }catch(e){
+    // non ha ancora un accesso vero: proviamo la migrazione automatica se la vecchia password combacia
+    if(cliente && cliente.password === password){
+      try{
+        const { error: signupError } = await supabase.auth.signUp({ email: emailAuth, password });
+        if(signupError) throw signupError;
+        state.ownerAuth = { telefono };
+        state.ownerPropId = null;
+        state.error = null;
+        render();
+        return;
+      }catch(e2){
+        alert('Non sono riuscita a creare il tuo accesso sicuro: ' + (e2 && e2.message ? e2.message : 'riprova più tardi'));
+        return;
+      }
+    }
+    alert('Telefono o password non corretti.');
+  }
+}
+async function logoutOwner(){
+  try{ await supabase.auth.signOut(); }catch(e){}
+  state.ownerAuth = null;
+  state.ownerPropId = null;
+  render();
+}
+async function requestPasswordResetOwner(cliente){
+  try{
+    const { error } = await supabase.auth.resetPasswordForEmail(cliente.email, { redirectTo: window.location.href.split('#')[0] });
+    if(error) throw error;
+    state.ownerResetInviato = true;
+    render();
+  }catch(e){
+    alert('Non sono riuscita a inviare l\'email di recupero: ' + (e && e.message ? e.message : 'riprova più tardi'));
+  }
+}
+async function updatePasswordAfterRecoveryOwner(newPassword, telefono){
+  try{
+    const { error } = await supabase.auth.updateUser({ password: newPassword });
+    if(error) throw error;
+    state.ownerRecoveryMode = false;
+    state.ownerAuth = { telefono };
+    state.ownerPropId = null;
+    render();
+  }catch(e){
+    alert('Non sono riuscita a impostare la nuova password: ' + (e && e.message ? e.message : 'riprova'));
+  }
 }
 
 async function loadData(){
@@ -2690,29 +2768,43 @@ function renderRecuperoProprietario(){
     </div>`;
   }
   const cliente = state.clienti.find(c=>c.telefono===state.ownerRecuperoTelefono);
-  if(!cliente || !cliente.domandaSicurezza){
+  if(!cliente){
     return `<div class="portal-shell" style="text-align:center;">
-      <h1 class="page-title">Recupero non disponibile</h1>
-      <p class="page-sub">Non risulta una domanda di sicurezza impostata per questo numero. Contatta l'agenzia per farti inviare di nuovo le credenziali.</p>
-      ${waButton(state.settings.telefonoGestore, `Ciao, ho dimenticato la password della mia area proprietario (telefono: ${state.ownerRecuperoTelefono}). Potete inviarmela di nuovo?`, "Contatta l'agenzia su WhatsApp")}
+      <h1 class="page-title">Numero non trovato</h1>
+      <p class="page-sub">Non risulta nessun account con questo numero. Controlla di averlo scritto come te lo ha dato l'agenzia.</p>
+      <button class="link-btn" data-owner-recupero-exit>← Torna al login</button>
+    </div>`;
+  }
+  if(cliente.email){
+    return `<div class="portal-shell" style="text-align:center;">
+      <h1 class="page-title">Recupero password</h1>
+      <p class="page-sub">${state.ownerResetInviato ? `Email inviata a ${cliente.email} — controlla la posta e segui il link per reimpostare la password.` : `Ti mandiamo un link per reimpostare la password all'indirizzo email che hai salvato.`}</p>
+      ${!state.ownerResetInviato ? `<button class="btn-primary" data-action="invia-reset-owner" data-owner-email="${cliente.email}" style="width:100%;max-width:300px;">Invia email di recupero</button>` : ''}
       <br><br>
       <button class="link-btn" data-owner-recupero-exit>← Torna al login</button>
     </div>`;
   }
   return `<div class="portal-shell" style="text-align:center;">
     <h1 class="page-title">Recupero password</h1>
-    <p class="page-sub">Rispondi alla tua domanda di sicurezza per impostarne una nuova.</p>
-    <form id="ownerRecuperoForm" style="max-width:300px;margin:0 auto;text-align:left;">
-      <div class="field"><label>${cliente.domandaSicurezza}</label><input name="risposta" required autofocus></div>
-      <div class="field"><label>Nuova password</label><input type="password" name="nuovaPassword" required minlength="4"></div>
-      <button type="submit" class="btn-primary" style="width:100%;">Reimposta password</button>
-    </form>
-    <button class="link-btn" data-owner-recupero-exit style="margin-top:16px;">← Torna al login</button>
+    <p class="page-sub">Non risulta un'email salvata per il recupero automatico. Per motivi di sicurezza, la reimpostazione la fa direttamente l'agenzia su tua richiesta.</p>
+    ${waButton(state.settings.telefonoGestore, `Ciao, ho dimenticato la password della mia area proprietario (telefono: ${state.ownerRecuperoTelefono}). Potete reimpostarmela?`, "Contatta l'agenzia su WhatsApp")}
+    <br><br>
+    <button class="link-btn" data-owner-recupero-exit>← Torna al login</button>
   </div>`;
 }
 
 // ---------- Vista Area Proprietari ----------
 function renderProprietariView(){
+  if(state.ownerRecoveryMode){
+    return `<div class="portal-shell" style="text-align:center;">
+      <h1 class="page-title">Imposta una nuova password</h1>
+      <p class="page-sub">Sei arrivato qui dal link inviato via email. Scegli la nuova password.</p>
+      <form id="ownerNuovaPasswordForm" style="max-width:300px;margin:0 auto;text-align:left;">
+        <div class="field"><label>Nuova password</label><input type="password" name="password" required autofocus minlength="6"></div>
+        <button type="submit" class="btn-primary" style="width:100%;">Salva nuova password</button>
+      </form>
+    </div>`;
+  }
   if(state.ownerRecuperoMode) return renderRecuperoProprietario();
   if(!state.ownerAuth){
     return `<div class="portal-shell" style="text-align:center;">
@@ -2727,7 +2819,7 @@ function renderProprietariView(){
     </div>`;
   }
 
-  const clienteLoggato = state.clienti.find(c => c.telefono === state.ownerAuth.telefono && c.password === state.ownerAuth.password);
+  const clienteLoggato = state.clienti.find(c => c.telefono === state.ownerAuth.telefono);
   if(!clienteLoggato){
     state.ownerAuth = null;
     return renderProprietariView();
@@ -3136,7 +3228,7 @@ function renderModal(){
         <form id="clienteForm">
           <div class="field"><label>Nome</label><input name="nome" required value="${c.nome||''}" placeholder="Nome e cognome"></div>
           <div class="field"><label>Telefono</label><input name="telefono" required value="${c.telefono||''}" placeholder="+39..."></div>
-          <div class="field"><label>Email (facoltativa)</label><input type="email" name="email" value="${c.email||''}" placeholder="nome@esempio.it"></div>
+          <div class="field"><label>Email (per il recupero password — consigliata)</label><input type="email" name="email" value="${c.email||''}" placeholder="nome@esempio.it"></div>
           <div class="field"><label>Indirizzo di residenza (facoltativo)</label><input name="indirizzo" value="${c.indirizzo||''}" placeholder="Via, città"></div>
           <div class="field"><label>Password area proprietario</label><input name="password" value="${c.password||''}" placeholder="Lascia vuoto: la genero io"></div>
           <div class="field"><label>Domanda di sicurezza (per il recupero password)</label><input name="domandaSicurezza" value="${c.domandaSicurezza||''}" placeholder="es. Nome del tuo primo animale"></div>
@@ -4081,15 +4173,13 @@ function attachHandlers(){
     const fd = new FormData(ownerLoginForm);
     const telefono = (fd.get('telefono')||'').trim();
     const password = fd.get('password');
-    const match = state.clienti.some(c => c.telefono === telefono && c.password === password);
-    if(match){ state.ownerAuth = {telefono, password}; state.ownerPropId = null; render(); }
-    else alert('Telefono o password non corretti.');
+    loginOwner(telefono, password);
   });
 
   const ownerRecuperoBtn = document.querySelector('[data-owner-recupero]');
   if(ownerRecuperoBtn) ownerRecuperoBtn.addEventListener('click', ()=>{ state.ownerRecuperoMode = true; render(); });
   const ownerRecuperoExitBtn = document.querySelector('[data-owner-recupero-exit]');
-  if(ownerRecuperoExitBtn) ownerRecuperoExitBtn.addEventListener('click', ()=>{ state.ownerRecuperoMode = false; state.ownerRecuperoTelefono = null; render(); });
+  if(ownerRecuperoExitBtn) ownerRecuperoExitBtn.addEventListener('click', ()=>{ state.ownerRecuperoMode = false; state.ownerRecuperoTelefono = null; state.ownerResetInviato = false; render(); });
 
   const ownerRecuperoTelefonoForm = document.getElementById('ownerRecuperoTelefonoForm');
   if(ownerRecuperoTelefonoForm) ownerRecuperoTelefonoForm.addEventListener('submit', ev=>{
@@ -4099,26 +4189,21 @@ function attachHandlers(){
     render();
   });
 
-  const ownerRecuperoForm = document.getElementById('ownerRecuperoForm');
-  if(ownerRecuperoForm) ownerRecuperoForm.addEventListener('submit', ev=>{
-    ev.preventDefault();
-    const fd = new FormData(ownerRecuperoForm);
+  const inviaResetOwnerBtn = document.querySelector('[data-action="invia-reset-owner"]');
+  if(inviaResetOwnerBtn) inviaResetOwnerBtn.addEventListener('click', ()=>{
     const cliente = state.clienti.find(c=>c.telefono===state.ownerRecuperoTelefono);
-    if(!cliente){ alert('Cliente non trovato.'); return; }
-    const risposta = (fd.get('risposta')||'').trim().toLowerCase();
-    const rispostaCorretta = (cliente.rispostaSicurezza||'').trim().toLowerCase();
-    if(risposta !== rispostaCorretta || !rispostaCorretta){ alert('Risposta non corretta.'); return; }
-    cliente.password = fd.get('nuovaPassword');
-    saveData();
-    state.ownerRecuperoMode = false;
-    state.ownerRecuperoTelefono = null;
-    state.ownerAuth = {telefono: cliente.telefono, password: cliente.password};
-    state.ownerPropId = null;
-    render();
+    if(cliente) requestPasswordResetOwner(cliente);
+  });
+
+  const ownerNuovaPasswordForm = document.getElementById('ownerNuovaPasswordForm');
+  if(ownerNuovaPasswordForm) ownerNuovaPasswordForm.addEventListener('submit', ev=>{
+    ev.preventDefault();
+    const fd = new FormData(ownerNuovaPasswordForm);
+    updatePasswordAfterRecoveryOwner(fd.get('password'), state.ownerRecoveryTelefono);
   });
 
   const ownerLogoutBtn = document.querySelector('[data-owner-logout]');
-  if(ownerLogoutBtn) ownerLogoutBtn.addEventListener('click', ()=>{ state.ownerAuth = null; state.ownerPropId = null; render(); });
+  if(ownerLogoutBtn) ownerLogoutBtn.addEventListener('click', logoutOwner);
 
   document.querySelectorAll('[data-del-payment]').forEach(b=>b.addEventListener('click', ()=>deletePayment(state.selectedId, b.getAttribute('data-del-payment'))));
   document.querySelectorAll('[data-del-expense]').forEach(b=>b.addEventListener('click', ()=>deleteExpense(state.selectedId, b.getAttribute('data-del-expense'))));

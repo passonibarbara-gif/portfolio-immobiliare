@@ -152,8 +152,8 @@
     border-left:3px solid transparent;
     transition:background .15s ease, border-color .15s ease, color .15s ease;
   }
-  .nav-item:hover{background:rgba(176,141,87,0.08); color:var(--text-on-dark);}
-  .nav-item.active{background:rgba(176,141,87,0.12); border-left-color:var(--brass); color:var(--text-on-dark); font-weight:500;}
+  .nav-item:hover{background:rgba(10,186,181,0.1); color:var(--text-on-dark);}
+  .nav-item.active{background:rgba(10,186,181,0.16); border-left-color:var(--brass); color:var(--text-on-dark); font-weight:500;}
   .nav-item .code{font-family:'IBM Plex Mono',monospace; font-size:10px; color:var(--text-on-dark-soft); opacity:.7;}
   .nav-section-label{
     font-family:'IBM Plex Mono',monospace;
@@ -202,17 +202,17 @@
   .stat-value.terracotta{color:var(--terracotta);}
 
   /* ---- riepilogo Panoramica in stile "bento" ---- */
-  .bento-row{display:grid; grid-template-columns:2fr 1fr 1fr 1fr; gap:14px; margin-bottom:36px;}
-  @media (max-width:760px){ .bento-row{grid-template-columns:repeat(2,1fr);} }
+  .bento-row{display:flex; flex-direction:column; gap:16px; margin-bottom:36px;}
   .bento-tile{
-    background:var(--paper-raised); border:1px solid var(--line-soft); border-radius:10px;
-    padding:20px 22px; box-shadow:0 1px 3px rgba(28,26,23,0.05); position:relative; overflow:hidden;
+    background:var(--line-soft); border:1px solid var(--line-soft); border-radius:14px;
+    padding:28px 32px; box-shadow:0 1px 3px rgba(28,26,23,0.05); position:relative; overflow:hidden;
   }
-  .bento-tile.big{background:linear-gradient(135deg, var(--brass-soft), var(--paper-raised) 70%); border-color:var(--brass);}
-  .bento-label{font-family:'IBM Plex Mono',monospace; font-size:10px; text-transform:uppercase; letter-spacing:.1em; color:var(--ink-soft); margin-bottom:10px;}
-  .bento-value{font-family:'Fraunces',serif; font-size:27px; font-weight:700;}
-  .bento-tile.big .bento-value{background:var(--brand-gradient); -webkit-background-clip:text; background-clip:text; color:transparent; font-size:34px;}
+  .bento-tile.big{background:linear-gradient(120deg, var(--brass-soft), var(--line-soft) 75%); border-color:var(--brass);}
+  .bento-label{font-family:'IBM Plex Mono',monospace; font-size:11px; text-transform:uppercase; letter-spacing:.1em; color:var(--ink-soft); margin-bottom:14px;}
+  .bento-value{font-family:'Fraunces',serif; font-size:32px; font-weight:700;}
+  .bento-tile.big .bento-value{background:var(--brand-gradient); -webkit-background-clip:text; background-clip:text; color:transparent; font-size:42px;}
   .bento-value.terracotta{color:var(--terracotta);}
+  .bento-tile .bento-sub{font-size:12.5px; color:var(--ink-soft); margin-top:10px;}
 
   .prop-type-icon{display:inline-flex; align-items:center; justify-content:center; vertical-align:-6px; margin-right:7px; width:24px; height:24px; border-radius:7px; border:1px solid var(--line-soft); color:var(--brass-deep); flex-shrink:0;}
 

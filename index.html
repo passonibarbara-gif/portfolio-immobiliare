@@ -400,12 +400,12 @@
 
   /* WhatsApp */
   .wa-btn{
-    display:inline-flex; align-items:center; gap:6px; background:#3F6B4E; color:#fff;
+    display:inline-flex; align-items:center; gap:6px; background:var(--brass-deep); color:#fff;
     border:none; padding:8px 15px; border-radius:8px; font-size:12px; cursor:pointer;
     text-decoration:none; font-family:'IBM Plex Sans',sans-serif; white-space:nowrap;
-    transition:background .15s ease;
+    transition:filter .15s ease;
   }
-  .wa-btn:hover{background:#2E5238;}
+  .wa-btn:hover{filter:brightness(1.1);}
 
   /* client portals */
   .portal-shell{max-width:620px; margin:0 auto; padding:52px 24px;}
@@ -3863,7 +3863,7 @@ function render(){
     else main = renderOverview();
     content = `<div class="app">${renderSidebar()}<main>${main}</main></div>`;
   }
-  const errorBanner = state.error ? `<div style="background:#FBEAEA;color:#D6503F;padding:10px 20px;font-size:13px;text-align:center;">${state.error} <button data-clear-error style="background:none;border:none;color:#D6503F;text-decoration:underline;cursor:pointer;margin-left:8px;">chiudi</button></div>` : '';
+  const errorBanner = state.error ? `<div style="background:#F1DAD1;color:var(--terracotta);padding:10px 20px;font-size:13px;text-align:center;">${state.error} <button data-clear-error style="background:none;border:none;color:var(--terracotta);text-decoration:underline;cursor:pointer;margin-left:8px;">chiudi</button></div>` : '';
   root.innerHTML = renderTopNav() + errorBanner + content + renderModal();
   attachHandlers();
   animateBentoNumbers();

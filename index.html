@@ -230,37 +230,37 @@
   }
 
   /* property cards - schede catastali */
-  .prop-grid{display:grid; grid-template-columns:repeat(auto-fill,minmax(230px,1fr)); gap:16px;}
+  .prop-grid{display:grid; grid-template-columns:repeat(auto-fill,minmax(260px,1fr)); gap:16px;}
   .prop-card{
     position:relative;
-    background:var(--paper-raised);
+    background:var(--line-soft);
     border:1px solid var(--line-soft);
-    border-radius:6px;
+    border-radius:12px;
     padding:20px;
     cursor:pointer;
     box-shadow:0 1px 3px rgba(28,26,23,0.05);
     transition:transform .18s ease, box-shadow .18s ease, border-color .18s ease;
   }
-  .prop-card:hover{transform:translateY(-3px); box-shadow:0 12px 28px rgba(28,26,23,0.12); border-color:var(--brass-soft);}
-  .prop-catasto{font-family:'IBM Plex Mono',monospace; font-size:10px; color:var(--ink-soft); margin-bottom:10px; letter-spacing:.04em;}
-  .prop-name{font-family:'Fraunces',serif; font-weight:600; font-size:18px; margin:0 0 3px 0;}
-  .prop-addr{font-size:12.5px; color:var(--ink-soft); margin-bottom:10px;}
+  .prop-card:hover{transform:translateY(-3px); box-shadow:0 12px 28px rgba(28,26,23,0.12); border-color:var(--brass);}
+  .prop-card-head{display:flex; justify-content:space-between; align-items:flex-start; gap:12px; margin-bottom:2px;}
+  .prop-card-main{display:flex; gap:12px; align-items:flex-start;}
+  .prop-catasto{font-family:'IBM Plex Mono',monospace; font-size:10.5px; color:var(--ink-soft); letter-spacing:.04em;}
+  .prop-name{font-family:'Fraunces',serif; font-weight:700; font-size:17px; margin:0 0 3px 0; display:flex; align-items:center;}
+  .prop-addr{font-size:12.5px; color:var(--ink-soft); margin-bottom:8px;}
   .prop-value{font-family:'IBM Plex Mono',monospace; font-size:15px; font-weight:500;}
   .prop-rent{font-size:11.5px; font-family:'IBM Plex Mono',monospace; color:var(--sage); margin-bottom:4px;}
   .prop-rent.vacant{color:var(--ink-soft);}
   .prop-rent.expiring{color:var(--terracotta);}
   .prop-bookable{font-size:11px; color:var(--brass-deep); margin-bottom:6px; font-weight:500;}
-  .stamp{
-    position:absolute; top:16px; right:16px;
-    width:36px; height:36px; border-radius:50%;
-    border:1.5px dashed currentColor;
-    display:flex; align-items:center; justify-content:center;
-    font-family:'IBM Plex Mono',monospace; font-size:8px; font-weight:600;
-    letter-spacing:.03em;
-    transform:rotate(-8deg);
-    opacity:.9;
+  .prop-card-foot{display:flex; justify-content:space-between; align-items:baseline; margin-top:10px; padding-top:10px; border-top:1px solid var(--line);}
+  .prop-price{font-family:'IBM Plex Mono',monospace; font-size:14px; color:var(--ink); font-weight:500;}
+  .status-seal{
+    font-family:'IBM Plex Mono',monospace; font-size:10px; letter-spacing:.04em; padding:3px 10px;
+    border-radius:20px; border:1px solid currentColor; white-space:nowrap; flex-shrink:0;
   }
-  .stamp.ok{color:var(--sage);}
+  .status-seal.ok{color:var(--sage);}
+  .status-seal.prog{color:var(--brass-deep);}
+  .status-seal.att{color:var(--terracotta);}
   .seal{
     display:inline-flex; align-items:center; justify-content:center;
     width:20px; height:20px; border-radius:50%;
@@ -268,8 +268,6 @@
     font-size:11px; flex-shrink:0; transform:rotate(-6deg);
     margin-right:5px; vertical-align:-5px;
   }
-  .stamp.prog{color:var(--brass-deep);}
-  .stamp.att{color:var(--terracotta);}
 
   /* dossier detail */
   .dossier-header{display:flex; justify-content:space-between; align-items:flex-start; margin-bottom:6px;}
@@ -301,7 +299,7 @@
     display:inline-flex; align-items:center; gap:4px; background:var(--brass); color:var(--surface-dark);
     font-size:10px; font-weight:600; padding:3px 9px; border-radius:20px; text-transform:uppercase; letter-spacing:.04em;
   }
-  .prop-cover{width:100%; height:130px; object-fit:cover; border-radius:6px 6px 0 0; margin:-20px -20px 14px -20px; width:calc(100% + 40px);}
+  .prop-cover{width:100%; height:130px; object-fit:cover; border-radius:12px 12px 0 0; margin:-20px -20px 14px -20px; width:calc(100% + 40px);}
   .icon-btn{
     background:none; border:1px solid var(--line); border-radius:8px;
     padding:7px 14px; font-size:12px; cursor:pointer; color:var(--ink-soft);
@@ -2389,10 +2387,14 @@ function renderClienteCRM(c){
   const immobiliCards = immobili.map(p=>{
     const status = propertyStatus(p);
     return `<div class="prop-card" data-nav="${p.id}">
-      <div class="stamp ${status}">${statusLabel[status]}</div>
-      <div class="prop-catasto">${p.catasto}</div>
-      <div class="prop-name">${propertyTypeIcon(p.tipo)}${p.nome}</div>
-      <div class="prop-addr">${p.indirizzo || '—'} · ${p.tipo}</div>
+      <div class="prop-card-head">
+        <div class="prop-card-main">${propertyTypeIcon(p.tipo)}<div><div class="prop-name">${p.nome}</div><div class="prop-addr">${p.indirizzo || '—'}</div></div></div>
+        <span class="status-seal ${status}">${statusLabel[status]}</span>
+      </div>
+      <div class="prop-card-foot">
+        <span class="prop-catasto">${p.catasto}</span>
+        ${p.prezzoNotte ? `<span class="prop-price">€ ${p.prezzoNotte}/notte</span>` : ''}
+      </div>
     </div>`;
   }).join('');
 
@@ -2518,12 +2520,16 @@ function renderOverview(){
     return `
       <div class="prop-card" data-nav="${p.id}">
         ${copertina ? `<img class="prop-cover" src="${copertina}">` : ''}
-        <div class="stamp ${status}">${statusLabel[status]}</div>
-        <div class="prop-catasto">${p.catasto}</div>
-        <div class="prop-name">${propertyTypeIcon(p.tipo)}${p.nome}</div>
-        <div class="prop-addr">${p.indirizzo || '—'} · ${p.tipo}</div>
+        <div class="prop-card-head">
+          <div class="prop-card-main">${propertyTypeIcon(p.tipo)}<div><div class="prop-name">${p.nome}</div><div class="prop-addr">${p.indirizzo || '—'}</div></div></div>
+          <span class="status-seal ${status}">${statusLabel[status]}</span>
+        </div>
         ${rentLine}
         ${bookableLine}
+        <div class="prop-card-foot">
+          <span class="prop-catasto">${p.catasto}</span>
+          ${p.prezzoNotte ? `<span class="prop-price">€ ${p.prezzoNotte}/notte</span>` : ''}
+        </div>
       </div>
     `;
   }).join('');

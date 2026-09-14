@@ -2510,10 +2510,10 @@ function renderOverview(){
     <p class="page-sub">Il tuo portfolio immobiliare, in un colpo d'occhio.</p>
     ${alertBanner}
     <div class="bento-row">
-      <div class="bento-tile big"><div class="bento-label">Spese ${anno}</div><div class="bento-value">${fmtCurrency(speseAnno)}</div></div>
-      <div class="bento-tile"><div class="bento-label">Manutenzioni entro 30gg</div><div class="bento-value ${manutenzioniUrgenti>0?'terracotta':''}">${manutenzioniUrgenti}</div></div>
-      <div class="bento-tile"><div class="bento-label">Immobili in portfolio</div><div class="bento-value">${props.length}</div></div>
-      <div class="bento-tile"><div class="bento-label">Richieste da evadere</div><div class="bento-value ${richiestePendenti>0?'terracotta':''}">${richiestePendenti}</div></div>
+      <div class="bento-tile big"><div class="bento-label">Spese ${anno}</div><div class="bento-value" data-count="${speseAnno}" data-format="currency">${fmtCurrency(0)}</div></div>
+      <div class="bento-tile"><div class="bento-label">Manutenzioni entro 30gg</div><div class="bento-value ${manutenzioniUrgenti>0?'terracotta':''}" data-count="${manutenzioniUrgenti}">0</div></div>
+      <div class="bento-tile"><div class="bento-label">Immobili in portfolio</div><div class="bento-value" data-count="${props.length}">0</div></div>
+      <div class="bento-tile"><div class="bento-label">Richieste da evadere</div><div class="bento-value ${richiestePendenti>0?'terracotta':''}" data-count="${richiestePendenti}">0</div></div>
     </div>
     ${secondRow}
 
@@ -2647,7 +2647,7 @@ function renderGuadagnoAgenzia(p){
     <div class="stat-row">
       <div class="stat-card"><div class="stat-label">Commissione su affitti</div><div class="stat-value">${fmtCurrency(ga.commissioneAgenzia)}</div></div>
       <div class="stat-card"><div class="stat-label">Da listino servizi</div><div class="stat-value">${fmtCurrency(ga.totaleServizi)}</div></div>
-      <div class="stat-card"><div class="stat-label">Totale guadagno agenzia</div><div class="stat-value sage">${fmtCurrency(ga.totaleAgenzia)}</div></div>
+      <div class="stat-card"><div class="stat-label">Totale guadagno agenzia</div><div class="stat-value sage" data-count="${ga.totaleAgenzia}" data-format="currency">${fmtCurrency(0)}</div></div>
     </div>
     <table>
       <thead><tr><th>Voce</th><th>Dettaglio</th><th>Importo</th></tr></thead>
@@ -3787,6 +3787,27 @@ function render(){
   const errorBanner = state.error ? `<div style="background:#FBEAEA;color:#D6503F;padding:10px 20px;font-size:13px;text-align:center;">${state.error} <button data-clear-error style="background:none;border:none;color:#D6503F;text-decoration:underline;cursor:pointer;margin-left:8px;">chiudi</button></div>` : '';
   root.innerHTML = renderTopNav() + errorBanner + content + renderModal();
   attachHandlers();
+  animateBentoNumbers();
+}
+
+function animateBentoNumbers(){
+  const els = document.querySelectorAll('.bento-value[data-count], .stat-value[data-count]');
+  if(!els.length) return;
+  const reduce = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+  els.forEach(el=>{
+    const target = parseFloat(el.getAttribute('data-count'))||0;
+    const isCurrency = el.getAttribute('data-format')==='currency';
+    if(reduce){ el.textContent = isCurrency ? fmtCurrency(target) : String(target); return; }
+    const start = performance.now(), dur = 850;
+    function step(ts){
+      const p = Math.min(1, (ts-start)/dur);
+      const eased = 1 - Math.pow(1-p, 3);
+      const val = target*eased;
+      el.textContent = isCurrency ? fmtCurrency(val) : Math.round(val);
+      if(p<1) requestAnimationFrame(step);
+    }
+    requestAnimationFrame(step);
+  });
 }
 
 function attachHandlers(){

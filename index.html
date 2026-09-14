@@ -557,6 +557,7 @@ let state = {
   loading: true,
   properties: [],
   clienti: [],
+  operatori: [],
   settings: {nomeAgenzia:'Property Manager', telefonoGestore:''},
   view: 'gestore', // 'gestore' | 'proprietari' | 'ospiti'
   selectedId: null, // dossier selezionato lato gestore
@@ -587,6 +588,10 @@ let state = {
   guestManageSelected: null,
   gestoreUnlocked: false,
   gestoreAuthUser: null, // email dell'utente autenticato, una volta loggato
+  gestoreRole: null, // 'admin' | 'operatore' | null
+  operatoreAttivo: null, // oggetto operatore corrente, se il ruolo è 'operatore'
+  gestoreAccessNegato: false, // true se autenticato ma non autorizzato su questa piattaforma
+  gestoreAuthMode: 'login', // 'login' | 'operatore-signup'
   gestoreResetInviato: false,
   gestoreRecoveryMode: false, // true quando si arriva da un link di reimpostazione password via email
   gestoreSetupFatto: false,
@@ -684,13 +689,38 @@ function applyLinkParams(){
 }
 
 // ---------- Autenticazione gestore (Supabase Auth) ----------
+function autorizzaSessione(email){
+  if(email && state.settings.gestoreEmail && email.toLowerCase()===state.settings.gestoreEmail.toLowerCase()){
+    state.gestoreRole = 'admin';
+    state.operatoreAttivo = null;
+    state.gestoreAccessNegato = false;
+    return true;
+  }
+  const op = getOperatoreByEmail(email);
+  if(op){
+    state.gestoreRole = 'operatore';
+    state.operatoreAttivo = op;
+    state.gestoreAccessNegato = false;
+    return true;
+  }
+  // autenticato con Supabase ma non autorizzato su questa piattaforma
+  state.gestoreRole = null;
+  state.operatoreAttivo = null;
+  state.gestoreAccessNegato = true;
+  return false;
+}
+
 async function checkAuthSession(){
   if(!SUPABASE_CONFIGURED || SUPABASE_LIB_ERROR || !supabase) return;
   try{
     const { data } = await supabase.auth.getSession();
     if(data && data.session && data.session.user){
-      state.gestoreUnlocked = true;
       state.gestoreAuthUser = data.session.user.email;
+      if(autorizzaSessione(data.session.user.email)){
+        state.gestoreUnlocked = true;
+      } else {
+        state.gestoreUnlocked = false;
+      }
       render();
     }
   }catch(e){ /* nessuna sessione attiva, resta al login */ }
@@ -701,12 +731,14 @@ async function checkAuthSession(){
       render();
     }
     if(event === 'SIGNED_IN' && session && session.user){
-      state.gestoreUnlocked = true;
       state.gestoreAuthUser = session.user.email;
+      state.gestoreUnlocked = autorizzaSessione(session.user.email);
     }
     if(event === 'SIGNED_OUT'){
       state.gestoreUnlocked = false;
       state.gestoreAuthUser = null;
+      state.gestoreRole = null;
+      state.operatoreAttivo = null;
     }
   });
 }
@@ -721,6 +753,8 @@ async function signUpGestore(email, password){
       // conferma email disattivata sul progetto: accesso immediato
       state.gestoreUnlocked = true;
       state.gestoreAuthUser = email;
+      state.gestoreRole = 'admin';
+      state.operatoreAttivo = null;
     } else {
       // Supabase richiede la conferma via email prima di attivare l'account
       state.gestoreSetupFatto = true;
@@ -735,18 +769,45 @@ async function signInGestore(email, password){
   try{
     const { data, error } = await supabase.auth.signInWithPassword({ email, password });
     if(error) throw error;
-    state.gestoreUnlocked = true;
     state.gestoreAuthUser = email;
     state.error = null;
+    if(autorizzaSessione(email)){
+      state.gestoreUnlocked = true;
+    } else {
+      state.gestoreUnlocked = false;
+    }
     render();
   }catch(e){
     alert('Accesso non riuscito: email o password non corrette.');
+  }
+}
+async function signUpOperatore(email, password){
+  const op = getOperatoreByEmail(email);
+  if(!op){
+    alert('Questa email non risulta autorizzata come operatore. Chiedi all\'amministratore di aggiungerti prima.');
+    return;
+  }
+  try{
+    const { data, error } = await supabase.auth.signUp({ email, password });
+    if(error) throw error;
+    state.gestoreAuthUser = email;
+    if(data && data.session){
+      state.gestoreUnlocked = autorizzaSessione(email);
+    } else {
+      alert('Account creato. Se richiesto, controlla la tua email per confermarlo, poi accedi normalmente.');
+      state.gestoreAuthMode = 'login';
+    }
+    render();
+  }catch(e){
+    alert('Impossibile creare l\'accesso: ' + (e && e.message ? e.message : 'errore sconosciuto'));
   }
 }
 async function signOutGestore(){
   try{ await supabase.auth.signOut(); }catch(e){}
   state.gestoreUnlocked = false;
   state.gestoreAuthUser = null;
+  state.gestoreRole = null;
+  state.operatoreAttivo = null;
   render();
 }
 async function requestPasswordReset(email){
@@ -784,6 +845,42 @@ async function cambiaEmailGestore(nuovaEmail){
   }
 }
 
+// ---------- Sistema ruoli e operatori ----------
+function isAdmin(){ return state.gestoreRole === 'admin'; }
+function getOperatoreByEmail(email){
+  return state.operatori.find(o => (o.email||'').toLowerCase() === (email||'').toLowerCase() && o.attivo!==false);
+}
+function haModulo(nome){
+  if(isAdmin()) return true;
+  if(!state.operatoreAttivo) return false;
+  return !!(state.operatoreAttivo.moduli && state.operatoreAttivo.moduli[nome]);
+}
+function immobileConsentito(propId){
+  if(isAdmin()) return true;
+  if(!state.operatoreAttivo) return false;
+  if(state.operatoreAttivo.tuttiImmobili) return true;
+  return (state.operatoreAttivo.immobiliConsentiti||[]).includes(propId);
+}
+function immobiliVisibili(){
+  if(isAdmin()) return state.properties;
+  return state.properties.filter(p => immobileConsentito(p.id));
+}
+function saveOperatore(data, editingId){
+  if(editingId){
+    const o = state.operatori.find(x=>x.id===editingId);
+    Object.assign(o, data);
+  } else {
+    state.operatori.push({ id: uid(), attivo: true, ...data });
+  }
+  saveData();
+}
+function eliminaOperatore(id){
+  if(!confirm('Rimuovere questo operatore? Non potrà più accedere.')) return;
+  state.operatori = state.operatori.filter(o=>o.id!==id);
+  saveData();
+  render();
+}
+
 async function loadData(){
   if(!SUPABASE_CONFIGURED){
     state.loading = false;
@@ -803,6 +900,7 @@ async function loadData(){
     state.properties = data.properties || [];
     state.clienti = data.clienti || [];
     state.settings = data.settings || {nomeAgenzia:'Property Manager', telefonoGestore:''};
+    state.operatori = data.operatori || [];
   }catch(e){
     state.properties = [];
     state.clienti = [];
@@ -818,7 +916,7 @@ async function persistAll(){
   if(!SUPABASE_CONFIGURED) return;
   try{
     const { error } = await supabase.from('app_data').update({
-      properties: state.properties, clienti: state.clienti, settings: state.settings, updated_at: new Date().toISOString()
+      properties: state.properties, clienti: state.clienti, settings: state.settings, operatori: state.operatori, updated_at: new Date().toISOString()
     }).eq('id','main');
     if(error) throw error;
     state.error = null;
@@ -835,6 +933,7 @@ function subscribeRealtime(){
       state.properties = payload.new.properties || state.properties;
       state.clienti = payload.new.clienti || state.clienti;
       state.settings = payload.new.settings || state.settings;
+      state.operatori = payload.new.operatori || state.operatori;
       render();
     })
     .subscribe();
@@ -1308,7 +1407,7 @@ function calcolaAlertProprietario(p){
 }
 function calcolaAlertPortfolio(){
   let prenotazioniPendenti=0, spesePagare=0, controlliRitardo=0, preventiviRisposti=0, messaggiNonLetti=0, interventiDaTriage=0;
-  state.properties.forEach(p=>{
+  immobiliVisibili().forEach(p=>{
     const a = calcolaAlertImmobile(p);
     prenotazioniPendenti += a.prenotazioniPendenti;
     spesePagare += a.spesePagare;
@@ -1341,7 +1440,7 @@ function trovaPrimoImmobileConAlert(tipo){
 
 function raccogliEventiPortfolio(){
   const eventi = [];
-  state.properties.forEach(p=>{
+  immobiliVisibili().forEach(p=>{
     (p.prenotazioni||[]).filter(b=>b.stato!=='rifiutata').forEach(b=>{
       if(b.checkin) eventi.push({data:b.checkin, titolo:`Check-in: ${b.nome}`, immobile:p.nome, colore:'sage'});
       if(b.checkout) eventi.push({data:b.checkout, titolo:`Check-out: ${b.nome}`, immobile:p.nome, colore:'brass'});
@@ -2036,7 +2135,8 @@ function renderPrenotazioni(p){
 // ---------- Vista Gestore ----------
 function renderSidebar(){
   const alertPortfolio = calcolaAlertPortfolio();
-  const items = state.properties.map(p=>{
+  const propsVisibili = immobiliVisibili();
+  const items = propsVisibili.map(p=>{
     const status = propertyStatus(p);
     const color = status==='ok' ? 'var(--sage)' : status==='prog' ? 'var(--brass)' : 'var(--terracotta)';
     const alertImmobile = calcolaAlertImmobile(p);
@@ -2046,26 +2146,41 @@ function renderSidebar(){
     </div>`;
   }).join('');
 
-  const clientiItems = state.clienti.map(c=>{
+  const clientiVisibiliIds = new Set(propsVisibili.map(p=>p.clienteId));
+  const clientiVisibili = isAdmin() ? state.clienti : state.clienti.filter(c=>clientiVisibiliIds.has(c.id));
+  const clientiItems = clientiVisibili.map(c=>{
     const nImmobili = state.properties.filter(p=>p.clienteId===c.id).length;
     return `<div class="nav-item ${state.selectedClienteId===c.id?'active':''}" data-nav-cliente="${c.id}">
       <div><div>${c.nome||'(senza nome)'}</div><div class="code">${nImmobili} immobil${nImmobili===1?'e':'i'}</div></div>
     </div>`;
   }).join('');
 
+  const operatoriItems = isAdmin() ? state.operatori.map(o=>`
+    <div class="nav-item" data-action="edit-operatore" data-operatore-id="${o.id}">
+      <div><div>${o.nome||o.email}${o.attivo===false?' (disattivo)':''}</div><div class="code">${o.email}</div></div>
+    </div>
+  `).join('') : '';
+
   return `
     <div class="sidebar">
       <p class="brand">Portfolio Immobiliare</p>
       <p class="brand-sub">Schedario proprietà</p>
       <div class="nav-item ${state.selectedId===null && !state.selectedClienteId && state.vistaGestore!=='tutte-prenotazioni'?'active':''}" data-nav="overview"><div>Panoramica${alertPortfolio.totale>0?`<span class="nav-badge">${alertPortfolio.totale}</span>`:''}</div></div>
-      <div class="nav-item ${state.selectedId===null && !state.selectedClienteId && state.vistaGestore==='tutte-prenotazioni'?'active':''}" data-nav-prenotazioni><div>Tutte le prenotazioni${alertPortfolio.prenotazioniPendenti>0?`<span class="nav-badge">${alertPortfolio.prenotazioniPendenti}</span>`:''}</div></div>
-      <div class="nav-section-label">Clienti (${state.clienti.length})</div>
-      ${clientiItems || '<div style="font-size:12.5px;color:var(--ink-soft);padding:8px 12px;">Nessun cliente ancora.</div>'}
-      <button class="btn-new" data-action="new-cliente">+ Nuovo cliente</button>
-      <div class="nav-section-label">Immobili (${state.properties.length})</div>
+      ${haModulo('prenotazioni') ? `<div class="nav-item ${state.selectedId===null && !state.selectedClienteId && state.vistaGestore==='tutte-prenotazioni'?'active':''}" data-nav-prenotazioni><div>Tutte le prenotazioni${alertPortfolio.prenotazioniPendenti>0?`<span class="nav-badge">${alertPortfolio.prenotazioniPendenti}</span>`:''}</div></div>` : ''}
+      ${haModulo('clienti') || isAdmin() ? `
+        <div class="nav-section-label">Clienti (${clientiVisibili.length})</div>
+        ${clientiItems || '<div style="font-size:12.5px;color:var(--ink-soft);padding:8px 12px;">Nessun cliente ancora.</div>'}
+        ${isAdmin() ? `<button class="btn-new" data-action="new-cliente">+ Nuovo cliente</button>` : ''}
+      ` : ''}
+      <div class="nav-section-label">Immobili (${propsVisibili.length})</div>
       ${items || '<div style="font-size:12.5px;color:var(--ink-soft);padding:8px 12px;">Nessun immobile ancora.</div>'}
-      <button class="btn-new" data-action="new-property">+ Nuovo immobile</button>
-      <div class="nav-item" data-action="open-settings" style="margin-top:18px;border-top:1px solid var(--line);padding-top:14px;"><i class="ti ti-settings"></i> Impostazioni agenzia</div>
+      ${isAdmin() ? `<button class="btn-new" data-action="new-property">+ Nuovo immobile</button>` : ''}
+      ${isAdmin() ? `
+        <div class="nav-section-label">Operatori (${state.operatori.length})</div>
+        ${operatoriItems || '<div style="font-size:12.5px;color:var(--ink-soft);padding:8px 12px;">Nessun operatore ancora.</div>'}
+        <button class="btn-new" data-action="new-operatore">+ Nuovo operatore</button>
+      ` : ''}
+      ${isAdmin() ? `<div class="nav-item" data-action="open-settings" style="margin-top:18px;border-top:1px solid var(--line);padding-top:14px;"><i class="ti ti-settings"></i> Impostazioni agenzia</div>` : ''}
       ${state.gestoreUnlocked ? `<div class="nav-item" data-action="logout-gestore" style="color:var(--terracotta);"><i class="ti ti-logout"></i> Esci</div>` : ''}
     </div>
   `;
@@ -2126,7 +2241,7 @@ function renderClienteCRM(c){
 
 function renderTuttePrenotazioni(){
   const righe = [];
-  state.properties.forEach(p=>{
+  immobiliVisibili().forEach(p=>{
     (p.prenotazioni||[]).forEach(b=>{
       righe.push({p, b});
     });
@@ -2172,7 +2287,7 @@ function renderTuttePrenotazioni(){
 }
 
 function renderOverview(){
-  const props = state.properties;
+  const props = immobiliVisibili();
   const anno = new Date().getFullYear();
   const speseAnno = props.reduce((s,p)=>s + (p.spese||[]).filter(e=>new Date(e.data).getFullYear()===anno).reduce((a,e)=>a+Number(e.importo||0),0),0);
   const manutenzioniUrgenti = props.reduce((s,p)=>s + (p.manutenzioni||[]).filter(m=>m.stato!=='completata' && daysUntil(m.scadenza)<=30).length, 0);
@@ -2440,7 +2555,7 @@ function renderDossier(p){
     {id:'controlli', label:'Controlli periodici'},
     {id:'spese', label:'Spese & Guadagno'},
     {id:'messaggi', label:'Messaggi'}
-  ];
+  ].filter(t => t.id==='anagrafica' || haModulo(t.id));
   const tabAttiva = TABS.some(t=>t.id===state.dossierTab) ? state.dossierTab : 'anagrafica';
   const tabsHtml = TABS.map(t=>`<button class="dossier-tab-btn ${tabAttiva===t.id?'active':''}" data-dossier-tab="${t.id}">${t.label}</button>`).join('');
 
@@ -2550,8 +2665,10 @@ function renderDossier(p){
         <p class="page-sub" style="margin-bottom:0;">${p.indirizzo || '—'} · ${p.tipo}</p>
       </div>
       <div class="dossier-actions">
-        <button class="icon-btn" data-action="edit-property">Modifica</button>
-        <button class="icon-btn danger" data-action="delete-property">Elimina</button>
+        ${isAdmin() ? `
+          <button class="icon-btn" data-action="edit-property">Modifica</button>
+          <button class="icon-btn danger" data-action="delete-property">Elimina</button>
+        ` : ''}
       </div>
     </div>
 
@@ -3039,6 +3156,56 @@ function renderModal(){
       </div></div>`;
   }
 
+  if(type==='operatore'){
+    const o = editing || {tuttiImmobili:false, immobiliConsentiti:[], moduli:{}};
+    const MODULI = [
+      {id:'prenotazioni', label:'Prenotazioni'},
+      {id:'interventi', label:'Interventi'},
+      {id:'controlli', label:'Controlli periodici'},
+      {id:'foto', label:'Foto'},
+      {id:'listino', label:'Listino e prezzi'},
+      {id:'spese', label:'Spese & Guadagno'},
+      {id:'messaggi', label:'Messaggi'},
+      {id:'clienti', label:'Clienti (CRM)'}
+    ];
+    const moduliHtml = MODULI.map(m=>`
+      <label style="display:flex;align-items:center;gap:8px;font-size:13px;padding:5px 0;text-transform:none;font-family:'IBM Plex Sans',sans-serif;font-weight:400;letter-spacing:0;">
+        <input type="checkbox" name="modulo_${m.id}" ${o.moduli && o.moduli[m.id] ? 'checked' : ''}> ${m.label}
+      </label>
+    `).join('');
+    const immobiliHtml = state.properties.map(p=>`
+      <label style="display:flex;align-items:center;gap:8px;font-size:13px;padding:5px 0;text-transform:none;font-family:'IBM Plex Sans',sans-serif;font-weight:400;letter-spacing:0;">
+        <input type="checkbox" name="immobile_${p.id}" ${(o.immobiliConsentiti||[]).includes(p.id) ? 'checked' : ''}> ${p.nome}
+      </label>
+    `).join('') || '<p style="font-size:12.5px;color:var(--ink-soft);">Nessun immobile ancora creato.</p>';
+    return `
+      <div class="overlay" data-close-overlay><div class="modal" data-stop>
+        <h2>${editing ? 'Modifica operatore' : 'Nuovo operatore'}</h2>
+        <form id="operatoreForm">
+          <div class="field"><label>Nome</label><input name="nome" required value="${o.nome||''}" placeholder="Nome e cognome"></div>
+          <div class="field"><label>Email</label><input type="email" name="email" required value="${o.email||''}" placeholder="nome@esempio.it" ${editing?'readonly style="opacity:.6;"':''}></div>
+          ${editing ? `<p style="font-size:11px;color:var(--ink-soft);margin:-10px 0 14px 0;">L'email non si può cambiare qui — rimuovi l'operatore e ricrealo se serve cambiarla.</p>` : `<p style="font-size:11px;color:var(--ink-soft);margin:-10px 0 14px 0;">L'operatore userà questa email per crearsi da solo un accesso (dal login, "Sei un operatore?").</p>`}
+
+          <p class="section-label" style="margin-top:18px;">Immobili visibili</p>
+          <label style="display:flex;align-items:center;gap:8px;font-size:13px;padding:5px 0 10px 0;text-transform:none;font-family:'IBM Plex Sans',sans-serif;font-weight:600;letter-spacing:0;">
+            <input type="checkbox" name="tuttiImmobili" id="tuttiImmobiliCheck" ${o.tuttiImmobili?'checked':''}> Tutti gli immobili (anche futuri)
+          </label>
+          <div id="listaImmobiliConsentiti" style="${o.tuttiImmobili?'display:none;':''}max-height:160px;overflow-y:auto;border:1px solid var(--line);border-radius:6px;padding:8px 12px;margin-bottom:16px;">
+            ${immobiliHtml}
+          </div>
+
+          <p class="section-label">Funzioni consentite</p>
+          <div style="margin-bottom:8px;">${moduliHtml}</div>
+
+          <div class="modal-actions">
+            <button type="button" class="btn-secondary" data-close>Annulla</button>
+            ${editing ? `<button type="button" class="icon-btn danger" data-action="delete-operatore" data-operatore-id="${editing.id}">Rimuovi operatore</button>` : ''}
+            <button type="submit" class="btn-primary">Salva</button>
+          </div>
+        </form>
+      </div></div>`;
+  }
+
   if(type==='servizio'){
     return `
       <div class="overlay" data-close-overlay><div class="modal" data-stop>
@@ -3461,25 +3628,35 @@ function render(){
         <button type="submit" class="btn-primary" style="width:100%;">Crea accesso e continua</button>
       </form>
     </div>`;
-  } else if(!state.gestoreUnlocked){
+  } else if(state.gestoreAccessNegato){
     content = `<div class="portal-shell" style="text-align:center;">
-      <h1 class="page-title">Area Gestore</h1>
-      <p class="page-sub">Accedi con la tua email e password.</p>
+      <h1 class="page-title">Accesso non autorizzato</h1>
+      <p class="page-sub">Il tuo account (${state.gestoreAuthUser}) si è autenticato correttamente, ma non risulta autorizzato su questa piattaforma.</p>
+      <p style="font-size:12.5px;color:var(--ink-soft);margin-bottom:20px;">Se dovresti avere accesso come operatore, chiedi all'amministratore di aggiungerti prima con questa stessa email.</p>
+      <button class="btn-secondary" data-action="logout-gestore">Esci</button>
+    </div>`;
+  } else if(!state.gestoreUnlocked){
+    const modOperatore = state.gestoreAuthMode==='operatore-signup';
+    content = `<div class="portal-shell" style="text-align:center;">
+      <h1 class="page-title">${modOperatore ? 'Accesso operatore' : 'Area Gestore'}</h1>
+      <p class="page-sub">${modOperatore ? 'Crea il tuo accesso con l\'email che ti ha autorizzato l\'amministratore.' : 'Accedi con la tua email e password.'}</p>
       ${state.gestoreSetupFatto ? `<p style="font-size:12.5px;color:var(--brass-deep);background:var(--brass-soft);padding:10px 14px;border-radius:8px;margin:0 0 16px 0;">Account creato! Se Supabase richiede una conferma, controlla la tua email prima di accedere.</p>` : ''}
-      <form id="gestoreLoginForm" style="max-width:300px;margin:0 auto;text-align:left;">
-        <div class="field"><label>Email</label><input type="email" name="email" required autofocus value="${state.settings.gestoreEmail||''}"></div>
-        <div class="field"><label>Password</label><input type="password" name="password" required></div>
-        <button type="submit" class="btn-primary" style="width:100%;">Accedi</button>
+      <form id="${modOperatore ? 'operatoreSignupForm' : 'gestoreLoginForm'}" style="max-width:300px;margin:0 auto;text-align:left;">
+        <div class="field"><label>Email</label><input type="email" name="email" required autofocus value="${modOperatore ? '' : (state.settings.gestoreEmail||'')}"></div>
+        <div class="field"><label>Password${modOperatore ? ' (almeno 6 caratteri)' : ''}</label><input type="password" name="password" required ${modOperatore?'minlength="6"':''}></div>
+        <button type="submit" class="btn-primary" style="width:100%;">${modOperatore ? 'Crea accesso' : 'Accedi'}</button>
       </form>
-      ${state.gestoreResetInviato
+      ${!modOperatore && state.gestoreResetInviato
         ? `<p style="font-size:12.5px;color:var(--sage);margin-top:16px;">Email inviata — controlla la posta e segui il link per reimpostare la password.</p>`
-        : `<button class="link-btn" data-gestore-recupero style="margin-top:16px;">Password dimenticata?</button>`}
+        : (!modOperatore ? `<button class="link-btn" data-gestore-recupero style="margin-top:16px;">Password dimenticata?</button><br>` : '')}
+      <button class="link-btn" data-action="toggle-operatore-mode" style="margin-top:10px;">${modOperatore ? '← Torna al login normale' : 'Sei un operatore? Crea il tuo accesso'}</button>
     </div>`;
   } else {
     const selected = state.properties.find(p=>p.id===state.selectedId);
     const clienteSelezionato = state.selectedClienteId ? state.clienti.find(c=>c.id===state.selectedClienteId) : null;
     let main;
-    if(selected) main = renderDossier(selected);
+    if(selected && !immobileConsentito(selected.id)) main = `<div class="portal-shell"><h1 class="page-title">Accesso non consentito</h1><p class="page-sub">Non hai i permessi per vedere questo immobile.</p></div>`;
+    else if(selected) main = renderDossier(selected);
     else if(clienteSelezionato) main = renderClienteCRM(clienteSelezionato);
     else if(state.vistaGestore==='tutte-prenotazioni') main = renderTuttePrenotazioni();
     else main = renderOverview();
@@ -3643,6 +3820,48 @@ function attachHandlers(){
 
   const newClienteBtn = document.querySelector('[data-action="new-cliente"]');
   if(newClienteBtn) newClienteBtn.addEventListener('click', ()=>openModal('cliente', null));
+
+  const newOperatoreBtn = document.querySelector('[data-action="new-operatore"]');
+  if(newOperatoreBtn) newOperatoreBtn.addEventListener('click', ()=>openModal('operatore', null));
+
+  document.querySelectorAll('[data-action="edit-operatore"]').forEach(node=>{
+    node.addEventListener('click', ()=>{
+      const op = state.operatori.find(o=>o.id===node.getAttribute('data-operatore-id'));
+      if(op) openModal('operatore', op);
+    });
+  });
+
+  document.querySelectorAll('[data-action="delete-operatore"]').forEach(node=>{
+    node.addEventListener('click', ()=>{
+      eliminaOperatore(node.getAttribute('data-operatore-id'));
+      closeModal();
+    });
+  });
+
+  const tuttiImmobiliCheck = document.getElementById('tuttiImmobiliCheck');
+  const listaImmobiliConsentiti = document.getElementById('listaImmobiliConsentiti');
+  if(tuttiImmobiliCheck && listaImmobiliConsentiti) tuttiImmobiliCheck.addEventListener('change', ()=>{
+    listaImmobiliConsentiti.style.display = tuttiImmobiliCheck.checked ? 'none' : 'block';
+  });
+
+  const operatoreForm = document.getElementById('operatoreForm');
+  if(operatoreForm) operatoreForm.addEventListener('submit', ev=>{
+    ev.preventDefault();
+    const fd = new FormData(operatoreForm);
+    const tuttiImmobili = fd.get('tuttiImmobili')==='on';
+    const immobiliConsentiti = state.properties.filter(p=>fd.get('immobile_'+p.id)==='on').map(p=>p.id);
+    const MODULI_IDS = ['prenotazioni','interventi','controlli','foto','listino','spese','messaggi','clienti'];
+    const moduli = {};
+    MODULI_IDS.forEach(m=>{ moduli[m] = fd.get('modulo_'+m)==='on'; });
+    const editingId = state.modal.editing ? state.modal.editing.id : null;
+    saveOperatore({
+      nome: fd.get('nome'),
+      email: editingId ? state.modal.editing.email : fd.get('email'),
+      tuttiImmobili, immobiliConsentiti, moduli, attivo: true
+    }, editingId);
+    closeModal();
+  });
+
 
   const editClienteBtn = document.querySelector('[data-action="edit-cliente"]');
   if(editClienteBtn) editClienteBtn.addEventListener('click', ()=>{
@@ -3819,6 +4038,19 @@ function attachHandlers(){
     ev.preventDefault();
     const fd = new FormData(gestoreLoginForm);
     signInGestore(fd.get('email'), fd.get('password'));
+  });
+
+  const operatoreSignupForm = document.getElementById('operatoreSignupForm');
+  if(operatoreSignupForm) operatoreSignupForm.addEventListener('submit', ev=>{
+    ev.preventDefault();
+    const fd = new FormData(operatoreSignupForm);
+    signUpOperatore(fd.get('email'), fd.get('password'));
+  });
+
+  const toggleOperatoreBtn = document.querySelector('[data-action="toggle-operatore-mode"]');
+  if(toggleOperatoreBtn) toggleOperatoreBtn.addEventListener('click', ()=>{
+    state.gestoreAuthMode = state.gestoreAuthMode==='operatore-signup' ? 'login' : 'operatore-signup';
+    render();
   });
 
   const gestoreRecuperoBtn = document.querySelector('[data-gestore-recupero]');

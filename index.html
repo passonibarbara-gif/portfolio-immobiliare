@@ -3228,11 +3228,9 @@ function renderModal(){
         <form id="clienteForm">
           <div class="field"><label>Nome</label><input name="nome" required value="${c.nome||''}" placeholder="Nome e cognome"></div>
           <div class="field"><label>Telefono</label><input name="telefono" required value="${c.telefono||''}" placeholder="+39..."></div>
-          <div class="field"><label>Email (per il recupero password — consigliata)</label><input type="email" name="email" value="${c.email||''}" placeholder="nome@esempio.it"></div>
+          <div class="field"><label>Email</label><input type="email" name="email" required value="${c.email||''}" placeholder="nome@esempio.it"></div>
           <div class="field"><label>Indirizzo di residenza (facoltativo)</label><input name="indirizzo" value="${c.indirizzo||''}" placeholder="Via, città"></div>
           <div class="field"><label>Password area proprietario</label><input name="password" value="${c.password||''}" placeholder="Lascia vuoto: la genero io"></div>
-          <div class="field"><label>Domanda di sicurezza (per il recupero password)</label><input name="domandaSicurezza" value="${c.domandaSicurezza||''}" placeholder="es. Nome del tuo primo animale"></div>
-          <div class="field"><label>Risposta</label><input name="rispostaSicurezza" value="${c.rispostaSicurezza||''}" placeholder="La sua risposta"></div>
           <div class="field"><label>Documento d'identità (facoltativo)</label><input type="file" name="documenti" accept="image/*" multiple></div>
           ${(c.documenti && c.documenti.length) ? `<div class="photo-strip" style="margin-bottom:14px;">${c.documenti.map((f,i)=>`
             <span class="photo-thumb-wrap">
@@ -3369,7 +3367,7 @@ function renderModal(){
               <div class="field"><label>Telefono</label><input name="clienteTelefono" value="${clienteAttuale?clienteAttuale.telefono:''}" placeholder="+39..."></div>
             </div>
             <div class="field-row">
-              <div class="field"><label>Email (facoltativa)</label><input type="email" name="clienteEmail" value="${clienteAttuale?clienteAttuale.email||'':''}" placeholder="nome@esempio.it"></div>
+              <div class="field"><label>Email</label><input type="email" name="clienteEmail" required value="${clienteAttuale?clienteAttuale.email||'':''}" placeholder="nome@esempio.it"></div>
               <div class="field"><label>Indirizzo di residenza (facoltativo)</label><input name="clienteIndirizzo" value="${clienteAttuale?clienteAttuale.indirizzo||'':''}" placeholder="Via, città"></div>
             </div>
             <div class="field"><label>Password area proprietario</label><input name="clientePassword" value="${clienteAttuale?clienteAttuale.password:''}" placeholder="Lascia vuoto: la genero io (o riuso quella già usata per questo numero)"></div>
@@ -4474,7 +4472,6 @@ function attachHandlers(){
     const cliente = saveCliente({
       nome: fd.get('nome'), telefono: fd.get('telefono'), password,
       email: fd.get('email')||'', indirizzo: fd.get('indirizzo')||'',
-      domandaSicurezza: fd.get('domandaSicurezza')||'', rispostaSicurezza: fd.get('rispostaSicurezza')||'',
       documenti: existingDocumenti.concat(nuoviDocumenti)
     }, editingId);
     saveData(); closeModal();

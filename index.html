@@ -4545,8 +4545,7 @@ function attachHandlers(){
 }
 
 render();
-loadData();
-checkAuthSession();
+loadData().then(()=>{ checkAuthSession(); });
 })();
 </script>
 <script>

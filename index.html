@@ -71,6 +71,34 @@
     background:var(--terracotta); color:#fff; font-family:'IBM Plex Mono',monospace;
     font-size:10px; font-weight:700; padding:0 5px; border-radius:20px; margin-left:6px; vertical-align:middle;
   }
+
+  /* ---- campanella notifiche (riusa gli alert reali del portfolio) ---- */
+  .notif-wrap{position:relative;}
+  .notif-btn{
+    position:relative; border:1px solid rgba(47,184,170,0.35); background:none; color:var(--text-on-dark);
+    width:36px; height:36px; border-radius:8px; cursor:pointer; display:flex; align-items:center; justify-content:center;
+    transition:border-color .15s ease, color .15s ease;
+  }
+  .notif-btn:hover{border-color:var(--brass); color:var(--brass);}
+  .notif-badge{
+    position:absolute; top:-5px; right:-5px; min-width:16px; height:16px; padding:0 3px;
+    background:var(--terracotta); color:#fff; font-family:'IBM Plex Mono',monospace; font-size:9px; font-weight:700;
+    border-radius:20px; display:flex; align-items:center; justify-content:center;
+  }
+  .notif-panel{
+    position:absolute; top:46px; right:0; width:300px; z-index:60;
+    background:var(--paper-raised); border:1px solid var(--line-soft); border-radius:10px; padding:6px;
+    box-shadow:0 14px 34px rgba(28,26,23,.22);
+    opacity:0; transform:translateY(-8px) scale(.95); pointer-events:none;
+  }
+  .notif-panel.show{animation:notifIn .35s cubic-bezier(.22,1.4,.4,1) forwards; pointer-events:auto;}
+  @keyframes notifIn{ 0%{opacity:0; transform:translateY(-10px) scale(.92);} 100%{opacity:1; transform:translateY(0) scale(1);} }
+  .notif-panel-title{font-family:'IBM Plex Mono',monospace; font-size:10px; text-transform:uppercase; letter-spacing:.08em; color:var(--ink-soft); padding:9px 10px 7px;}
+  .notif-item{display:flex; gap:9px; align-items:flex-start; padding:9px 10px; border-radius:7px; cursor:pointer; font-size:12.5px; color:var(--ink); line-height:1.4;}
+  .notif-item:hover{background:var(--brass-soft);}
+  .notif-item .n-dot{width:7px; height:7px; border-radius:50%; background:var(--terracotta); margin-top:5px; flex-shrink:0;}
+  .notif-empty{padding:16px 10px; font-size:12.5px; color:var(--ink-soft); text-align:center;}
+
   .alert-banner{
     background:#F1DAD1; border:1px solid var(--terracotta); border-radius:8px;
     padding:16px 20px; margin-bottom:28px;
@@ -636,6 +664,7 @@ let state = {
   gestoreRecoveryMode: false, // true quando si arriva da un link di reimpostazione password via email
   gestoreSetupFatto: false,
   modal: null, // {type, editing, propId, context}
+  notifOpen: false, // pannello notifiche (campanella) aperto/chiuso
   stampFlash: null, // {key, kind:'ok'|'crit'} — timbro animato da mostrare al prossimo render
   error: null
 };
@@ -3235,6 +3264,31 @@ function renderOspitiView(){
 }
 
 // ---------- Top nav ----------
+function renderNotificheGestore(alert){
+  const voci = [
+    alert.prenotazioniPendenti>0 ? {tipo:'prenotazioni', txt:`${alert.prenotazioniPendenti} richiest${alert.prenotazioniPendenti>1?'e':'a'} di prenotazione da confermare o rifiutare`} : null,
+    alert.spesePagare>0 ? {tipo:'spese', txt:`${alert.spesePagare} spes${alert.spesePagare>1?'e':'a'} approvat${alert.spesePagare>1?'e':'a'} da pagare`} : null,
+    alert.controlliRitardo>0 ? {tipo:'controlli', txt:`${alert.controlliRitardo} immobil${alert.controlliRitardo>1?'i':'e'} con controllo periodico in ritardo`} : null,
+    alert.preventiviRisposti>0 ? {tipo:'interventi', txt:`${alert.preventiviRisposti} preventiv${alert.preventiviRisposti>1?'i':'o'} con risposta del proprietario da gestire`} : null,
+    alert.interventiDaTriage>0 ? {tipo:'interventi-nuovi', txt:`${alert.interventiDaTriage} nuov${alert.interventiDaTriage>1?'i':'o'} intervent${alert.interventiDaTriage>1?'i':'o'} da valutare`} : null,
+    alert.messaggiNonLetti>0 ? {tipo:'messaggi', txt:`${alert.messaggiNonLetti} messagg${alert.messaggiNonLetti>1?'i':'io'} non lett${alert.messaggiNonLetti>1?'i':'o'}`} : null,
+  ].filter(Boolean);
+  const righe = voci.length
+    ? voci.map(v=>`<div class="notif-item" data-goto-alert="${v.tipo}"><span class="n-dot"></span><span>${v.txt}</span></div>`).join('')
+    : `<div class="notif-empty">Nessuna notifica al momento.</div>`;
+  return `
+    <div class="notif-wrap">
+      <button type="button" class="notif-btn" data-action="toggle-notif" aria-label="Notifiche">
+        <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M6 9a6 6 0 1 1 12 0c0 4 1.5 5.5 1.5 5.5H4.5S6 13 6 9Z"/><path d="M10 18a2 2 0 0 0 4 0"/></svg>
+        ${alert.totale>0?`<span class="notif-badge">${alert.totale}</span>`:''}
+      </button>
+      <div class="notif-panel ${state.notifOpen?'show':''}">
+        <div class="notif-panel-title">Notifiche</div>
+        ${righe}
+      </div>
+    </div>
+  `;
+}
 function renderTopNav(){
   const alert = calcolaAlertPortfolio();
   return `<div class="topnav">
@@ -3243,6 +3297,7 @@ function renderTopNav(){
       <button class="tab-btn ${state.view==='gestore'?'active':''}" data-view="gestore">Gestore${alert.totale>0?`<span class="nav-badge">${alert.totale}</span>`:''}</button>
       <button class="tab-btn ${state.view==='proprietari'?'active':''}" data-view="proprietari">Area Proprietari</button>
       <button class="tab-btn ${state.view==='ospiti'?'active':''}" data-view="ospiti">Prenota un soggiorno</button>
+      ${state.gestoreUnlocked ? renderNotificheGestore(alert) : ''}
     </div>
   </div>`;
 }
@@ -3840,7 +3895,9 @@ function attachHandlers(){
     el.addEventListener('click', ()=>{
       const tipo = el.getAttribute('data-goto-alert');
       const p = trovaPrimoImmobileConAlert(tipo);
+      state.notifOpen = false;
       if(!p) return;
+      state.view = 'gestore';
       state.selectedId = p.id;
       state.selectedClienteId = null;
       const tabPerTipo = {
@@ -3852,6 +3909,22 @@ function attachHandlers(){
       render();
     });
   });
+
+  const notifToggleBtn = document.querySelector('[data-action="toggle-notif"]');
+  if(notifToggleBtn) notifToggleBtn.addEventListener('click', (ev)=>{
+    ev.stopPropagation();
+    state.notifOpen = !state.notifOpen;
+    render();
+  });
+  if(!window.__notifOutsideBound){
+    window.__notifOutsideBound = true;
+    document.addEventListener('click', ev=>{
+      if(state.notifOpen && !ev.target.closest('.notif-wrap')){
+        state.notifOpen = false;
+        render();
+      }
+    });
+  }
 
   document.querySelectorAll('[data-goto-owner-alert]').forEach(el=>{
     el.addEventListener('click', ()=>{

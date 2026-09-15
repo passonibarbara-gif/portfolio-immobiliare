@@ -409,7 +409,7 @@
   .empty-state .big{font-family:'Fraunces',serif; font-size:19px; color:var(--ink); margin-bottom:6px;}
 
   .tenant-card{
-    background:var(--paper-raised); border:1px solid var(--line-soft); border-left:3px solid var(--terracotta); border-radius:6px;
+    background:var(--line-soft); border:1px solid var(--line-soft); border-left:3px solid var(--terracotta); border-radius:10px;
     padding:18px 20px; margin-bottom:18px; display:flex; justify-content:space-between; align-items:flex-start; gap:14px; flex-wrap:wrap;
     box-shadow:0 1px 3px rgba(28,26,23,0.05);
   }
@@ -443,7 +443,7 @@
   .field input:focus, .field select:focus, .field textarea:focus{ box-shadow:0 0 0 3px rgba(10,186,181,.16); }
   .portal-picker{display:grid; gap:10px; margin-top:20px;}
   .portal-pick-card{
-    background:var(--paper-raised); border:1px solid var(--line-soft); border-radius:6px;
+    background:var(--line-soft); border:1px solid var(--line-soft); border-radius:12px;
     padding:18px 20px; cursor:pointer; display:flex; justify-content:space-between; align-items:center;
     box-shadow:0 1px 3px rgba(28,26,23,0.05);
     transition:border-color .15s ease, transform .15s ease, box-shadow .15s ease;
@@ -462,7 +462,7 @@
   .prop-gallery img{width:150px; height:106px; object-fit:cover; border-radius:8px; border:1.5px solid var(--brass-soft); flex-shrink:0;}
 
   .commitment-box{
-    background:var(--paper-raised); border:1px solid var(--brass-soft); border-radius:6px;
+    background:var(--line-soft); border:1px solid var(--brass-soft); border-radius:10px;
     padding:16px 20px; margin:16px 0 26px 0;
   }
   .commitment-box ul{margin:0; padding-left:0; list-style:none;}
@@ -3005,12 +3005,15 @@ function renderDossier(p){
 function renderProprietariView(){
   if(state.ownerRecoveryMode){
     return `<div class="portal-shell" style="text-align:center;">
+      <div class="auth-card">
+      <div class="auth-brand">${state.settings.nomeAgenzia || 'Property Manager'}</div>
       <h1 class="page-title">Imposta una nuova password</h1>
       <p class="page-sub">Sei arrivato qui dal link inviato via email. Scegli la nuova password.</p>
-      <form id="ownerNuovaPasswordForm" style="max-width:300px;margin:0 auto;text-align:left;">
+      <form id="ownerNuovaPasswordForm" style="text-align:left;">
         <div class="field"><label>Nuova password</label><input type="password" name="password" required autofocus minlength="6"></div>
         <button type="submit" class="btn-primary" style="width:100%;">Salva nuova password</button>
       </form>
+      </div>
     </div>`;
   }
   if(!state.ownerAuth){
@@ -3168,7 +3171,7 @@ function renderProprietariView(){
       ${mieiImmobili.length>1 ? `<button class="link-btn" data-owner-back>← I miei immobili</button>` : `<span></span>`}
       <button class="link-btn" data-owner-logout>Esci</button>
     </div>
-    <h1 class="page-title">${p.nome}</h1>
+    <h1 class="page-title">${propertyTypeIcon(p.tipo)}${p.nome}</h1>
     <p class="page-sub">${p.indirizzo||'—'} · ${p.tipo}</p>
 
     <div class="dossier-tabs">${ownerTabsHtml}</div>

@@ -122,8 +122,13 @@
   /* ---------- Sidebar (schedario) ---------- */
   .sidebar{
     border-right:1px solid var(--brass-deep);
-    padding:28px 20px;
+    padding:28px 18px;
     background:linear-gradient(180deg,var(--surface-dark) 0%, var(--surface-dark-2) 100%);
+    position:relative;
+  }
+  .sidebar::before{
+    content:''; position:absolute; top:0; left:0; right:0; height:3px;
+    background:var(--brand-gradient);
   }
   .brand{
     font-family:'Fraunces',serif;
@@ -140,43 +145,59 @@
     text-transform:uppercase;
     letter-spacing:.12em;
     margin:0 0 26px 0;
+    display:flex; align-items:center; gap:8px;
   }
+  .brand-sub::after{ content:''; flex:1; height:1px; background:var(--text-on-dark-soft); opacity:.25; }
   .nav-item{
     display:flex; align-items:center; justify-content:space-between;
-    padding:10px 12px;
-    border-radius:3px;
-    margin-bottom:4px;
+    padding:9px 12px;
+    border-radius:10px;
+    margin-bottom:3px;
     cursor:pointer;
     font-size:14px;
     color:var(--text-on-dark-soft);
-    border-left:3px solid transparent;
-    transition:background .15s ease, border-color .15s ease, color .15s ease;
+    position:relative;
+    transition:background .18s ease, color .18s ease, transform .15s ease, box-shadow .18s ease;
   }
-  .nav-item:hover{background:rgba(10,186,181,0.1); color:var(--text-on-dark);}
-  .nav-item.active{background:rgba(10,186,181,0.16); border-left-color:var(--brass); color:var(--text-on-dark); font-weight:500;}
+  .nav-item:hover{background:rgba(127,237,224,0.08); color:var(--text-on-dark); transform:translateX(3px);}
+  .nav-item.active{
+    background:linear-gradient(90deg, rgba(10,186,181,0.28), rgba(127,237,224,0.05));
+    color:var(--text-on-dark); font-weight:600;
+    box-shadow:inset 3px 0 0 var(--tiffany), 0 2px 10px rgba(10,186,181,0.15);
+  }
   .nav-item .code{font-family:'IBM Plex Mono',monospace; font-size:10px; color:var(--text-on-dark-soft); opacity:.7;}
+  .nav-item-main{display:flex; align-items:center;}
+  .nav-icon{
+    display:inline-flex; align-items:center; justify-content:center; flex-shrink:0;
+    width:26px; height:26px; border-radius:8px; margin-right:10px; font-size:14px;
+    background:rgba(255,255,255,0.05); color:var(--tiffany);
+    transition:background .18s ease;
+  }
+  .nav-item.active .nav-icon{background:rgba(127,237,224,0.2);}
   .nav-section-label{
     font-family:'IBM Plex Mono',monospace;
     font-size:10px; text-transform:uppercase; letter-spacing:.12em;
-    color:var(--text-on-dark-soft); opacity:.65; margin:24px 0 8px 12px;
+    color:var(--text-on-dark-soft); opacity:.65; margin:26px 0 8px 4px;
+    display:flex; align-items:center; gap:6px;
   }
+  .nav-section-label::before{ content:''; width:10px; height:1px; background:var(--tiffany); opacity:.7; flex-shrink:0; }
   .badge-dot{width:7px;height:7px;border-radius:50%;flex-shrink:0;margin-left:8px;}
   .btn-new{
     width:100%;
     margin-top:18px;
     padding:12px 12px;
-    background:var(--brass);
+    background:var(--brand-gradient);
     color:var(--surface-dark);
     border:none;
-    border-radius:3px;
+    border-radius:10px;
     font-family:'IBM Plex Sans',sans-serif;
-    font-size:12.5px; font-weight:600;
+    font-size:12.5px; font-weight:700;
     cursor:pointer;
     letter-spacing:.05em;
     text-transform:uppercase;
-    transition:background .15s ease;
+    transition:filter .15s ease, transform .15s ease;
   }
-  .btn-new:hover{background:var(--brass-soft);}
+  .btn-new:hover{filter:brightness(1.08); transform:translateY(-1px);}
 
   /* ---------- Main ---------- */
   main{padding:40px 48px; max-width:920px;}
@@ -202,23 +223,16 @@
   .stat-value.terracotta{color:var(--terracotta);}
 
   /* ---- riepilogo Panoramica in stile "bento" ---- */
-  .bento-row{display:grid; grid-template-columns:repeat(6,1fr); gap:14px; margin-bottom:36px;}
+  .bento-row{display:grid; grid-template-columns:repeat(4,1fr); gap:14px; margin-bottom:36px;}
   @media (max-width:700px){ .bento-row{grid-template-columns:repeat(2,1fr);} }
   .bento-tile{
     background:var(--line-soft); border:1px solid var(--line-soft); border-radius:14px;
-    padding:24px 26px; box-shadow:0 1px 3px rgba(28,26,23,0.05); position:relative; overflow:hidden;
+    padding:22px 22px; box-shadow:0 1px 3px rgba(28,26,23,0.05); position:relative; overflow:hidden;
     display:flex; flex-direction:column; justify-content:center;
   }
-  .bento-tile.big{
-    grid-column:span 3; grid-row:span 3;
-    background:linear-gradient(120deg, var(--brass-soft), var(--line-soft) 75%); border-color:var(--brass);
-  }
-  .bento-tile.mid{grid-column:span 3;}
-  @media (max-width:700px){ .bento-tile.big, .bento-tile.mid{grid-column:span 2; grid-row:auto;} }
   .bento-label{font-family:'IBM Plex Mono',monospace; font-size:11px; text-transform:uppercase; letter-spacing:.1em; color:var(--ink-soft); margin-bottom:14px;}
-  .bento-value{font-family:'Fraunces',serif; font-size:30px; font-weight:700;}
-  .bento-tile.big .bento-value{background:var(--brand-gradient); -webkit-background-clip:text; background-clip:text; color:transparent; font-size:44px;}
-  .bento-value.terracotta{color:var(--terracotta);}
+  .bento-value{font-family:'Fraunces',serif; font-size:24px; font-weight:700; background:var(--brand-gradient); -webkit-background-clip:text; background-clip:text; color:transparent; white-space:nowrap;}
+  .bento-value.terracotta{background:none; -webkit-text-fill-color:initial; color:var(--terracotta);}
   .bento-tile .bento-sub{font-size:12.5px; color:var(--ink-soft); margin-top:10px;}
 
   .prop-type-icon{display:inline-flex; align-items:center; justify-content:center; vertical-align:-6px; margin-right:7px; width:24px; height:24px; border-radius:7px; border:1px solid var(--line-soft); color:var(--brass-deep); flex-shrink:0;}
@@ -2464,8 +2478,8 @@ function renderSidebar(){
     <div class="sidebar">
       <p class="brand">Portfolio Immobiliare</p>
       <p class="brand-sub">Schedario proprietà</p>
-      <div class="nav-item ${state.selectedId===null && !state.selectedClienteId && state.vistaGestore!=='tutte-prenotazioni'?'active':''}" data-nav="overview"><div>Panoramica${alertPortfolio.totale>0?`<span class="nav-badge">${alertPortfolio.totale}</span>`:''}</div></div>
-      ${haModulo('prenotazioni') ? `<div class="nav-item ${state.selectedId===null && !state.selectedClienteId && state.vistaGestore==='tutte-prenotazioni'?'active':''}" data-nav-prenotazioni><div>Tutte le prenotazioni${alertPortfolio.prenotazioniPendenti>0?`<span class="nav-badge">${alertPortfolio.prenotazioniPendenti}</span>`:''}</div></div>` : ''}
+      <div class="nav-item ${state.selectedId===null && !state.selectedClienteId && state.vistaGestore!=='tutte-prenotazioni'?'active':''}" data-nav="overview"><div class="nav-item-main"><span class="nav-icon"><i class="ti ti-layout-dashboard"></i></span>Panoramica${alertPortfolio.totale>0?`<span class="nav-badge">${alertPortfolio.totale}</span>`:''}</div></div>
+      ${haModulo('prenotazioni') ? `<div class="nav-item ${state.selectedId===null && !state.selectedClienteId && state.vistaGestore==='tutte-prenotazioni'?'active':''}" data-nav-prenotazioni><div class="nav-item-main"><span class="nav-icon"><i class="ti ti-calendar-event"></i></span>Tutte le prenotazioni${alertPortfolio.prenotazioniPendenti>0?`<span class="nav-badge">${alertPortfolio.prenotazioniPendenti}</span>`:''}</div></div>` : ''}
       ${haModulo('clienti') || isAdmin() ? `
         <div class="nav-section-label">Clienti (${clientiVisibili.length})</div>
         ${clientiItems || '<div style="font-size:12.5px;color:var(--ink-soft);padding:8px 12px;">Nessun cliente ancora.</div>'}
@@ -2479,8 +2493,8 @@ function renderSidebar(){
         ${operatoriItems || '<div style="font-size:12.5px;color:var(--ink-soft);padding:8px 12px;">Nessun operatore ancora.</div>'}
         <button class="btn-new" data-action="new-operatore">+ Nuovo operatore</button>
       ` : ''}
-      ${isAdmin() ? `<div class="nav-item" data-action="open-settings" style="margin-top:18px;border-top:1px solid var(--line);padding-top:14px;"><i class="ti ti-settings"></i> Impostazioni agenzia</div>` : ''}
-      ${state.gestoreUnlocked ? `<div class="nav-item" data-action="logout-gestore" style="color:var(--terracotta);"><i class="ti ti-logout"></i> Esci</div>` : ''}
+      ${isAdmin() ? `<div class="nav-item" data-action="open-settings" style="margin-top:18px;border-top:1px solid rgba(255,255,255,0.1);padding-top:14px;"><div class="nav-item-main"><span class="nav-icon"><i class="ti ti-settings"></i></span>Impostazioni agenzia</div></div>` : ''}
+      ${state.gestoreUnlocked ? `<div class="nav-item" data-action="logout-gestore" style="color:var(--terracotta);"><div class="nav-item-main"><span class="nav-icon" style="color:var(--terracotta);"><i class="ti ti-logout"></i></span>Esci</div></div>` : ''}
     </div>
   `;
 }
@@ -2673,10 +2687,10 @@ function renderOverview(){
     <p class="page-sub">Il tuo portfolio immobiliare, in un colpo d'occhio.</p>
     ${alertBanner}
     <div class="bento-row">
-      <div class="bento-tile big"><div class="bento-label">Spese ${anno}</div><div class="bento-value" data-count="${speseAnno}" data-format="currency">${fmtCurrency(0)}</div></div>
-      <div class="bento-tile mid"><div class="bento-label">Manutenzioni entro 30gg</div><div class="bento-value ${manutenzioniUrgenti>0?'terracotta':''}" data-count="${manutenzioniUrgenti}">0</div></div>
-      <div class="bento-tile mid"><div class="bento-label">Immobili in portfolio</div><div class="bento-value" data-count="${props.length}">0</div></div>
-      <div class="bento-tile mid"><div class="bento-label">Richieste da evadere</div><div class="bento-value ${richiestePendenti>0?'terracotta':''}" data-count="${richiestePendenti}">0</div></div>
+      <div class="bento-tile"><div class="bento-label">Spese ${anno}</div><div class="bento-value" data-count="${speseAnno}" data-format="currency">${fmtCurrency(0)}</div></div>
+      <div class="bento-tile"><div class="bento-label">Manutenzioni entro 30gg</div><div class="bento-value ${manutenzioniUrgenti>0?'terracotta':''}" data-count="${manutenzioniUrgenti}">0</div></div>
+      <div class="bento-tile"><div class="bento-label">Immobili in portfolio</div><div class="bento-value" data-count="${props.length}">0</div></div>
+      <div class="bento-tile"><div class="bento-label">Richieste da evadere</div><div class="bento-value ${richiestePendenti>0?'terracotta':''}" data-count="${richiestePendenti}">0</div></div>
     </div>
     ${secondRow}
 

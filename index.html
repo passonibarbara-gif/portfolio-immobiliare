@@ -395,6 +395,8 @@
   .field input:focus, .field select:focus, .field textarea:focus{ outline:none; border-color:var(--brass); }
   .field input[type=checkbox]{width:auto;}
   .field-row{display:grid; grid-template-columns:1fr 1fr; gap:12px;}
+  .form-subsection{background:var(--line-soft); border-radius:10px; padding:14px 14px 2px; margin:10px 0 14px 0;}
+  .form-subsection .field textarea{background:var(--paper-raised);}
   .modal-actions{display:flex; justify-content:flex-end; gap:10px; margin-top:24px;}
   .btn-primary{
     background:var(--brand-gradient); color:#fff; border:1px solid transparent;
@@ -2559,6 +2561,29 @@ function renderContrattoGestione(p){
   `;
 }
 
+function renderLocazione(p){
+  const l = p.locazione;
+  if(!l || !l.attivo){
+    return `<div class="vacant-box"><div>Immobile libero, nessuna locazione a lungo termine attiva. Attivala da "Modifica".</div></div>`;
+  }
+  const scadenzaVicina = l.scadenzaContratto && daysUntil(l.scadenzaContratto) <= 30;
+  return `
+    <div class="tenant-card">
+      <div>
+        <p class="tenant-name">Locazione attiva</p>
+        <div class="tenant-meta">
+          ${l.dataInizio ? `Dal ${fmtDate(l.dataInizio)}` : 'Inizio non indicato'}${l.scadenzaContratto ? ` al ${fmtDate(l.scadenzaContratto)}` : ' (senza scadenza)'}
+          ${scadenzaVicina ? `<br><span class="warn">Scade tra ${daysUntil(l.scadenzaContratto)} giorni</span>` : ''}
+          <br>Canone mensile: ${fmtCurrency(l.canone)}
+        </div>
+      </div>
+      <div class="tenant-actions">
+        <button class="icon-btn" data-action="new-payment">+ Registra pagamento</button>
+      </div>
+    </div>
+  `;
+}
+
 function renderPrenotazioni(p){
   const list = [...(p.prenotazioni||[])].sort((a,b)=>new Date(b.createdAt)-new Date(a.createdAt));
   if(!list.length) return `<p style="font-size:12.5px;color:var(--ink-soft);margin:-6px 0 30px 0;">Nessuna richiesta di prenotazione ricevuta.</p>`;
@@ -3078,6 +3103,8 @@ function renderDossier(p){
       </div>
       <p class="section-label">Contratto di gestione</p>
       ${renderContrattoGestione(p)}
+      <p class="section-label" style="margin-top:24px;">Locazione a lungo termine</p>
+      ${renderLocazione(p)}
     `;
   } else if(tabAttiva==='foto'){
     tabContent = renderFotoModulo(p);
@@ -3529,6 +3556,7 @@ function renderOspitiView(){
       <h1 class="page-title">${propertyTypeIcon(p.tipo)}${p.nome}</h1>
       <p class="page-sub">${p.indirizzo||'—'} · ${p.tipo}</p>
       ${renderPhotoGallery(fotoPubbliche(p))}
+      ${p.descrizioneAnnuncio ? `<p style="font-size:13.5px;line-height:1.6;color:var(--ink);margin:4px 0 18px 0;white-space:pre-line;">${p.descrizioneAnnuncio}</p>` : ''}
       <div style="display:flex;gap:16px;flex-wrap:wrap;font-size:12.5px;color:var(--ink-soft);margin-bottom:20px;">
         ${(p.capacitaAdulti||p.capacitaBambini) ? `<span><i class="ti ti-user"></i> Fino a ${p.capacitaAdulti||0} adult${p.capacitaAdulti===1?'o':'i'}${p.capacitaBambini?` + ${p.capacitaBambini} bambin${p.capacitaBambini===1?'o':'i'}`:''}</span>` : ''}
         <span>${p.animaliAmmessi ? '<i class="ti ti-dog"></i> Animali ammessi' : '<i class="ti ti-ban"></i> Animali non ammessi'}</span>
@@ -3840,14 +3868,30 @@ function renderModal(){
             </div>
             <p style="font-size:11px;color:var(--ink-soft);margin:-4px 0 14px 0;">Il proprietario userà questa email per crearsi da solo un accesso (dal login dell'area proprietari, "Non hai ancora un accesso?").</p>
           </div>
+          <p class="section-label" style="margin-top:22px;">Locazione a lungo termine</p>
+          <div class="field" style="display:flex;align-items:center;gap:8px;">
+            <input type="checkbox" name="locazioneAttiva" id="locCheck" ${(p.locazione&&p.locazione.attivo)?'checked':''}>
+            <label for="locCheck" style="margin:0;text-transform:none;font-family:'IBM Plex Sans',sans-serif;font-size:13px;color:var(--ink);">Immobile locato (in affitto a lungo termine)</label>
+          </div>
+          <div id="locazioneField" class="form-subsection" style="${(p.locazione&&p.locazione.attivo)?'':'display:none;'}">
+            <div class="field-row">
+              <div class="field"><label>Data inizio contratto</label><input type="date" name="locazioneDataInizio" value="${(p.locazione&&p.locazione.dataInizio)||''}"></div>
+              <div class="field"><label>Scadenza contratto (facoltativa)</label><input type="date" name="locazioneScadenza" value="${(p.locazione&&p.locazione.scadenzaContratto)||''}"></div>
+            </div>
+            <div class="field"><label>Canone mensile (€)</label><input type="number" name="locazioneCanone" min="0" value="${(p.locazione&&p.locazione.canone)||''}" placeholder="0"></div>
+          </div>
+
+          <p class="section-label" style="margin-top:22px;">Prenotazioni brevi (portale ospiti)</p>
           <div class="field" style="display:flex;align-items:center;gap:8px;">
             <input type="checkbox" name="disponibilePrenotazioni" id="dispCheck" ${p.disponibilePrenotazioni?'checked':''}>
             <label for="dispCheck" style="margin:0;text-transform:none;font-family:'IBM Plex Sans',sans-serif;font-size:13px;color:var(--ink);">Disponibile per prenotazioni (portale ospiti)</label>
           </div>
-          <div id="caratteristicheField" style="${p.disponibilePrenotazioni?'':'display:none;'}">
-            <div class="field"><label>Caratteristiche mostrate all'ospite in fase di prenotazione (una per riga)</label><textarea name="caratteristicheAnnuncio" rows="4" placeholder="es.&#10;Wi-Fi gratuito&#10;Aria condizionata&#10;Vista mare&#10;Parcheggio privato">${p.caratteristicheAnnuncio||''}</textarea></div>
+          <div id="caratteristicheField" class="form-subsection" style="${p.disponibilePrenotazioni?'':'display:none;'}">
+            <div class="field"><label>Descrizione per l'annuncio</label><textarea name="descrizioneAnnuncio" rows="3" placeholder="Racconta l'immobile in poche righe: cosa lo rende speciale, la zona, i dintorni...">${p.descrizioneAnnuncio||''}</textarea></div>
+            <div class="field"><label>Punti di forza (uno per riga)</label><textarea name="caratteristicheAnnuncio" rows="4" placeholder="Wi-Fi gratuito&#10;Aria condizionata&#10;Vista mare&#10;Parcheggio privato">${p.caratteristicheAnnuncio||''}</textarea></div>
+            <p style="font-size:11px;color:var(--ink-soft);margin:-4px 0 14px 0;">Descrizione e punti di forza compaiono nella scheda dell'immobile quando l'ospite prenota.</p>
           </div>
-          <p style="font-size:11.5px;color:var(--ink-soft);margin:-4px 0 14px 0;">Le foto si caricano dalla tab "Foto" della scheda immobile, dopo il salvataggio.</p>
+          <p style="font-size:11.5px;color:var(--ink-soft);margin:14px 0 14px 0;">Le foto si caricano dalla tab "Foto" della scheda immobile, dopo il salvataggio.</p>
           <div class="modal-actions">
             <button type="button" class="btn-secondary" data-close>Annulla</button>
             <button type="submit" class="btn-primary">Salva</button>
@@ -4964,6 +5008,11 @@ function attachHandlers(){
       const box = document.getElementById('caratteristicheField');
       if(box) box.style.display = dispCheckEl.checked ? 'block' : 'none';
     });
+    const locCheckEl = document.getElementById('locCheck');
+    if(locCheckEl) locCheckEl.addEventListener('change', ()=>{
+      const box = document.getElementById('locazioneField');
+      if(box) box.style.display = locCheckEl.checked ? 'block' : 'none';
+    });
     propForm.addEventListener('submit', async ev=>{
       ev.preventDefault();
       const fd = new FormData(propForm);
@@ -4974,6 +5023,15 @@ function attachHandlers(){
         clienteId = nuovoCliente.id;
       }
       const percentualeRaw = fd.get('percentualeProprietario');
+      const propEsistente = state.modal.editing;
+      const locazioneAttiva = fd.get('locazioneAttiva')==='on';
+      const locazione = locazioneAttiva ? {
+        attivo: true,
+        dataInizio: fd.get('locazioneDataInizio')||'',
+        scadenzaContratto: fd.get('locazioneScadenza')||'',
+        canone: Number(fd.get('locazioneCanone'))||0,
+        pagamenti: (propEsistente && propEsistente.locazione && propEsistente.locazione.pagamenti) || []
+      } : (propEsistente && propEsistente.locazione ? {...propEsistente.locazione, attivo:false} : null);
       saveProperty({
         nome: fd.get('nome'),
         indirizzo: fd.get('indirizzo'),
@@ -4985,8 +5043,10 @@ function attachHandlers(){
         capacitaAdulti: Number(fd.get('capacitaAdulti'))||0,
         capacitaBambini: Number(fd.get('capacitaBambini'))||0,
         animaliAmmessi: fd.get('animaliAmmessi')==='on',
-        caratteristicheAnnuncio: fd.get('caratteristicheAnnuncio')||''
-      }, (state.modal.editing && state.modal.editing.id) ? state.modal.editing.id : null);
+        descrizioneAnnuncio: fd.get('descrizioneAnnuncio')||'',
+        caratteristicheAnnuncio: fd.get('caratteristicheAnnuncio')||'',
+        locazione
+      }, (propEsistente && propEsistente.id) ? propEsistente.id : null);
     });
   }
 

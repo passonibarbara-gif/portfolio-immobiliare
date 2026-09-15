@@ -2597,6 +2597,19 @@ function renderLocazione(p){
   `;
 }
 
+function renderPrenotazioniBreviInfo(p){
+  if(!p.disponibilePrenotazioni){
+    return `<div class="vacant-box"><div>Immobile non disponibile per prenotazioni brevi. Attivalo da "Modifica".</div></div>`;
+  }
+  return `
+    <div class="chart-card">
+      <div class="stat-card" style="max-width:260px;"><div class="stat-label">CIN / licenza</div><div class="stat-value" style="font-size:15px;">${p.cin || 'Non inserito'}</div></div>
+      ${p.descrizioneAnnuncio ? `<p style="font-size:13px;line-height:1.6;color:var(--ink);margin:16px 0 0 0;white-space:pre-line;">${p.descrizioneAnnuncio}</p>` : `<p style="font-size:12.5px;color:var(--ink-soft);margin:16px 0 0 0;">Nessuna descrizione inserita.</p>`}
+    </div>
+    ${renderCaratteristicheAnnuncio(p) || `<p style="font-size:12.5px;color:var(--ink-soft);margin-top:10px;">Nessun punto di forza selezionato.</p>`}
+  `;
+}
+
 function renderPrenotazioni(p){
   const list = [...(p.prenotazioni||[])].sort((a,b)=>new Date(b.createdAt)-new Date(a.createdAt));
   if(!list.length) return `<p style="font-size:12.5px;color:var(--ink-soft);margin:-6px 0 30px 0;">Nessuna richiesta di prenotazione ricevuta.</p>`;
@@ -3123,6 +3136,8 @@ function renderDossier(p){
       ${renderContrattoGestione(p)}
       <p class="section-label" style="margin-top:24px;">Locazione a lungo termine</p>
       ${renderLocazione(p)}
+      <p class="section-label" style="margin-top:24px;">Prenotazioni brevi (portale ospiti)</p>
+      ${renderPrenotazioniBreviInfo(p)}
     `;
   } else if(tabAttiva==='foto'){
     tabContent = renderFotoModulo(p);
@@ -3573,6 +3588,7 @@ function renderOspitiView(){
       ${renderWizardSteps(3)}
       <h1 class="page-title">${propertyTypeIcon(p.tipo)}${p.nome}</h1>
       <p class="page-sub">${p.indirizzo||'—'} · ${p.tipo}</p>
+      ${p.cin ? `<p style="font-size:10.5px;font-family:'IBM Plex Mono',monospace;color:var(--ink-soft);letter-spacing:.03em;margin:-4px 0 4px 0;">CIN ${p.cin}</p>` : ''}
       ${renderPhotoGallery(fotoPubbliche(p))}
       ${p.descrizioneAnnuncio ? `<p style="font-size:13.5px;line-height:1.6;color:var(--ink);margin:4px 0 18px 0;white-space:pre-line;">${p.descrizioneAnnuncio}</p>` : ''}
       <div style="display:flex;gap:16px;flex-wrap:wrap;font-size:12.5px;color:var(--ink-soft);margin-bottom:20px;">
@@ -3908,6 +3924,8 @@ function renderModal(){
             <label for="dispCheck" style="margin:0;text-transform:none;font-family:'IBM Plex Sans',sans-serif;font-size:13px;color:var(--ink);">Disponibile per prenotazioni (portale ospiti)</label>
           </div>
           <div id="caratteristicheField" class="form-subsection" style="${p.disponibilePrenotazioni?'':'display:none;'}">
+            <div class="field"><label>CIN — Codice identificativo nazionale</label><input name="cin" value="${p.cin||''}" placeholder="es. IT1234567890ABCDEF"></div>
+            <p style="font-size:11px;color:var(--ink-soft);margin:-10px 0 14px 0;">Obbligatorio per legge negli annunci di affitto breve, se già assegnato dal Ministero del Turismo.</p>
             <div class="field"><label>Descrizione per l'annuncio</label><textarea name="descrizioneAnnuncio" rows="3" placeholder="Racconta l'immobile in poche righe: cosa lo rende speciale, la zona, i dintorni...">${p.descrizioneAnnuncio||''}</textarea></div>
             <div class="field"><label>Punti di forza</label>
               <div class="amenity-grid">
@@ -5071,6 +5089,7 @@ function attachHandlers(){
         capacitaAdulti: Number(fd.get('capacitaAdulti'))||0,
         capacitaBambini: Number(fd.get('capacitaBambini'))||0,
         animaliAmmessi: fd.get('animaliAmmessi')==='on',
+        cin: fd.get('cin')||'',
         descrizioneAnnuncio: fd.get('descrizioneAnnuncio')||'',
         caratteristicheAnnuncio: [...amenitaSelezionate, ...altreRighe].join('\n'),
         locazione

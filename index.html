@@ -408,6 +408,13 @@
   /* client portals */
   .portal-shell{max-width:620px; margin:0 auto; padding:52px 24px;}
   @media (max-width:760px){ .portal-shell{padding:28px 18px;} }
+  .auth-card{
+    max-width:380px; margin:0 auto; background:var(--paper-raised); border:1px solid var(--line-soft);
+    border-radius:16px; padding:40px 36px; box-shadow:0 4px 24px rgba(28,26,23,0.06);
+  }
+  .auth-brand{font-family:'Fraunces',serif; font-weight:700; font-style:italic; font-size:15px; color:var(--brass-deep); margin-bottom:18px; letter-spacing:.01em;}
+  .field input, .field select, .field textarea{ border-radius:8px; }
+  .field input:focus, .field select:focus, .field textarea:focus{ box-shadow:0 0 0 3px rgba(10,186,181,.16); }
   .portal-picker{display:grid; gap:10px; margin-top:20px;}
   .portal-pick-card{
     background:var(--paper-raised); border:1px solid var(--line-soft); border-radius:6px;
@@ -2896,9 +2903,11 @@ function renderProprietariView(){
   if(!state.ownerAuth){
     const modSignup = state.ownerAuthMode==='signup';
     return `<div class="portal-shell" style="text-align:center;">
+      <div class="auth-card">
+      <div class="auth-brand">${state.settings.nomeAgenzia || 'Property Manager'}</div>
       <h1 class="page-title">Area Proprietari</h1>
       <p class="page-sub">${modSignup ? 'Crea il tuo accesso con l\'email che ti ha registrato l\'agenzia.' : 'Accedi con la tua email e la password che hai scelto.'}</p>
-      <form id="ownerLoginForm" style="max-width:300px;margin:0 auto;text-align:left;">
+      <form id="ownerLoginForm" style="text-align:left;">
         <div class="field"><label>Email</label><input type="email" name="email" required autofocus placeholder="nome@esempio.it"></div>
         <div class="field"><label>Password${modSignup ? ' (almeno 6 caratteri)' : ''}</label><input type="password" name="password" required ${modSignup?'minlength="6"':''}></div>
         <button type="submit" class="btn-primary" style="width:100%;">${modSignup ? 'Crea accesso' : 'Accedi'}</button>
@@ -2907,6 +2916,7 @@ function renderProprietariView(){
         ? `<p style="font-size:12.5px;color:var(--sage);margin-top:16px;">Email inviata — controlla la posta e segui il link per reimpostare la password.</p>`
         : (!modSignup ? `<button class="link-btn" data-owner-recupero style="margin-top:16px;">Password dimenticata?</button><br>` : '')}
       <button class="link-btn" data-action="toggle-owner-mode" style="margin-top:10px;">${modSignup ? '← Torna al login' : 'Non hai ancora un accesso? Crea il tuo accesso'}</button>
+      </div>
     </div>`;
   }
 
@@ -3818,37 +3828,47 @@ function render(){
     content = renderOspitiView();
   } else if(state.gestoreRecoveryMode){
     content = `<div class="portal-shell" style="text-align:center;">
+      <div class="auth-card">
+      <div class="auth-brand">${state.settings.nomeAgenzia || 'Property Manager'}</div>
       <h1 class="page-title">Imposta una nuova password</h1>
       <p class="page-sub">Sei arrivata qui dal link inviato via email. Scegli la nuova password.</p>
-      <form id="nuovaPasswordRecoveryForm" style="max-width:300px;margin:0 auto;text-align:left;">
+      <form id="nuovaPasswordRecoveryForm" style="text-align:left;">
         <div class="field"><label>Nuova password</label><input type="password" name="password" required autofocus minlength="6"></div>
         <button type="submit" class="btn-primary" style="width:100%;">Salva nuova password</button>
       </form>
+      </div>
     </div>`;
   } else if(!state.settings.gestoreEmail){
     content = `<div class="portal-shell" style="text-align:center;">
+      <div class="auth-card">
+      <div class="auth-brand">${state.settings.nomeAgenzia || 'Property Manager'}</div>
       <h1 class="page-title">Benvenuto</h1>
       <p class="page-sub">Configura il tuo accesso sicuro all'area gestore.</p>
-      <form id="setupGestoreAuthForm" style="max-width:300px;margin:0 auto;text-align:left;">
+      <form id="setupGestoreAuthForm" style="text-align:left;">
         <div class="field"><label>Email</label><input type="email" name="email" required autofocus value="passoni.barbara@gmail.com"></div>
         <div class="field"><label>Password (almeno 6 caratteri)</label><input type="password" name="password" required minlength="6"></div>
         <button type="submit" class="btn-primary" style="width:100%;">Crea accesso e continua</button>
       </form>
+      </div>
     </div>`;
   } else if(state.gestoreAccessNegato){
     content = `<div class="portal-shell" style="text-align:center;">
+      <div class="auth-card">
       <h1 class="page-title">Accesso non autorizzato</h1>
       <p class="page-sub">Il tuo account (${state.gestoreAuthUser}) si è autenticato correttamente, ma non risulta autorizzato su questa piattaforma.</p>
       <p style="font-size:12.5px;color:var(--ink-soft);margin-bottom:20px;">Se dovresti avere accesso come operatore, chiedi all'amministratore di aggiungerti prima con questa stessa email.</p>
       <button class="btn-secondary" data-action="logout-gestore">Esci</button>
+      </div>
     </div>`;
   } else if(!state.gestoreUnlocked){
     const modOperatore = state.gestoreAuthMode==='operatore-signup';
     content = `<div class="portal-shell" style="text-align:center;">
+      <div class="auth-card">
+      <div class="auth-brand">${state.settings.nomeAgenzia || 'Property Manager'}</div>
       <h1 class="page-title">${modOperatore ? 'Accesso operatore' : 'Area Gestore'}</h1>
       <p class="page-sub">${modOperatore ? 'Crea il tuo accesso con l\'email che ti ha autorizzato l\'amministratore.' : 'Accedi con la tua email e password.'}</p>
       ${state.gestoreSetupFatto ? `<p style="font-size:12.5px;color:var(--brass-deep);background:var(--brass-soft);padding:10px 14px;border-radius:8px;margin:0 0 16px 0;">Account creato! Se Supabase richiede una conferma, controlla la tua email prima di accedere.</p>` : ''}
-      <form id="${modOperatore ? 'operatoreSignupForm' : 'gestoreLoginForm'}" style="max-width:300px;margin:0 auto;text-align:left;">
+      <form id="${modOperatore ? 'operatoreSignupForm' : 'gestoreLoginForm'}" style="text-align:left;">
         <div class="field"><label>Email</label><input type="email" name="email" required autofocus value="${modOperatore ? '' : (state.settings.gestoreEmail||'')}"></div>
         <div class="field"><label>Password${modOperatore ? ' (almeno 6 caratteri)' : ''}</label><input type="password" name="password" required ${modOperatore?'minlength="6"':''}></div>
         <button type="submit" class="btn-primary" style="width:100%;">${modOperatore ? 'Crea accesso' : 'Accedi'}</button>
@@ -3857,6 +3877,7 @@ function render(){
         ? `<p style="font-size:12.5px;color:var(--sage);margin-top:16px;">Email inviata — controlla la posta e segui il link per reimpostare la password.</p>`
         : (!modOperatore ? `<button class="link-btn" data-gestore-recupero style="margin-top:16px;">Password dimenticata?</button><br>` : '')}
       <button class="link-btn" data-action="toggle-operatore-mode" style="margin-top:10px;">${modOperatore ? '← Torna al login normale' : 'Sei un operatore? Crea il tuo accesso'}</button>
+      </div>
     </div>`;
   } else {
     const selected = state.properties.find(p=>p.id===state.selectedId);

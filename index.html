@@ -14,7 +14,7 @@
 <meta name="apple-mobile-web-app-title" content="Portfolio Imm.">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <style>
-  @import url('https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,400;9..144,500;9..144,600;9..144,700&family=IBM+Plex+Sans:wght@400;500;600&family=IBM+Plex+Mono:wght@400;500&display=swap');
+  @import url('https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,400;0,9..144,500;0,9..144,600;0,9..144,700;1,9..144,600;1,9..144,700&family=IBM+Plex+Sans:wght@400;500;600&family=IBM+Plex+Mono:wght@400;500&display=swap');
 
   :root{
     --ink:#241F1A;
@@ -576,8 +576,14 @@
   .msg-bubble{max-width:74%; padding:10px 14px; border-radius:14px; font-size:13.5px; line-height:1.45; background:var(--paper-raised); align-self:flex-start; border-bottom-left-radius:4px; opacity:0; transform:translateY(8px); animation:msgIn .35s cubic-bezier(.2,.7,.2,1) forwards;}
   .msg-bubble.own{align-self:flex-end; background:var(--brand-gradient); color:#fff; border-bottom-left-radius:14px; border-bottom-right-radius:4px;}
   @keyframes msgIn{ to{ opacity:1; transform:none; } }
-  .msg-meta{font-size:10px; color:var(--ink-soft); margin-top:5px; font-family:'IBM Plex Mono',monospace; letter-spacing:.03em;}
-  .msg-bubble.own .msg-meta{color:rgba(255,255,255,.8);}
+  .msg-meta{font-size:10px; color:var(--ink-soft); margin-top:5px; font-family:'IBM Plex Mono',monospace; letter-spacing:.03em; display:flex; align-items:center; gap:5px;}
+  .msg-bubble.own .msg-meta{color:rgba(255,255,255,.8); justify-content:flex-end;}
+  .tick-wrap{display:inline-flex; align-items:center; flex-shrink:0;}
+  .tick-wrap svg{display:block;}
+  .tick-wrap .tick-read{display:none;}
+  .tick-wrap.is-read .tick-sent{display:none;}
+  .tick-wrap.is-read .tick-read{display:block; color:#fff;}
+  .tick-wrap:not(.is-read) .tick-sent{color:rgba(255,255,255,.65);}
   .msg-form{display:flex; gap:8px; margin-bottom:30px;}
   .msg-form input{flex:1; padding:11px 14px; border:1px solid var(--line); border-radius:9px; font-size:13.5px; font-family:'IBM Plex Sans',sans-serif;}
   .send-btn{
@@ -1890,12 +1896,20 @@ function segnaPagamentoBooking(propId, bookingId, ricevuta){
   if(ricevuta) b.ricevutaPagamento = ricevuta;
   saveData(); closeModal(); render();
 }
+function tickMarkHtml(m, viewer){
+  if(m.autore !== viewer) return '';
+  const isRead = viewer !== 'gestore' && !!m.letto;
+  return `<span class="tick-wrap ${isRead?'is-read':''}" aria-hidden="true">
+    <svg class="tick-sent" viewBox="0 0 18 11" width="14" height="9" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M1 5.5 5 9.5 14 1"/></svg>
+    <svg class="tick-read" viewBox="0 0 18 11" width="14" height="9" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M1 5.5 5 9.5 11 2"/><path d="M6 5.5 10 9.5 17 1"/></svg>
+  </span>`;
+}
 function renderBookingChat(p, b, viewer){
   const list = [...(b.messaggiOspite||[])].sort((a,c)=>new Date(a.data)-new Date(c.data));
   const bubbles = list.map(m=>`
     <div class="msg-bubble ${m.autore===viewer?'own':''}">
       <div>${m.testo}</div>
-      <div class="msg-meta">${m.autore==='gestore'?'Gestore':'Tu'} · ${fmtDate(m.data)}</div>
+      <div class="msg-meta">${m.autore==='gestore'?'Gestore':'Tu'} · ${fmtDate(m.data)}${tickMarkHtml(m, viewer)}</div>
     </div>
   `).join('') || '<p style="font-size:12.5px;color:var(--ink-soft);margin:0;">Nessun messaggio ancora.</p>';
   return `
@@ -2232,7 +2246,7 @@ function renderMessages(p, viewer){
   const bubbles = list.map(m=>`
     <div class="msg-bubble ${m.autore===viewer?'own':''}">
       <div>${m.testo}</div>
-      <div class="msg-meta">${m.autore==='gestore'?'Gestore':'Proprietario'} · ${fmtDate(m.data)}</div>
+      <div class="msg-meta">${m.autore==='gestore'?'Gestore':'Proprietario'} · ${fmtDate(m.data)}${tickMarkHtml(m, viewer)}</div>
     </div>
   `).join('') || '<p style="font-size:12.5px;color:var(--ink-soft);margin:0;">Nessun messaggio ancora. Scrivi il primo qui sotto.</p>';
   return `

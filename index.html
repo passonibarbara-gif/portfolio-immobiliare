@@ -97,6 +97,10 @@
   .notif-item{display:flex; gap:9px; align-items:flex-start; padding:9px 10px; border-radius:7px; cursor:pointer; font-size:12.5px; color:var(--ink); line-height:1.4;}
   .notif-item:hover{background:var(--brass-soft);}
   .notif-item .n-dot{width:7px; height:7px; border-radius:50%; background:var(--terracotta); margin-top:5px; flex-shrink:0;}
+  .notif-item.unread{background:var(--brass-soft);}
+  .notif-item.unread .n-dot{background:var(--brass-deep);}
+  .notif-item .n-dot.read{background:var(--line);}
+  .notif-item-sub{font-size:10px; color:var(--ink-soft); margin-top:2px;}
   .notif-empty{padding:16px 10px; font-size:12.5px; color:var(--ink-soft); text-align:center;}
 
   .alert-banner{
@@ -735,6 +739,28 @@ function stampMarkHtml(key){
   return `<div class="stamp-mark ${kind} show" aria-hidden="true">${kind==='ok'?'Confermato':'Rifiutato'}</div>`;
 }
 
+// ---------- Notifiche di attività (gestore <-> proprietario) ----------
+function addNotifica(p, testo, destinatario){
+  if(!p.notifiche) p.notifiche = [];
+  p.notifiche.push({id:uid(), testo, data:new Date().toISOString(), destinatario, letto:false});
+}
+function segnaNotificheLette(props, ruolo){
+  const lista = Array.isArray(props) ? props : [props];
+  let cambiato = false;
+  lista.forEach(p=>{
+    (p && p.notifiche || []).forEach(n=>{ if(n.destinatario===ruolo && !n.letto){ n.letto = true; cambiato = true; } });
+  });
+  if(cambiato) saveData();
+}
+function notificheNonLette(props, ruolo){
+  const lista = Array.isArray(props) ? props : [props];
+  const tutte = [];
+  lista.forEach(p=>{
+    (p && p.notifiche || []).forEach(n=>{ if(n.destinatario===ruolo) tutte.push({...n, propNome: p.nome}); });
+  });
+  return tutte.sort((a,b)=>new Date(b.data)-new Date(a.data));
+}
+
 const CATEGORIE_SPESA = ['Tasse (IMU/TARI)','Condominio','Manutenzione','Assicurazione','Utenze','Altro'];
 const TIPI_IMMOBILE = ['Appartamento','Villa','Box/Garage','Negozio','Ufficio','Terreno'];
 
@@ -1262,6 +1288,7 @@ function saveExpense(propId, data, editingId){
     const e = {id:uid(), stato:'in-attesa', ricevuta:null, storico:[], ...data};
     logStoricoSpesa(e, 'Spesa registrata, in attesa di approvazione del proprietario.');
     p.spese.push(e);
+    addNotifica(p, `Nuova spesa da approvare: ${fmtCurrency(e.importo)}${e.categoria?(' — '+e.categoria):''}.`, 'proprietario');
   }
   saveData(); closeModal(); render();
 }
@@ -1276,6 +1303,7 @@ function rispondiSpesa(propId, expId, esito){
   e.stato = esito;
   logStoricoSpesa(e, esito==='approvata' ? 'Spesa approvata dal proprietario.' : 'Spesa rifiutata dal proprietario.');
   flashStamp('spesa:'+expId, esito==='approvata'?'ok':'crit');
+  addNotifica(p, `Il proprietario ha ${esito==='approvata'?'approvato':'rifiutato'} la spesa di ${fmtCurrency(e.importo)}.`, 'gestore');
   saveData(); render();
 }
 function pagaSpesa(propId, expId, data){
@@ -1284,6 +1312,7 @@ function pagaSpesa(propId, expId, data){
   e.stato = 'pagata';
   if(data.ricevuta) e.ricevuta = data.ricevuta;
   logStoricoSpesa(e, `Spesa pagata.${data.ricevuta ? ' Ricevuta caricata.' : ''}`);
+  addNotifica(p, `La tua spesa di ${fmtCurrency(e.importo)} è stata pagata dall'agenzia.`, 'proprietario');
   saveData(); closeModal(); render();
 }
 
@@ -1304,6 +1333,8 @@ function saveMaintenance(propId, data, editingId){
     logStorico(m, `Intervento segnalato${m.richiedente?(' da '+m.richiedente):''}${dettagli?(' — '+dettagli):''}.`);
     p.manutenzioni.push(m);
     risultato = m;
+    if(m.richiedente==='Proprietario') addNotifica(p, `Il proprietario ha segnalato un problema${m.tipologia?(': '+m.tipologia):''}.`, 'gestore');
+    else addNotifica(p, `Nuovo intervento registrato dal gestore${m.tipologia?(': '+m.tipologia):''}.`, 'proprietario');
   }
   saveData(); closeModal(); render();
   return risultato;
@@ -1332,6 +1363,7 @@ function addPreventivo(propId, mId, data){
   const m = p.manutenzioni.find(x=>x.id===mId);
   m.preventivo = { fornitore:data.fornitore, importo:data.importo, note:data.note, stato:'in-attesa' };
   logStorico(m, `Preventivo inviato: ${data.fornitore} — ${fmtCurrency(data.importo)}.`);
+  addNotifica(p, `Nuovo preventivo da approvare: ${data.fornitore} — ${fmtCurrency(data.importo)}.`, 'proprietario');
   saveData(); closeModal(); render();
 }
 function rispondiPreventivo(propId, mId, esito){
@@ -1341,6 +1373,7 @@ function rispondiPreventivo(propId, mId, esito){
   if(esito==='approvato'){ m.stato='in-corso'; logStorico(m, 'Preventivo approvato dal proprietario.'); }
   else { logStorico(m, 'Preventivo rifiutato dal proprietario.'); }
   flashStamp('preventivo:'+mId, esito==='approvato'?'ok':'crit');
+  addNotifica(p, `Il proprietario ha ${esito==='approvato'?'approvato':'rifiutato'} il preventivo di ${m.preventivo.fornitore}.`, 'gestore');
   saveData(); render();
 }
 function programmaIntervento(propId, mId, data){
@@ -1370,6 +1403,7 @@ function completaIntervento(propId, mId, data){
   m.fotoDopo = (m.fotoDopo||[]).concat(data.fotoDopo||[]);
   if(data.fatturaImporto){ m.fattura = {importo:data.fatturaImporto, nota:data.fatturaNota||''}; }
   logStorico(m, `Intervento completato — il proprietario verrà avvisato.${data.fatturaImporto?(' Fattura: '+fmtCurrency(data.fatturaImporto)+'.'):''}`);
+  addNotifica(p, `Intervento completato${m.tipologia?(': '+m.tipologia):''}.`, 'proprietario');
   saveData(); closeModal(); render();
 }
 
@@ -1865,6 +1899,7 @@ function updateBookingStatus(propId, bookingId, stato){
   const b = p.prenotazioni.find(x=>x.id===bookingId);
   b.stato = stato;
   if(stato==='confermata' || stato==='rifiutata') flashStamp('booking:'+bookingId, stato==='confermata'?'ok':'crit');
+  if(stato==='confermata' || stato==='rifiutata') addNotifica(p, `Prenotazione di ${b.nome} ${stato}.`, 'proprietario');
   saveData(); render();
 }
 function deleteBooking(propId, bookingId){
@@ -1878,6 +1913,7 @@ function sendMessage(propId, autore, testo){
   const p = state.properties.find(x=>x.id===propId);
   if(!p.messaggi) p.messaggi = [];
   p.messaggi.push({id:uid(), autore, testo, data:new Date().toISOString(), letto: autore==='gestore'});
+  addNotifica(p, `Nuovo messaggio dal ${autore==='gestore'?'gestore':'proprietario'}.`, autore==='gestore'?'proprietario':'gestore');
   saveData(); render();
 }
 function segnaMessaggiLetti(propId){
@@ -3422,6 +3458,33 @@ function renderOspitiView(){
 }
 
 // ---------- Top nav ----------
+function renderNotifBellHtml(pendingVoci, attivita, badgeTotale, gotoAttr){
+  const pendingHtml = pendingVoci.length
+    ? pendingVoci.map(v=>`<div class="notif-item" data-${gotoAttr}="${v.tipo}"><span class="n-dot"></span><span>${v.txt}</span></div>`).join('')
+    : '';
+  const attivitaHtml = attivita.length
+    ? attivita.slice(0,20).map(n=>`
+      <div class="notif-item ${n.letto?'':'unread'}">
+        <span class="n-dot ${n.letto?'read':''}"></span>
+        <span>${n.testo}${n.propNome?` <span style="color:var(--ink-soft);">· ${n.propNome}</span>`:''}<div class="notif-item-sub">${fmtDate(n.data)}</div></span>
+      </div>`).join('')
+    : '';
+  const sezioni = [];
+  if(pendingHtml) sezioni.push(`<div class="notif-panel-title">Da fare</div>${pendingHtml}`);
+  if(attivitaHtml) sezioni.push(`<div class="notif-panel-title">Attività recenti</div>${attivitaHtml}`);
+  const corpo = sezioni.length ? sezioni.join('') : `<div class="notif-empty">Nessuna notifica al momento.</div>`;
+  return `
+    <div class="notif-wrap">
+      <button type="button" class="notif-btn" data-action="toggle-notif" aria-label="Notifiche">
+        <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M6 9a6 6 0 1 1 12 0c0 4 1.5 5.5 1.5 5.5H4.5S6 13 6 9Z"/><path d="M10 18a2 2 0 0 0 4 0"/></svg>
+        ${badgeTotale>0?`<span class="notif-badge">${badgeTotale}</span>`:''}
+      </button>
+      <div class="notif-panel ${state.notifOpen?'show':''}">
+        ${corpo}
+      </div>
+    </div>
+  `;
+}
 function renderNotificheGestore(alert){
   const voci = [
     alert.prenotazioniPendenti>0 ? {tipo:'prenotazioni', txt:`${alert.prenotazioniPendenti} richiest${alert.prenotazioniPendenti>1?'e':'a'} di prenotazione da confermare o rifiutare`} : null,
@@ -3431,24 +3494,32 @@ function renderNotificheGestore(alert){
     alert.interventiDaTriage>0 ? {tipo:'interventi-nuovi', txt:`${alert.interventiDaTriage} nuov${alert.interventiDaTriage>1?'i':'o'} intervent${alert.interventiDaTriage>1?'i':'o'} da valutare`} : null,
     alert.messaggiNonLetti>0 ? {tipo:'messaggi', txt:`${alert.messaggiNonLetti} messagg${alert.messaggiNonLetti>1?'i':'io'} non lett${alert.messaggiNonLetti>1?'i':'o'}`} : null,
   ].filter(Boolean);
-  const righe = voci.length
-    ? voci.map(v=>`<div class="notif-item" data-goto-alert="${v.tipo}"><span class="n-dot"></span><span>${v.txt}</span></div>`).join('')
-    : `<div class="notif-empty">Nessuna notifica al momento.</div>`;
-  return `
-    <div class="notif-wrap">
-      <button type="button" class="notif-btn" data-action="toggle-notif" aria-label="Notifiche">
-        <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M6 9a6 6 0 1 1 12 0c0 4 1.5 5.5 1.5 5.5H4.5S6 13 6 9Z"/><path d="M10 18a2 2 0 0 0 4 0"/></svg>
-        ${alert.totale>0?`<span class="notif-badge">${alert.totale}</span>`:''}
-      </button>
-      <div class="notif-panel ${state.notifOpen?'show':''}">
-        <div class="notif-panel-title">Notifiche</div>
-        ${righe}
-      </div>
-    </div>
-  `;
+  const attivita = notificheNonLette(state.properties, 'gestore');
+  const nonLette = attivita.filter(n=>!n.letto).length;
+  return renderNotifBellHtml(voci, attivita, alert.totale + nonLette, 'goto-alert');
+}
+function renderNotificheProprietario(mieiImmobili, alertProprietario){
+  const voci = [
+    alertProprietario.preventiviInAttesa>0 ? {tipo:'interventi', txt:`${alertProprietario.preventiviInAttesa} preventiv${alertProprietario.preventiviInAttesa>1?'i':'o'} in attesa della tua approvazione`} : null,
+    alertProprietario.speseInAttesa>0 ? {tipo:'spese', txt:`${alertProprietario.speseInAttesa} spes${alertProprietario.speseInAttesa>1?'e':'a'} in attesa della tua approvazione`} : null,
+    alertProprietario.controlloInRitardo>0 ? {tipo:'controlli', txt:'Controllo periodico in ritardo'} : null,
+  ].filter(Boolean);
+  const attivita = notificheNonLette(mieiImmobili, 'proprietario');
+  const nonLette = attivita.filter(n=>!n.letto).length;
+  return renderNotifBellHtml(voci, attivita, voci.length + nonLette, 'goto-owner-alert');
 }
 function renderTopNav(){
   const alert = calcolaAlertPortfolio();
+  let ownerBell = '';
+  if(state.ownerAuth){
+    const clienteLoggato = getClienteByEmail(state.ownerAuth.email);
+    const mieiImmobili = clienteLoggato ? state.properties.filter(x=>x.clienteId===clienteLoggato.id) : [];
+    if(mieiImmobili.length){
+      const pCorrente = mieiImmobili.find(x=>x.id===state.ownerPropId) || mieiImmobili[0];
+      const alertProprietario = calcolaAlertProprietario(pCorrente);
+      ownerBell = renderNotificheProprietario(mieiImmobili, alertProprietario);
+    }
+  }
   return `<div class="topnav">
     <div class="topnav-brand">${state.settings.nomeAgenzia || 'Property Manager'}</div>
     <div class="topnav-tabs">
@@ -3456,6 +3527,7 @@ function renderTopNav(){
       <button class="tab-btn ${state.view==='proprietari'?'active':''}" data-view="proprietari">Area Proprietari</button>
       <button class="tab-btn ${state.view==='ospiti'?'active':''}" data-view="ospiti">Prenota un soggiorno</button>
       ${state.gestoreUnlocked ? renderNotificheGestore(alert) : ''}
+      ${ownerBell}
     </div>
   </div>`;
 }
@@ -4083,6 +4155,14 @@ function attachHandlers(){
   if(notifToggleBtn) notifToggleBtn.addEventListener('click', (ev)=>{
     ev.stopPropagation();
     state.notifOpen = !state.notifOpen;
+    if(state.notifOpen){
+      if(state.gestoreUnlocked) segnaNotificheLette(state.properties, 'gestore');
+      if(state.ownerAuth){
+        const clienteLoggato = getClienteByEmail(state.ownerAuth.email);
+        const mieiImmobili = clienteLoggato ? state.properties.filter(x=>x.clienteId===clienteLoggato.id) : [];
+        segnaNotificheLette(mieiImmobili, 'proprietario');
+      }
+    }
     render();
   });
   if(!window.__notifOutsideBound){

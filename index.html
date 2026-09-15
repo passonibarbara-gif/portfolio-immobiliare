@@ -299,19 +299,21 @@
   .dossier-header{display:flex; justify-content:space-between; align-items:flex-start; margin-bottom:6px;}
   .dossier-actions{display:flex; gap:8px; flex-wrap:wrap;}
   .dossier-tabs{
-    display:flex; gap:2px; border-bottom:1px solid var(--line); margin:22px 0 28px 0;
-    flex-wrap:nowrap; overflow-x:auto; -webkit-overflow-scrolling:touch;
-    scrollbar-width:none; -ms-overflow-style:none;
+    display:flex; gap:8px; flex-wrap:wrap; margin:22px 0 28px 0;
   }
-  .dossier-tabs::-webkit-scrollbar{display:none;}
   .dossier-tab-btn{
-    background:none; border:none; padding:10px 14px; font-size:13px; color:var(--ink-soft);
-    cursor:pointer; border-bottom:2px solid transparent; font-family:'IBM Plex Sans',sans-serif;
-    letter-spacing:.02em; transition:color .15s ease, border-color .15s ease;
-    white-space:nowrap; flex-shrink:0;
+    background:var(--line-soft); border:1px solid var(--line-soft); padding:9px 15px 9px 12px;
+    border-radius:20px; font-size:12.5px; color:var(--ink-soft); cursor:pointer;
+    font-family:'IBM Plex Sans',sans-serif; letter-spacing:.02em;
+    display:inline-flex; align-items:center; gap:6px; white-space:nowrap;
+    transition:background .18s ease, border-color .18s ease, color .18s ease, box-shadow .18s ease;
   }
-  .dossier-tab-btn:hover{color:var(--ink);}
-  .dossier-tab-btn.active{color:var(--brass-deep); border-bottom-color:var(--brass); font-weight:600;}
+  .dossier-tab-btn i{font-size:14px; margin-right:0;}
+  .dossier-tab-btn:hover:not(.active){border-color:var(--brass); color:var(--ink);}
+  .dossier-tab-btn.active{
+    background:var(--brand-gradient); border-color:transparent; color:#fff; font-weight:600;
+    box-shadow:0 3px 10px rgba(10,186,181,0.25);
+  }
 
   .foto-card{
     background:var(--line-soft); border:1px solid var(--line-soft); border-radius:10px;
@@ -2871,17 +2873,17 @@ function renderDossier(p){
   const cliente = getCliente(p);
 
   const TABS = [
-    {id:'anagrafica', label:'Anagrafica'},
-    {id:'foto', label:'Foto'},
-    {id:'listino', label:'Listino'},
-    {id:'prenotazioni', label:'Prenotazioni'},
-    {id:'interventi', label:'Interventi'},
-    {id:'controlli', label:'Controlli periodici'},
-    {id:'spese', label:'Spese & Guadagno'},
-    {id:'messaggi', label:'Messaggi'}
+    {id:'anagrafica', label:'Anagrafica', icon:'ti-file-text'},
+    {id:'foto', label:'Foto', icon:'ti-photo'},
+    {id:'listino', label:'Listino', icon:'ti-list-details'},
+    {id:'prenotazioni', label:'Prenotazioni', icon:'ti-calendar-event'},
+    {id:'interventi', label:'Interventi', icon:'ti-tool'},
+    {id:'controlli', label:'Controlli periodici', icon:'ti-clipboard-check'},
+    {id:'spese', label:'Spese & Guadagno', icon:'ti-wallet'},
+    {id:'messaggi', label:'Messaggi', icon:'ti-message-circle'}
   ].filter(t => t.id==='anagrafica' || haModulo(t.id));
   const tabAttiva = TABS.some(t=>t.id===state.dossierTab) ? state.dossierTab : 'anagrafica';
-  const tabsHtml = TABS.map(t=>`<button class="dossier-tab-btn ${tabAttiva===t.id?'active':''}" data-dossier-tab="${t.id}">${t.label}</button>`).join('');
+  const tabsHtml = TABS.map(t=>`<button class="dossier-tab-btn ${tabAttiva===t.id?'active':''}" data-dossier-tab="${t.id}"><i class="ti ${t.icon}"></i>${t.label}</button>`).join('');
 
   let tabContent = '';
   if(tabAttiva==='anagrafica'){
@@ -3081,16 +3083,16 @@ function renderProprietariView(){
   `).join('') : `<tr><td colspan="3" class="empty-row">Nessuna prenotazione registrata.</td></tr>`;
 
   const OWNER_TABS = [
-    {id:'panoramica', label:'Panoramica'},
-    {id:'foto', label:'Foto'},
-    {id:'prenotazioni', label:'Prenotazioni'},
-    {id:'interventi', label:'Interventi'},
-    {id:'controlli', label:'Controlli periodici'},
-    {id:'spese', label:'Spese & Guadagno'},
-    {id:'messaggi', label:'Messaggi'}
+    {id:'panoramica', label:'Panoramica', icon:'ti-layout-dashboard'},
+    {id:'foto', label:'Foto', icon:'ti-photo'},
+    {id:'prenotazioni', label:'Prenotazioni', icon:'ti-calendar-event'},
+    {id:'interventi', label:'Interventi', icon:'ti-tool'},
+    {id:'controlli', label:'Controlli periodici', icon:'ti-clipboard-check'},
+    {id:'spese', label:'Spese & Guadagno', icon:'ti-wallet'},
+    {id:'messaggi', label:'Messaggi', icon:'ti-message-circle'}
   ];
   const ownerTab = OWNER_TABS.some(t=>t.id===state.ownerDossierTab) ? state.ownerDossierTab : 'panoramica';
-  const ownerTabsHtml = OWNER_TABS.map(t=>`<button class="dossier-tab-btn ${ownerTab===t.id?'active':''}" data-owner-tab="${t.id}">${t.label}</button>`).join('');
+  const ownerTabsHtml = OWNER_TABS.map(t=>`<button class="dossier-tab-btn ${ownerTab===t.id?'active':''}" data-owner-tab="${t.id}"><i class="ti ${t.icon}"></i>${t.label}</button>`).join('');
 
   let ownerTabContent = '';
   if(ownerTab==='panoramica'){

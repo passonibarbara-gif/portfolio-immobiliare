@@ -756,9 +756,11 @@ function stampMarkHtml(key){
 }
 
 // ---------- Notifiche di attività (gestore <-> proprietario) ----------
+const NOTIFICHE_MAX_PER_IMMOBILE = 30;
 function addNotifica(p, testo, destinatario, tab){
   if(!p.notifiche) p.notifiche = [];
   p.notifiche.push({id:uid(), testo, data:new Date().toISOString(), destinatario, tab, propId:p.id, letto:false});
+  if(p.notifiche.length > NOTIFICHE_MAX_PER_IMMOBILE) p.notifiche = p.notifiche.slice(-NOTIFICHE_MAX_PER_IMMOBILE);
 }
 function segnaNotificheLette(props, ruolo){
   const lista = Array.isArray(props) ? props : [props];

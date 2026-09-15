@@ -2953,6 +2953,15 @@ function renderImpegnoServizio(){
     <ul>${righe.map(r=>`<li>${r}</li>`).join('')}</ul>
   </div>`;
 }
+function renderCaratteristicheAnnuncio(p){
+  const testo = p.caratteristicheAnnuncio;
+  if(!testo || !testo.trim()) return '';
+  const righe = testo.split('\n').map(r=>r.trim()).filter(Boolean);
+  if(!righe.length) return '';
+  return `<div class="commitment-box">
+    <ul>${righe.map(r=>`<li>${r}</li>`).join('')}</ul>
+  </div>`;
+}
 
 function renderListinoServizi(p, editable){
   const voci = p.listinoServizi || [];
@@ -3510,6 +3519,7 @@ function renderOspitiView(){
         ${(p.capacitaAdulti||p.capacitaBambini) ? `<span><i class="ti ti-user"></i> Fino a ${p.capacitaAdulti||0} adult${p.capacitaAdulti===1?'o':'i'}${p.capacitaBambini?` + ${p.capacitaBambini} bambin${p.capacitaBambini===1?'o':'i'}`:''}</span>` : ''}
         <span>${p.animaliAmmessi ? '<i class="ti ti-dog"></i> Animali ammessi' : '<i class="ti ti-ban"></i> Animali non ammessi'}</span>
       </div>
+      ${renderCaratteristicheAnnuncio(p)}
       <div class="chart-card">
         <p class="section-label" style="margin-top:0;">Il tuo soggiorno</p>
         <table>
@@ -3819,6 +3829,9 @@ function renderModal(){
           <div class="field" style="display:flex;align-items:center;gap:8px;">
             <input type="checkbox" name="disponibilePrenotazioni" id="dispCheck" ${p.disponibilePrenotazioni?'checked':''}>
             <label for="dispCheck" style="margin:0;text-transform:none;font-family:'IBM Plex Sans',sans-serif;font-size:13px;color:var(--ink);">Disponibile per prenotazioni (portale ospiti)</label>
+          </div>
+          <div id="caratteristicheField" style="${p.disponibilePrenotazioni?'':'display:none;'}">
+            <div class="field"><label>Caratteristiche mostrate all'ospite in fase di prenotazione (una per riga)</label><textarea name="caratteristicheAnnuncio" rows="4" placeholder="es.&#10;Wi-Fi gratuito&#10;Aria condizionata&#10;Vista mare&#10;Parcheggio privato">${p.caratteristicheAnnuncio||''}</textarea></div>
           </div>
           <p style="font-size:11.5px;color:var(--ink-soft);margin:-4px 0 14px 0;">Le foto si caricano dalla tab "Foto" della scheda immobile, dopo il salvataggio.</p>
           <div class="modal-actions">
@@ -4932,6 +4945,11 @@ function attachHandlers(){
       const box = document.getElementById('newClienteFields');
       if(box) box.style.display = clienteSelectEl.value ? 'none' : 'block';
     });
+    const dispCheckEl = document.getElementById('dispCheck');
+    if(dispCheckEl) dispCheckEl.addEventListener('change', ()=>{
+      const box = document.getElementById('caratteristicheField');
+      if(box) box.style.display = dispCheckEl.checked ? 'block' : 'none';
+    });
     propForm.addEventListener('submit', async ev=>{
       ev.preventDefault();
       const fd = new FormData(propForm);
@@ -4952,7 +4970,8 @@ function attachHandlers(){
         disponibilePrenotazioni: fd.get('disponibilePrenotazioni')==='on',
         capacitaAdulti: Number(fd.get('capacitaAdulti'))||0,
         capacitaBambini: Number(fd.get('capacitaBambini'))||0,
-        animaliAmmessi: fd.get('animaliAmmessi')==='on'
+        animaliAmmessi: fd.get('animaliAmmessi')==='on',
+        caratteristicheAnnuncio: fd.get('caratteristicheAnnuncio')||''
       }, (state.modal.editing && state.modal.editing.id) ? state.modal.editing.id : null);
     });
   }

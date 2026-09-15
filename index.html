@@ -1786,12 +1786,12 @@ function calcolaAlertImmobile(p){
     m.preventivo && m.stato!=='completata' &&
     ((m.preventivo.stato==='approvato' && !m.dataProgrammazione) || m.preventivo.stato==='rifiutato')
   ).length;
-  const messaggiProprieta = (p.messaggi||[]).filter(m=>m.autore!=='gestore' && !m.letto).length;
-  const messaggiPrenotazioni = (p.prenotazioni||[]).reduce((s,b)=>s+(b.messaggiOspite||[]).filter(m=>m.autore!=='gestore' && !m.letto).length, 0);
-  const messaggiNonLetti = messaggiProprieta + messaggiPrenotazioni;
+  const messaggiProprietario = (p.messaggi||[]).filter(m=>m.autore!=='gestore' && !m.letto).length;
+  const messaggiOspiti = (p.prenotazioni||[]).reduce((s,b)=>s+(b.messaggiOspite||[]).filter(m=>m.autore!=='gestore' && !m.letto).length, 0);
+  const messaggiNonLetti = messaggiProprietario + messaggiOspiti;
   const interventiDaTriage = (p.manutenzioni||[]).filter(m => m.stato==='programmata' && !m.preventivo && !m.dataProgrammazione).length;
   const totale = prenotazioniPendenti + spesePagare + controlloInRitardo + preventiviRisposti + messaggiNonLetti + interventiDaTriage;
-  return { totale, prenotazioniPendenti, spesePagare, controlloInRitardo, preventiviRisposti, messaggiNonLetti, interventiDaTriage };
+  return { totale, prenotazioniPendenti, spesePagare, controlloInRitardo, preventiviRisposti, messaggiProprietario, messaggiOspiti, messaggiNonLetti, interventiDaTriage };
 }
 function calcolaAlertProprietario(p){
   const preventiviInAttesa = (p.manutenzioni||[]).filter(m=>m.preventivo && m.preventivo.stato==='in-attesa').length;
@@ -1801,19 +1801,21 @@ function calcolaAlertProprietario(p){
   return { totale, preventiviInAttesa, speseInAttesa, controlloInRitardo };
 }
 function calcolaAlertPortfolio(){
-  let prenotazioniPendenti=0, spesePagare=0, controlliRitardo=0, preventiviRisposti=0, messaggiNonLetti=0, interventiDaTriage=0;
+  let prenotazioniPendenti=0, spesePagare=0, controlliRitardo=0, preventiviRisposti=0, messaggiProprietario=0, messaggiOspiti=0, interventiDaTriage=0;
   immobiliVisibili().forEach(p=>{
     const a = calcolaAlertImmobile(p);
     prenotazioniPendenti += a.prenotazioniPendenti;
     spesePagare += a.spesePagare;
     controlliRitardo += a.controlloInRitardo;
     preventiviRisposti += a.preventiviRisposti;
-    messaggiNonLetti += a.messaggiNonLetti;
+    messaggiProprietario += a.messaggiProprietario;
+    messaggiOspiti += a.messaggiOspiti;
     interventiDaTriage += a.interventiDaTriage;
   });
+  const messaggiNonLetti = messaggiProprietario + messaggiOspiti;
   return {
     totale: prenotazioniPendenti+spesePagare+controlliRitardo+preventiviRisposti+messaggiNonLetti+interventiDaTriage,
-    prenotazioniPendenti, spesePagare, controlliRitardo, preventiviRisposti, messaggiNonLetti, interventiDaTriage
+    prenotazioniPendenti, spesePagare, controlliRitardo, preventiviRisposti, messaggiProprietario, messaggiOspiti, messaggiNonLetti, interventiDaTriage
   };
 }
 function trovaPrimoImmobileConAlert(tipo){
@@ -1825,11 +1827,8 @@ function trovaPrimoImmobileConAlert(tipo){
     ((m.preventivo.stato==='approvato' && !m.dataProgrammazione) || m.preventivo.stato==='rifiutato')
   ));
   if(tipo==='interventi-nuovi') return state.properties.find(p=>(p.manutenzioni||[]).some(m => m.stato==='programmata' && !m.preventivo && !m.dataProgrammazione));
-  if(tipo==='messaggi') return state.properties.find(p=>{
-    const nelleMessaggi = (p.messaggi||[]).some(m=>m.autore!=='gestore' && !m.letto);
-    const nellePrenotazioni = (p.prenotazioni||[]).some(b=>(b.messaggiOspite||[]).some(m=>m.autore!=='gestore' && !m.letto));
-    return nelleMessaggi || nellePrenotazioni;
-  });
+  if(tipo==='messaggi') return state.properties.find(p=>(p.messaggi||[]).some(m=>m.autore!=='gestore' && !m.letto));
+  if(tipo==='messaggi-ospiti') return state.properties.find(p=>(p.prenotazioni||[]).some(b=>(b.messaggiOspite||[]).some(m=>m.autore!=='gestore' && !m.letto)));
   return null;
 }
 
@@ -2023,6 +2022,7 @@ function sendMessageBooking(propId, bookingId, autore, testo){
   const b = p.prenotazioni.find(x=>x.id===bookingId);
   if(!b.messaggiOspite) b.messaggiOspite = [];
   b.messaggiOspite.push({id:uid(), autore, testo, data:new Date().toISOString(), letto: autore==='gestore'});
+  if(autore!=='gestore') addNotifica(p, `Nuovo messaggio da ${b.nome} (ospite).`, 'gestore', 'prenotazioni');
   saveData(); render();
 }
 function segnaPagamentoBooking(propId, bookingId, ricevuta){
@@ -2579,7 +2579,8 @@ function renderPrenotazioni(p){
         ` : ''}
         ${(b.stato==='confermata' && !b.pagamentoRicevuto) ? `<button class="icon-btn" data-segna-pagamento-booking="${b.id}">Segna pagamento ricevuto</button>` : ''}
       </div>
-      <div style="margin-top:12px;">
+      <div style="margin-top:14px;padding-top:12px;border-top:1px solid var(--line);">
+        <p style="font-family:'IBM Plex Mono',monospace;font-size:10px;text-transform:uppercase;letter-spacing:.08em;color:var(--ink-soft);margin:0 0 8px 0;">Messaggi con l'ospite ${b.nome}</p>
         ${renderBookingChat(p, b, 'gestore')}
       </div>
     </div>
@@ -2820,7 +2821,8 @@ function renderOverview(){
       ${alertPortfolio.controlliRitardo>0 ? `<div class="alert-banner-item clickable" data-goto-alert="controlli"><b>${alertPortfolio.controlliRitardo}</b> immobil${alertPortfolio.controlliRitardo>1?'i':'e'} con controllo periodico in ritardo</div>` : ''}
       ${alertPortfolio.preventiviRisposti>0 ? `<div class="alert-banner-item clickable" data-goto-alert="interventi"><b>${alertPortfolio.preventiviRisposti}</b> preventiv${alertPortfolio.preventiviRisposti>1?'i':'o'} con risposta del proprietario da gestire</div>` : ''}
       ${alertPortfolio.interventiDaTriage>0 ? `<div class="alert-banner-item clickable" data-goto-alert="interventi-nuovi"><b>${alertPortfolio.interventiDaTriage}</b> nuov${alertPortfolio.interventiDaTriage>1?'i':'o'} intervent${alertPortfolio.interventiDaTriage>1?'i':'o'} da valutare</div>` : ''}
-      ${alertPortfolio.messaggiNonLetti>0 ? `<div class="alert-banner-item clickable" data-goto-alert="messaggi"><b>${alertPortfolio.messaggiNonLetti}</b> messagg${alertPortfolio.messaggiNonLetti>1?'i':'io'} non lett${alertPortfolio.messaggiNonLetti>1?'i':'o'}</div>` : ''}
+      ${alertPortfolio.messaggiProprietario>0 ? `<div class="alert-banner-item clickable" data-goto-alert="messaggi"><b>${alertPortfolio.messaggiProprietario}</b> messagg${alertPortfolio.messaggiProprietario>1?'i':'io'} dal proprietario non lett${alertPortfolio.messaggiProprietario>1?'i':'o'}</div>` : ''}
+      ${alertPortfolio.messaggiOspiti>0 ? `<div class="alert-banner-item clickable" data-goto-alert="messaggi-ospiti"><b>${alertPortfolio.messaggiOspiti}</b> messagg${alertPortfolio.messaggiOspiti>1?'i':'io'} da${alertPortfolio.messaggiOspiti>1?' ospiti':' un ospite'} non lett${alertPortfolio.messaggiOspiti>1?'i':'o'}</div>` : ''}
     </div>
   ` : '';
 
@@ -3120,7 +3122,10 @@ function renderDossier(p){
       <button class="add-inline" data-action="new-versamento">+ Registra versamento al proprietario</button>
     `;
   } else if(tabAttiva==='messaggi'){
-    tabContent = renderMessages(p, 'gestore');
+    tabContent = `
+      <p style="font-size:11.5px;color:var(--ink-soft);margin:-4px 0 14px 0;">Chat con il proprietario. I messaggi dei singoli ospiti sono nella scheda <b>Prenotazioni</b>, dentro ogni richiesta.</p>
+      ${renderMessages(p, 'gestore')}
+    `;
   }
 
   return `
@@ -3601,7 +3606,8 @@ function renderNotificheGestore(alert){
     alert.controlliRitardo>0 ? {tipo:'controlli', txt:`${alert.controlliRitardo} immobil${alert.controlliRitardo>1?'i':'e'} con controllo periodico in ritardo`} : null,
     alert.preventiviRisposti>0 ? {tipo:'interventi', txt:`${alert.preventiviRisposti} preventiv${alert.preventiviRisposti>1?'i':'o'} con risposta del proprietario da gestire`} : null,
     alert.interventiDaTriage>0 ? {tipo:'interventi-nuovi', txt:`${alert.interventiDaTriage} nuov${alert.interventiDaTriage>1?'i':'o'} intervent${alert.interventiDaTriage>1?'i':'o'} da valutare`} : null,
-    alert.messaggiNonLetti>0 ? {tipo:'messaggi', txt:`${alert.messaggiNonLetti} messagg${alert.messaggiNonLetti>1?'i':'io'} non lett${alert.messaggiNonLetti>1?'i':'o'}`} : null,
+    alert.messaggiProprietario>0 ? {tipo:'messaggi', txt:`${alert.messaggiProprietario} messagg${alert.messaggiProprietario>1?'i':'io'} dal proprietario non lett${alert.messaggiProprietario>1?'i':'o'}`} : null,
+    alert.messaggiOspiti>0 ? {tipo:'messaggi-ospiti', txt:`${alert.messaggiOspiti} messagg${alert.messaggiOspiti>1?'i':'io'} da${alert.messaggiOspiti>1?' ospiti':' un ospite'} non lett${alert.messaggiOspiti>1?'i':'o'}`} : null,
   ].filter(Boolean);
   const attivita = notificheNonLette(state.properties, 'gestore');
   const nonLette = attivita.filter(n=>!n.letto).length;
@@ -4292,10 +4298,11 @@ function attachHandlers(){
       state.selectedClienteId = null;
       const tabPerTipo = {
         controlli: 'controlli', spese: 'spese', prenotazioni: 'prenotazioni',
-        interventi: 'interventi', 'interventi-nuovi': 'interventi', messaggi: 'messaggi'
+        interventi: 'interventi', 'interventi-nuovi': 'interventi', messaggi: 'messaggi', 'messaggi-ospiti': 'prenotazioni'
       };
       state.dossierTab = tabPerTipo[tipo] || 'anagrafica';
-      if(tipo==='messaggi'){ segnaMessaggiLetti(p.id); segnaMessaggiBookingLetti(p.id); }
+      if(tipo==='messaggi') segnaMessaggiLetti(p.id);
+      if(tipo==='messaggi-ospiti') segnaMessaggiBookingLetti(p.id);
       render();
     });
   });
@@ -4403,7 +4410,8 @@ function attachHandlers(){
           : (a && a.spesePagare>0) ? 'spese'
           : (a && a.preventiviRisposti>0) ? 'interventi'
           : (a && a.interventiDaTriage>0) ? 'interventi'
-          : (a && a.messaggiNonLetti>0) ? 'messaggi'
+          : (a && a.messaggiOspiti>0) ? 'prenotazioni'
+          : (a && a.messaggiProprietario>0) ? 'messaggi'
           : (a && a.controlloInRitardo>0) ? 'controlli'
           : 'anagrafica';
         if(state.dossierTab==='messaggi'){ segnaMessaggiLetti(state.selectedId); segnaMessaggiBookingLetti(state.selectedId); }

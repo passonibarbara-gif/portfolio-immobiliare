@@ -584,10 +584,24 @@
   .cal-cell.booked{background:#F1DAD1; color:var(--terracotta); font-weight:600;}
   .cal-cell.pending{background:var(--brass-soft); color:var(--brass-deep); font-weight:600;}
   .cal-cell.today{box-shadow:inset 0 0 0 1.5px var(--brass);}
+  .cal-cell-click{cursor:pointer; transition:background .15s ease, outline .1s ease;}
+  .cal-cell-click:hover{background:var(--line-soft);}
+  .cal-cell-click.selected{outline:2px solid var(--brass); outline-offset:-2px; background:var(--brass-soft);}
   .cal-legend{display:flex; gap:14px; margin-top:10px; font-size:10.5px; color:var(--ink-soft); flex-wrap:wrap;}
   .cal-legend .dot{display:inline-block; width:8px; height:8px; border-radius:2px; margin-right:4px; vertical-align:middle;}
   .cal-legend .dot.booked{background:var(--terracotta);}
   .cal-legend .dot.pending{background:var(--brass-deep);}
+  .cal-day-detail{
+    margin-top:16px; padding:14px 16px; background:var(--line-soft); border-radius:10px;
+    animation:msgIn .25s cubic-bezier(.2,.7,.2,1) forwards;
+  }
+  .cal-day-detail-head{
+    display:flex; justify-content:space-between; align-items:center; margin-bottom:8px;
+    font-family:'IBM Plex Mono',monospace; font-size:11px; text-transform:uppercase; letter-spacing:.05em; color:var(--ink-soft);
+  }
+  .cal-day-detail-item{display:flex; gap:9px; align-items:flex-start; padding:7px 4px; border-radius:7px; cursor:pointer; font-size:13px; color:var(--ink); line-height:1.4; transition:background .15s ease;}
+  .cal-day-detail-item:hover{background:var(--brass-soft);}
+  .cal-day-detail-item .n-dot{width:7px; height:7px; border-radius:50%; margin-top:5px; flex-shrink:0;}
 
   .msg-thread{
     max-height:340px; overflow-y:auto; border:1px solid var(--line-soft); border-radius:14px;
@@ -692,6 +706,8 @@ let state = {
   dossierTab: 'anagrafica', // tab attiva nella scheda immobile
   ownerDossierTab: 'panoramica', // tab attiva nell'area proprietari
   dashboardCalendarOffset: 0,
+  dashboardCalendarSelectedDay: null,
+  calendarSelectedDay: null,
   guestWizardStep: 1,
   guestDates: {checkin:'', checkout:'', adulti:1, bambini:0, animali:0},
   guestBookingData: {nomeProprio:'', cognome:'', telefono:'', indirizzo:'', note:'', documento:null, adulti:1, bambini:0, animali:0},
@@ -1773,17 +1789,17 @@ function raccogliEventiPortfolio(){
   const eventi = [];
   immobiliVisibili().forEach(p=>{
     (p.prenotazioni||[]).filter(b=>b.stato!=='rifiutata').forEach(b=>{
-      if(b.checkin) eventi.push({data:b.checkin, titolo:`Check-in: ${b.nome}`, immobile:p.nome, colore:'sage'});
-      if(b.checkout) eventi.push({data:b.checkout, titolo:`Check-out: ${b.nome}`, immobile:p.nome, colore:'brass'});
+      if(b.checkin) eventi.push({data:b.checkin, titolo:`Check-in: ${b.nome}`, immobile:p.nome, colore:'sage', propId:p.id, tab:'prenotazioni'});
+      if(b.checkout) eventi.push({data:b.checkout, titolo:`Check-out: ${b.nome}`, immobile:p.nome, colore:'brass', propId:p.id, tab:'prenotazioni'});
     });
     (p.manutenzioni||[]).filter(m=>m.stato!=='completata').forEach(m=>{
-      if(m.scadenza) eventi.push({data:m.scadenza, titolo:`Scadenza intervento: ${m.descrizione}`, immobile:p.nome, colore:'terracotta'});
-      if(m.dataProgrammazione) eventi.push({data:m.dataProgrammazione, titolo:`Intervento programmato: ${m.descrizione}`, immobile:p.nome, colore:'brass'});
+      if(m.scadenza) eventi.push({data:m.scadenza, titolo:`Scadenza intervento: ${m.descrizione}`, immobile:p.nome, colore:'terracotta', propId:p.id, tab:'interventi'});
+      if(m.dataProgrammazione) eventi.push({data:m.dataProgrammazione, titolo:`Intervento programmato: ${m.descrizione}`, immobile:p.nome, colore:'brass', propId:p.id, tab:'interventi'});
     });
     const prossimoControllo = calcProssimoControllo(p);
-    if(prossimoControllo.data) eventi.push({data:prossimoControllo.data, titolo:'Controllo periodico previsto', immobile:p.nome, colore: prossimoControllo.inRitardo?'terracotta':'brass'});
+    if(prossimoControllo.data) eventi.push({data:prossimoControllo.data, titolo:'Controllo periodico previsto', immobile:p.nome, colore: prossimoControllo.inRitardo?'terracotta':'brass', propId:p.id, tab:'controlli'});
     if(p.contrattoGestione && p.contrattoGestione.attivo && p.contrattoGestione.scadenza){
-      eventi.push({data:p.contrattoGestione.scadenza, titolo:'Scadenza contratto di gestione', immobile:p.nome, colore:'terracotta'});
+      eventi.push({data:p.contrattoGestione.scadenza, titolo:'Scadenza contratto di gestione', immobile:p.nome, colore:'terracotta', propId:p.id, tab:'anagrafica'});
     }
   });
   eventi.sort((a,b)=>new Date(a.data)-new Date(b.data));
@@ -1813,22 +1829,41 @@ function renderDashboardCalendar(){
     const key = `${year}-${String(month+1).padStart(2,'0')}-${String(day).padStart(2,'0')}`;
     const evs = eventiPerGiorno[key] || [];
     let cls = key===todayKey ? 'today' : '';
+    if(key===state.dashboardCalendarSelectedDay) cls += ' selected';
     let dotColor = '';
     if(evs.length){
       dotColor = evs.some(e=>e.colore==='terracotta') ? 'var(--terracotta)' : evs.some(e=>e.colore==='brass') ? 'var(--brass-deep)' : 'var(--sage)';
     }
-    cells += `<div class="cal-cell ${cls}" style="flex-direction:column;gap:2px;" title="${evs.map(e=>e.titolo+' — '+e.immobile).join('; ')}">
+    cells += `<div class="cal-cell cal-cell-click ${cls}" style="flex-direction:column;gap:2px;" data-cal-day="${key}" title="${evs.map(e=>e.titolo+' — '+e.immobile).join('; ')}">
       <span>${day}</span>
       ${evs.length ? `<span style="width:5px;height:5px;border-radius:50%;background:${dotColor};"></span>` : ''}
     </div>`;
   }
   const weekdays = ['Lu','Ma','Me','Gi','Ve','Sa','Do'].map(w=>`<div class="cal-weekday">${w}</div>`).join('');
 
+  const evsGiornoSelezionato = state.dashboardCalendarSelectedDay ? (eventiPerGiorno[state.dashboardCalendarSelectedDay] || []) : null;
+  const dettaglioGiorno = evsGiornoSelezionato ? `
+    <div class="cal-day-detail">
+      <div class="cal-day-detail-head">
+        <span>${fmtDate(state.dashboardCalendarSelectedDay)}</span>
+        <button type="button" class="link-btn" data-cal-day-close>chiudi</button>
+      </div>
+      ${evsGiornoSelezionato.length ? evsGiornoSelezionato.map(e=>`
+        <div class="cal-day-detail-item" data-goto-evento="${e.propId}::${e.tab}">
+          <span class="n-dot" style="background:${e.colore==='terracotta'?'var(--terracotta)':e.colore==='brass'?'var(--brass-deep)':'var(--sage)'}"></span>
+          <span>${e.titolo}<div class="notif-item-sub">${e.immobile}</div></span>
+        </div>
+      `).join('') : `<p style="font-size:12.5px;color:var(--ink-soft);margin:6px 0 0 0;">Nessuna attività in programma per questo giorno.</p>`}
+    </div>
+  ` : '';
+
   const prossimi = eventi.filter(e=>e.data && e.data >= todayKey).slice(0,12);
   const listaHtml = prossimi.length ? prossimi.map(e=>`
-    <div style="display:flex;justify-content:space-between;align-items:center;gap:10px;padding:11px 2px;border-bottom:1px solid var(--line-soft);font-size:13px;flex-wrap:wrap;">
-      <div><strong>${fmtDate(e.data)}</strong> — ${e.titolo}</div>
-      <div style="color:var(--ink-soft);font-size:11.5px;font-family:'IBM Plex Mono',monospace;">${e.immobile}</div>
+    <div class="cal-day-detail-item" style="padding:11px 2px;border-bottom:1px solid var(--line-soft); border-radius:0;" data-goto-evento="${e.propId}::${e.tab}">
+      <div style="display:flex;justify-content:space-between;align-items:center;gap:10px;flex-wrap:wrap;flex:1;">
+        <div><strong>${fmtDate(e.data)}</strong> — ${e.titolo}</div>
+        <div style="color:var(--ink-soft);font-size:11.5px;font-family:'IBM Plex Mono',monospace;">${e.immobile}</div>
+      </div>
     </div>
   `).join('') : `<p style="font-size:12.5px;color:var(--ink-soft);">Nessuna scadenza o prenotazione imminente.</p>`;
 
@@ -1845,6 +1880,7 @@ function renderDashboardCalendar(){
           <span><i class="dot booked"></i>Scadenza/urgente</span>
           <span><i class="dot pending"></i>Programmato</span>
         </div>
+        ${dettaglioGiorno}
       </div>
       <div style="margin-top:26px; padding-top:22px; border-top:1px solid var(--line-soft);">
         <p style="font-family:'IBM Plex Mono',monospace;font-size:10px;text-transform:uppercase;letter-spacing:.08em;color:var(--ink-soft);margin-bottom:6px;">Prossime scadenze</p>
@@ -2031,9 +2067,28 @@ function renderCalendar(prenotazioni, monthOffset){
     const key = `${year}-${String(month+1).padStart(2,'0')}-${String(day).padStart(2,'0')}`;
     let cls = confirmed.has(key) ? 'booked' : pending.has(key) ? 'pending' : '';
     if(key===todayKey) cls += ' today';
-    cells += `<div class="cal-cell ${cls}">${day}</div>`;
+    if(key===state.calendarSelectedDay) cls += ' selected';
+    cells += `<div class="cal-cell cal-cell-click ${cls}" data-booking-cal-day="${key}">${day}</div>`;
   }
   const weekdays = ['Lu','Ma','Me','Gi','Ve','Sa','Do'].map(w=>`<div class="cal-weekday">${w}</div>`).join('');
+
+  const bookingsGiorno = state.calendarSelectedDay
+    ? (prenotazioni||[]).filter(b=>b.stato!=='rifiutata' && b.checkin && b.checkout && state.calendarSelectedDay>=b.checkin && state.calendarSelectedDay<b.checkout)
+    : null;
+  const dettaglioGiorno = bookingsGiorno ? `
+    <div class="cal-day-detail">
+      <div class="cal-day-detail-head">
+        <span>${fmtDate(state.calendarSelectedDay)}</span>
+        <button type="button" class="link-btn" data-booking-cal-day-close>chiudi</button>
+      </div>
+      ${bookingsGiorno.length ? bookingsGiorno.map(b=>`
+        <div class="cal-day-detail-item" style="cursor:default;">
+          <span class="n-dot" style="background:${b.stato==='confermata'?'var(--terracotta)':'var(--brass-deep)'}"></span>
+          <span>${b.nome} — ${fmtDate(b.checkin)} → ${fmtDate(b.checkout)}<div class="notif-item-sub">${b.stato}</div></span>
+        </div>
+      `).join('') : `<p style="font-size:12.5px;color:var(--ink-soft);margin:6px 0 0 0;">Nessuna prenotazione per questo giorno.</p>`}
+    </div>
+  ` : '';
 
   return `<div class="calendar">
     <div class="cal-header">
@@ -2046,6 +2101,7 @@ function renderCalendar(prenotazioni, monthOffset){
       <span><i class="dot booked"></i>Confermata</span>
       <span><i class="dot pending"></i>Richiesta in attesa</span>
     </div>
+    ${dettaglioGiorno}
   </div>`;
 }
 
@@ -4114,8 +4170,19 @@ function attachHandlers(){
 
   document.querySelectorAll('[data-cal-nav]').forEach(b=>b.addEventListener('click', ()=>{
     state.calendarOffset += Number(b.getAttribute('data-cal-nav'));
+    state.calendarSelectedDay = null;
     render();
   }));
+
+  document.querySelectorAll('[data-booking-cal-day]').forEach(el=>{
+    el.addEventListener('click', ()=>{
+      const key = el.getAttribute('data-booking-cal-day');
+      state.calendarSelectedDay = state.calendarSelectedDay===key ? null : key;
+      render();
+    });
+  });
+  const bookingCalDayCloseBtn = document.querySelector('[data-booking-cal-day-close]');
+  if(bookingCalDayCloseBtn) bookingCalDayCloseBtn.addEventListener('click', ()=>{ state.calendarSelectedDay = null; render(); });
 
   document.querySelectorAll('[data-price-cal-nav]').forEach(b=>b.addEventListener('click', ()=>{
     state.priceCalendarOffset += Number(b.getAttribute('data-price-cal-nav'));
@@ -4129,8 +4196,34 @@ function attachHandlers(){
 
   document.querySelectorAll('[data-dash-cal-nav]').forEach(b=>b.addEventListener('click', ()=>{
     state.dashboardCalendarOffset += Number(b.getAttribute('data-dash-cal-nav'));
+    state.dashboardCalendarSelectedDay = null;
     render();
   }));
+
+  document.querySelectorAll('[data-cal-day]').forEach(el=>{
+    el.addEventListener('click', ()=>{
+      const key = el.getAttribute('data-cal-day');
+      state.dashboardCalendarSelectedDay = state.dashboardCalendarSelectedDay===key ? null : key;
+      render();
+    });
+  });
+  const calDayCloseBtn = document.querySelector('[data-cal-day-close]');
+  if(calDayCloseBtn) calDayCloseBtn.addEventListener('click', ()=>{ state.dashboardCalendarSelectedDay = null; render(); });
+
+  document.querySelectorAll('[data-goto-evento]').forEach(el=>{
+    el.addEventListener('click', ()=>{
+      const [propId, tab] = el.getAttribute('data-goto-evento').split('::');
+      const p = state.properties.find(x=>x.id===propId);
+      if(!p) return;
+      state.view = 'gestore';
+      state.selectedId = p.id;
+      state.selectedClienteId = null;
+      state.dossierTab = tab;
+      state.dashboardCalendarSelectedDay = null;
+      if(tab==='messaggi'){ segnaMessaggiLetti(p.id); segnaMessaggiBookingLetti(p.id); }
+      render();
+    });
+  });
 
   document.querySelectorAll('[data-goto-alert]').forEach(el=>{
     el.addEventListener('click', ()=>{

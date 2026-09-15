@@ -456,6 +456,50 @@
   }
   .portal-pick-card:hover{border-color:var(--brass); transform:translateY(-2px); box-shadow:0 8px 20px rgba(28,26,23,0.1);}
 
+  /* ---- Prenota un soggiorno: vetrina pubblica ---- */
+  .guest-hero{
+    position:relative; overflow:hidden; border-radius:18px; padding:38px 34px; margin-bottom:24px;
+    background:linear-gradient(135deg, var(--surface-dark) 0%, var(--surface-dark-2) 100%);
+  }
+  .guest-hero::before{
+    content:''; position:absolute; inset:0; background:var(--brand-gradient); opacity:.16; pointer-events:none;
+  }
+  .guest-hero-brand{
+    position:relative; font-family:'Fraunces',serif; font-weight:700; font-style:italic; font-size:14px;
+    color:var(--tiffany); letter-spacing:.02em; margin-bottom:12px;
+  }
+  .guest-hero h1{position:relative; font-family:'Fraunces',serif; font-weight:700; font-size:32px; line-height:1.18; color:var(--text-on-dark); margin:0 0 10px 0;}
+  .guest-hero p{position:relative; font-size:14px; color:var(--text-on-dark-soft); margin:0; max-width:460px;}
+  @media (max-width:600px){ .guest-hero{padding:28px 22px;} .guest-hero h1{font-size:25px;} }
+
+  .guest-prop-grid{display:grid; grid-template-columns:repeat(auto-fill, minmax(240px,1fr)); gap:18px; margin-top:20px;}
+  .guest-prop-card{
+    background:var(--line-soft); border:1px solid var(--line-soft); border-radius:14px; overflow:hidden; cursor:pointer;
+    box-shadow:0 1px 3px rgba(28,26,23,0.05);
+    transition:transform .18s ease, box-shadow .18s ease, border-color .18s ease;
+  }
+  .guest-prop-card:hover{transform:translateY(-4px); box-shadow:0 16px 34px rgba(28,26,23,0.14); border-color:var(--brass);}
+  .guest-prop-card-img{width:100%; height:170px; object-fit:cover; display:block;}
+  .guest-prop-card-img.placeholder{
+    display:flex; align-items:center; justify-content:center;
+    background:linear-gradient(135deg, var(--brass-soft), var(--line-soft) 75%); color:var(--brass-deep);
+  }
+  .guest-prop-card-img.placeholder .prop-type-icon{width:44px; height:44px; border:none;}
+  .guest-prop-card-img.placeholder .prop-type-icon svg{width:24px; height:24px;}
+  .guest-prop-card-body{padding:16px 18px 18px;}
+  .guest-prop-card-name{font-family:'Fraunces',serif; font-weight:700; font-size:18px; margin-bottom:2px;}
+  .guest-prop-card-addr{font-size:12.5px; color:var(--ink-soft); margin-bottom:8px;}
+  .guest-prop-card-feat{font-size:11.5px; color:var(--ink-soft); margin-bottom:12px;}
+  .guest-prop-card-foot{display:flex; justify-content:space-between; align-items:baseline; padding-top:12px; border-top:1px solid var(--line);}
+  .guest-prop-card-price{font-family:'Fraunces',serif; font-weight:700; font-size:19px; background:var(--brand-gradient); -webkit-background-clip:text; background-clip:text; color:transparent;}
+  .guest-prop-card-nights{font-size:11px; color:var(--ink-soft); font-family:'IBM Plex Mono',monospace;}
+
+  .guest-confirm-mark{
+    width:64px; height:64px; border-radius:50%; margin:0 auto 20px; background:var(--brand-gradient);
+    color:#fff; display:flex; align-items:center; justify-content:center; font-size:28px;
+    box-shadow:0 8px 24px rgba(10,186,181,0.3); animation:stampIn .55s cubic-bezier(.22,1.6,.4,1) forwards;
+  }
+
   .photo-strip{display:flex; gap:8px; flex-wrap:wrap; margin:8px 0 2px 0;}
   .photo-thumb{width:56px; height:56px; object-fit:cover; border-radius:4px; border:1px solid var(--line-soft);}
   .photo-thumb-wrap{position:relative; display:inline-block;}
@@ -871,6 +915,8 @@ function applyLinkParams(){
     if(prenota && state.properties.some(p=>p.id===prenota)){
       state.view = 'ospiti';
       state.guestPropId = prenota;
+    } else if(prenota){
+      state.view = 'ospiti';
     } else if(proprietario){
       state.view = 'proprietari';
     } else if(prenotazioni){
@@ -3357,6 +3403,7 @@ function renderOspitiView(){
   if(state.guestSubmitted && state.lastBooking){
     const b = state.lastBooking;
     return `<div class="portal-shell" style="text-align:center;">
+      <div class="guest-confirm-mark"><i class="ti ti-check"></i></div>
       <h1 class="page-title">Richiesta inviata</h1>
       <p class="page-sub">Ti contatteremo a breve per confermare la prenotazione presso ${b.propNome}.</p>
       ${b.totale ? `<p style="font-size:15px;margin-bottom:18px;">Totale soggiorno: <strong>${fmtCurrency(b.totale)}</strong></p>` : ''}
@@ -3374,12 +3421,15 @@ function renderOspitiView(){
 
   // ---- Step 1: scelta periodo ----
   if(step===1){
-    return `<div class="portal-shell">
-      <h1 class="page-title">Prenota un soggiorno</h1>
+    return `<div class="portal-shell" style="max-width:760px;">
+      <div class="guest-hero">
+        <div class="guest-hero-brand">${state.settings.nomeAgenzia || 'Property Manager'}</div>
+        <h1>Trova il tuo prossimo soggiorno</h1>
+        <p>Scegli le date, controlla la disponibilità in tempo reale e prenota in pochi minuti.</p>
+      </div>
       <button class="link-btn" data-guest-goto-manage style="margin-bottom:20px;display:block;">Hai già prenotato? Gestisci la tua prenotazione →</button>
       ${renderWizardSteps(1)}
-      <p class="page-sub">Scegli le date e chi viaggia con te.</p>
-      <form id="guestDatesForm" style="max-width:400px;">
+      <form id="guestDatesForm" style="max-width:420px;">
         <div class="field-row">
           <div class="field"><label>Check-in</label><input type="date" name="checkin" required value="${state.guestDates.checkin}"></div>
           <div class="field"><label>Check-out</label><input type="date" name="checkout" required value="${state.guestDates.checkout}"></div>
@@ -3405,28 +3455,26 @@ function renderOspitiView(){
         (p.capacitaAdulti||p.capacitaBambini) ? `<i class="ti ti-user"></i> fino a ${p.capacitaAdulti||0} adult${p.capacitaAdulti===1?'o':'i'}${p.capacitaBambini?` + ${p.capacitaBambini} bambin${p.capacitaBambini===1?'o':'i'}`:''}` : null,
         p.animaliAmmessi ? '<i class="ti ti-dog"></i> animali ammessi' : null
       ].filter(Boolean).join(' · ');
-      return `<div class="portal-pick-card" data-guest-pick="${p.id}">
-        <div style="display:flex;align-items:center;gap:12px;">
-          ${cop ? `<img src="${cop}" style="width:52px;height:52px;object-fit:cover;border-radius:6px;flex-shrink:0;">` : ''}
-          <div>
-            <div style="font-family:'Fraunces',serif;font-weight:600;">${p.nome}</div>
-            <div style="font-size:12px;color:var(--ink-soft);">${p.indirizzo||'—'} · ${p.tipo}</div>
-            ${caratteristiche ? `<div style="font-size:11px;color:var(--ink-soft);margin-top:2px;">${caratteristiche}</div>` : ''}
+      return `<div class="guest-prop-card" data-guest-pick="${p.id}">
+        ${cop ? `<img class="guest-prop-card-img" src="${cop}">` : `<div class="guest-prop-card-img placeholder">${propertyTypeIcon(p.tipo)}</div>`}
+        <div class="guest-prop-card-body">
+          <div class="guest-prop-card-name">${p.nome}</div>
+          <div class="guest-prop-card-addr">${p.indirizzo||'—'} · ${p.tipo}</div>
+          ${caratteristiche ? `<div class="guest-prop-card-feat">${caratteristiche}</div>` : ''}
+          <div class="guest-prop-card-foot">
+            <span class="guest-prop-card-price">${fmtCurrency(calcolo.totale)}</span>
+            <span class="guest-prop-card-nights">${calcolo.notti} nott${calcolo.notti===1?'e':'i'}</span>
           </div>
-        </div>
-        <div style="text-align:right;">
-          <div style="font-family:'Fraunces',serif;font-weight:600;">${fmtCurrency(calcolo.totale)}</div>
-          <div style="font-size:11px;color:var(--ink-soft);">${calcolo.notti} notti</div>
         </div>
       </div>`;
     }).join('') || '<p style="color:var(--ink-soft);">Nessun immobile disponibile per queste date e per il numero di ospiti/animali indicato. Prova a cambiare i criteri.</p>';
 
-    return `<div class="portal-shell">
+    return `<div class="portal-shell" style="max-width:760px;">
       <button class="link-btn" data-guest-wizard-back="1" style="margin-bottom:16px;">← Cambia criteri</button>
       ${renderWizardSteps(2)}
       <h1 class="page-title">Immobili disponibili</h1>
       <p class="page-sub">${fmtDate(gd.checkin)} → ${fmtDate(gd.checkout)} · ${gd.adulti} adult${gd.adulti===1?'o':'i'}${gd.bambini?`, ${gd.bambini} bambin${gd.bambini===1?'o':'i'}`:''}${gd.animali?`, ${gd.animali} animal${gd.animali===1?'e':'i'}`:''}</p>
-      <div class="portal-picker">${cards}</div>
+      <div class="guest-prop-grid">${cards}</div>
     </div>`;
   }
 
@@ -3437,24 +3485,26 @@ function renderOspitiView(){
   // ---- Step 3: dettagli immobile e importo ----
   if(step===3){
     const righeServizi = calcolo.servizi.map(s=>`<tr><td>${s.nome}</td><td class="cell-num">${fmtCurrency(s.importo)}</td></tr>`).join('');
-    return `<div class="portal-shell">
+    return `<div class="portal-shell" style="max-width:760px;">
       <button class="link-btn" data-guest-wizard-back="2" style="margin-bottom:16px;">← Altri immobili</button>
       ${renderWizardSteps(3)}
-      <h1 class="page-title">${p.nome}</h1>
+      <h1 class="page-title">${propertyTypeIcon(p.tipo)}${p.nome}</h1>
       <p class="page-sub">${p.indirizzo||'—'} · ${p.tipo}</p>
       ${renderPhotoGallery(fotoPubbliche(p))}
       <div style="display:flex;gap:16px;flex-wrap:wrap;font-size:12.5px;color:var(--ink-soft);margin-bottom:20px;">
         ${(p.capacitaAdulti||p.capacitaBambini) ? `<span><i class="ti ti-user"></i> Fino a ${p.capacitaAdulti||0} adult${p.capacitaAdulti===1?'o':'i'}${p.capacitaBambini?` + ${p.capacitaBambini} bambin${p.capacitaBambini===1?'o':'i'}`:''}</span>` : ''}
         <span>${p.animaliAmmessi ? '<i class="ti ti-dog"></i> Animali ammessi' : '<i class="ti ti-ban"></i> Animali non ammessi'}</span>
       </div>
-      <p class="section-label" style="margin-top:20px;">Il tuo soggiorno</p>
-      <table>
-        <tbody>
-          <tr><td>${fmtDate(state.guestDates.checkin)} → ${fmtDate(state.guestDates.checkout)} (${calcolo.notti} nott${calcolo.notti===1?'e':'i'})</td><td class="cell-num">${fmtCurrency(calcolo.soggiornoBase)}</td></tr>
-          ${righeServizi}
-        </tbody>
-      </table>
-      <p style="font-family:'Fraunces',serif;font-weight:600;font-size:20px;margin:-24px 0 24px 0;">Totale: ${fmtCurrency(calcolo.totale)}</p>
+      <div class="chart-card">
+        <p class="section-label" style="margin-top:0;">Il tuo soggiorno</p>
+        <table>
+          <tbody>
+            <tr><td>${fmtDate(state.guestDates.checkin)} → ${fmtDate(state.guestDates.checkout)} (${calcolo.notti} nott${calcolo.notti===1?'e':'i'})</td><td class="cell-num">${fmtCurrency(calcolo.soggiornoBase)}</td></tr>
+            ${righeServizi}
+          </tbody>
+        </table>
+        <div class="chart-total" style="margin-top:6px;">Totale: <span style="background:var(--brand-gradient); -webkit-background-clip:text; background-clip:text; color:transparent;">${fmtCurrency(calcolo.totale)}</span></div>
+      </div>
       <button class="btn-primary" data-guest-wizard-next="4" style="width:100%;">Prenota questo immobile</button>
     </div>`;
   }
@@ -3462,7 +3512,7 @@ function renderOspitiView(){
   // ---- Step 4: dati anagrafici e documento ----
   if(step===4){
     const bd = state.guestBookingData;
-    return `<div class="portal-shell">
+    return `<div class="portal-shell" style="max-width:760px;">
       <button class="link-btn" data-guest-wizard-back="3" style="margin-bottom:16px;">← Torna ai dettagli</button>
       ${renderWizardSteps(4)}
       <h1 class="page-title">I tuoi dati</h1>
@@ -3486,11 +3536,11 @@ function renderOspitiView(){
   // ---- Step 5: pagamento e conferma finale ----
   const bd = state.guestBookingData;
   const haLinkPagamento = !!p.linkPagamento;
-  return `<div class="portal-shell">
+  return `<div class="portal-shell" style="max-width:760px;">
     <button class="link-btn" data-guest-wizard-back="4" style="margin-bottom:16px;">← Modifica i tuoi dati</button>
     ${renderWizardSteps(5)}
     <h1 class="page-title">${haLinkPagamento ? 'Pagamento e conferma' : 'Conferma la tua richiesta'}</h1>
-    <div class="stat-card" style="margin-bottom:20px;">
+    <div class="chart-card" style="margin-bottom:20px;">
       <div style="font-family:'Fraunces',serif;font-weight:600;font-size:17px;margin-bottom:6px;">${p.nome}</div>
       <div style="font-size:13px;color:var(--ink-soft);">${p.indirizzo||'—'} · ${p.tipo}</div>
       <div style="font-size:13px;color:var(--ink-soft);margin-top:8px;">${fmtDate(state.guestDates.checkin)} → ${fmtDate(state.guestDates.checkout)} · ${calcolo.notti} nott${calcolo.notti===1?'e':'i'}</div>
@@ -3498,7 +3548,7 @@ function renderOspitiView(){
       <div style="font-size:13px;color:var(--ink-soft);">${bd.indirizzo}</div>
       <div style="font-size:13px;color:var(--ink-soft);margin-top:8px;">${state.guestDates.adulti} adult${state.guestDates.adulti===1?'o':'i'}${state.guestDates.bambini?`, ${state.guestDates.bambini} bambin${state.guestDates.bambini===1?'o':'i'}`:''}${state.guestDates.animali?`, ${state.guestDates.animali} animal${state.guestDates.animali===1?'e':'i'} domestic${state.guestDates.animali===1?'o':'i'}`:''}</div>
       ${bd.note ? `<div style="font-size:13px;color:var(--ink-soft);margin-top:4px;">Nota: ${bd.note}</div>` : ''}
-      <div style="font-family:'Fraunces',serif;font-weight:600;font-size:22px;margin-top:14px;">Totale: ${fmtCurrency(calcolo.totale)}</div>
+      <div class="chart-total" style="margin-top:14px;">Totale: <span style="background:var(--brand-gradient); -webkit-background-clip:text; background-clip:text; color:transparent;">${fmtCurrency(calcolo.totale)}</span></div>
     </div>
     ${haLinkPagamento ? `
       <ol style="font-size:13px;color:var(--ink-soft);padding-left:18px;margin-bottom:20px;">
@@ -3578,11 +3628,14 @@ function renderTopNav(){
       ownerBell = renderNotificheProprietario(mieiImmobili, alertProprietario);
     }
   }
+  const isOspiti = state.view==='ospiti';
   return `<div class="topnav">
     <div class="topnav-brand">${state.settings.nomeAgenzia || 'Property Manager'}</div>
     <div class="topnav-tabs">
-      <button class="tab-btn ${state.view==='gestore'?'active':''}" data-view="gestore">Gestore${alert.totale>0?`<span class="nav-badge">${alert.totale}</span>`:''}</button>
-      <button class="tab-btn ${state.view==='proprietari'?'active':''}" data-view="proprietari">Area Proprietari</button>
+      ${!isOspiti ? `
+        <button class="tab-btn ${state.view==='gestore'?'active':''}" data-view="gestore">Gestore${alert.totale>0?`<span class="nav-badge">${alert.totale}</span>`:''}</button>
+        <button class="tab-btn ${state.view==='proprietari'?'active':''}" data-view="proprietari">Area Proprietari</button>
+      ` : ''}
       <button class="tab-btn ${state.view==='ospiti'?'active':''}" data-view="ospiti">Prenota un soggiorno</button>
       ${(state.gestoreUnlocked && state.view==='gestore') ? renderNotificheGestore(alert) : ''}
       ${ownerBell}

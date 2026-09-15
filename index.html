@@ -2278,6 +2278,15 @@ function getCoverPhotoUrl(p){
   if(pubblicita) return pubblicita.url;
   return fotoUrl(p.foto[0]);
 }
+function getCoverPhotoPubblicaUrl(p){
+  const pubblicita = (p.foto||[]).filter(f=>typeof f==='object' && f.categoria==='pubblicita');
+  if(!pubblicita.length) return null;
+  if(p.fotoCopertina){
+    const cop = pubblicita.find(f=>f.id===p.fotoCopertina);
+    if(cop) return cop.url;
+  }
+  return pubblicita[0].url;
+}
 
 function renderFotoModulo(p){
   const foto = (p.foto||[]).filter(f=>typeof f==='object');
@@ -3455,7 +3464,7 @@ function renderOspitiView(){
     const gd = state.guestDates;
     const bookable = state.properties.filter(p=>propertyAvailableForDates(p, gd.checkin, gd.checkout, gd.adulti, gd.bambini, gd.animali));
     const cards = bookable.map(p=>{
-      const cop = getCoverPhotoUrl(p);
+      const cop = getCoverPhotoPubblicaUrl(p);
       const calcolo = calcTotale(p, gd.checkin, gd.checkout);
       const caratteristiche = [
         (p.capacitaAdulti||p.capacitaBambini) ? `<i class="ti ti-user"></i> fino a ${p.capacitaAdulti||0} adult${p.capacitaAdulti===1?'o':'i'}${p.capacitaBambini?` + ${p.capacitaBambini} bambin${p.capacitaBambini===1?'o':'i'}`:''}` : null,

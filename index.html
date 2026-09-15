@@ -740,9 +740,9 @@ function stampMarkHtml(key){
 }
 
 // ---------- Notifiche di attività (gestore <-> proprietario) ----------
-function addNotifica(p, testo, destinatario){
+function addNotifica(p, testo, destinatario, tab){
   if(!p.notifiche) p.notifiche = [];
-  p.notifiche.push({id:uid(), testo, data:new Date().toISOString(), destinatario, letto:false});
+  p.notifiche.push({id:uid(), testo, data:new Date().toISOString(), destinatario, tab, propId:p.id, letto:false});
 }
 function segnaNotificheLette(props, ruolo){
   const lista = Array.isArray(props) ? props : [props];
@@ -1288,7 +1288,7 @@ function saveExpense(propId, data, editingId){
     const e = {id:uid(), stato:'in-attesa', ricevuta:null, storico:[], ...data};
     logStoricoSpesa(e, 'Spesa registrata, in attesa di approvazione del proprietario.');
     p.spese.push(e);
-    addNotifica(p, `Nuova spesa da approvare: ${fmtCurrency(e.importo)}${e.categoria?(' — '+e.categoria):''}.`, 'proprietario');
+    addNotifica(p, `Nuova spesa da approvare: ${fmtCurrency(e.importo)}${e.categoria?(' — '+e.categoria):''}.`, 'proprietario', 'spese');
   }
   saveData(); closeModal(); render();
 }
@@ -1303,7 +1303,7 @@ function rispondiSpesa(propId, expId, esito){
   e.stato = esito;
   logStoricoSpesa(e, esito==='approvata' ? 'Spesa approvata dal proprietario.' : 'Spesa rifiutata dal proprietario.');
   flashStamp('spesa:'+expId, esito==='approvata'?'ok':'crit');
-  addNotifica(p, `Il proprietario ha ${esito==='approvata'?'approvato':'rifiutato'} la spesa di ${fmtCurrency(e.importo)}.`, 'gestore');
+  addNotifica(p, `Il proprietario ha ${esito==='approvata'?'approvato':'rifiutato'} la spesa di ${fmtCurrency(e.importo)}.`, 'gestore', 'spese');
   saveData(); render();
 }
 function pagaSpesa(propId, expId, data){
@@ -1312,7 +1312,7 @@ function pagaSpesa(propId, expId, data){
   e.stato = 'pagata';
   if(data.ricevuta) e.ricevuta = data.ricevuta;
   logStoricoSpesa(e, `Spesa pagata.${data.ricevuta ? ' Ricevuta caricata.' : ''}`);
-  addNotifica(p, `La tua spesa di ${fmtCurrency(e.importo)} è stata pagata dall'agenzia.`, 'proprietario');
+  addNotifica(p, `La tua spesa di ${fmtCurrency(e.importo)} è stata pagata dall'agenzia.`, 'proprietario', 'spese');
   saveData(); closeModal(); render();
 }
 
@@ -1333,8 +1333,8 @@ function saveMaintenance(propId, data, editingId){
     logStorico(m, `Intervento segnalato${m.richiedente?(' da '+m.richiedente):''}${dettagli?(' — '+dettagli):''}.`);
     p.manutenzioni.push(m);
     risultato = m;
-    if(m.richiedente==='Proprietario') addNotifica(p, `Il proprietario ha segnalato un problema${m.tipologia?(': '+m.tipologia):''}.`, 'gestore');
-    else addNotifica(p, `Nuovo intervento registrato dal gestore${m.tipologia?(': '+m.tipologia):''}.`, 'proprietario');
+    if(m.richiedente==='Proprietario') addNotifica(p, `Il proprietario ha segnalato un problema${m.tipologia?(': '+m.tipologia):''}.`, 'gestore', 'interventi');
+    else addNotifica(p, `Nuovo intervento registrato dal gestore${m.tipologia?(': '+m.tipologia):''}.`, 'proprietario', 'interventi');
   }
   saveData(); closeModal(); render();
   return risultato;
@@ -1363,7 +1363,7 @@ function addPreventivo(propId, mId, data){
   const m = p.manutenzioni.find(x=>x.id===mId);
   m.preventivo = { fornitore:data.fornitore, importo:data.importo, note:data.note, stato:'in-attesa' };
   logStorico(m, `Preventivo inviato: ${data.fornitore} — ${fmtCurrency(data.importo)}.`);
-  addNotifica(p, `Nuovo preventivo da approvare: ${data.fornitore} — ${fmtCurrency(data.importo)}.`, 'proprietario');
+  addNotifica(p, `Nuovo preventivo da approvare: ${data.fornitore} — ${fmtCurrency(data.importo)}.`, 'proprietario', 'interventi');
   saveData(); closeModal(); render();
 }
 function rispondiPreventivo(propId, mId, esito){
@@ -1373,7 +1373,7 @@ function rispondiPreventivo(propId, mId, esito){
   if(esito==='approvato'){ m.stato='in-corso'; logStorico(m, 'Preventivo approvato dal proprietario.'); }
   else { logStorico(m, 'Preventivo rifiutato dal proprietario.'); }
   flashStamp('preventivo:'+mId, esito==='approvato'?'ok':'crit');
-  addNotifica(p, `Il proprietario ha ${esito==='approvato'?'approvato':'rifiutato'} il preventivo di ${m.preventivo.fornitore}.`, 'gestore');
+  addNotifica(p, `Il proprietario ha ${esito==='approvato'?'approvato':'rifiutato'} il preventivo di ${m.preventivo.fornitore}.`, 'gestore', 'interventi');
   saveData(); render();
 }
 function programmaIntervento(propId, mId, data){
@@ -1403,7 +1403,7 @@ function completaIntervento(propId, mId, data){
   m.fotoDopo = (m.fotoDopo||[]).concat(data.fotoDopo||[]);
   if(data.fatturaImporto){ m.fattura = {importo:data.fatturaImporto, nota:data.fatturaNota||''}; }
   logStorico(m, `Intervento completato — il proprietario verrà avvisato.${data.fatturaImporto?(' Fattura: '+fmtCurrency(data.fatturaImporto)+'.'):''}`);
-  addNotifica(p, `Intervento completato${m.tipologia?(': '+m.tipologia):''}.`, 'proprietario');
+  addNotifica(p, `Intervento completato${m.tipologia?(': '+m.tipologia):''}.`, 'proprietario', 'interventi');
   saveData(); closeModal(); render();
 }
 
@@ -1899,7 +1899,7 @@ function updateBookingStatus(propId, bookingId, stato){
   const b = p.prenotazioni.find(x=>x.id===bookingId);
   b.stato = stato;
   if(stato==='confermata' || stato==='rifiutata') flashStamp('booking:'+bookingId, stato==='confermata'?'ok':'crit');
-  if(stato==='confermata' || stato==='rifiutata') addNotifica(p, `Prenotazione di ${b.nome} ${stato}.`, 'proprietario');
+  if(stato==='confermata' || stato==='rifiutata') addNotifica(p, `Prenotazione di ${b.nome} ${stato}.`, 'proprietario', 'prenotazioni');
   saveData(); render();
 }
 function deleteBooking(propId, bookingId){
@@ -1913,7 +1913,7 @@ function sendMessage(propId, autore, testo){
   const p = state.properties.find(x=>x.id===propId);
   if(!p.messaggi) p.messaggi = [];
   p.messaggi.push({id:uid(), autore, testo, data:new Date().toISOString(), letto: autore==='gestore'});
-  addNotifica(p, `Nuovo messaggio dal ${autore==='gestore'?'gestore':'proprietario'}.`, autore==='gestore'?'proprietario':'gestore');
+  addNotifica(p, `Nuovo messaggio dal ${autore==='gestore'?'gestore':'proprietario'}.`, autore==='gestore'?'proprietario':'gestore', 'messaggi');
   saveData(); render();
 }
 function segnaMessaggiLetti(propId){
@@ -3458,13 +3458,13 @@ function renderOspitiView(){
 }
 
 // ---------- Top nav ----------
-function renderNotifBellHtml(pendingVoci, attivita, badgeTotale, gotoAttr){
+function renderNotifBellHtml(pendingVoci, attivita, badgeTotale, gotoAttr, gotoNotificaAttr){
   const pendingHtml = pendingVoci.length
     ? pendingVoci.map(v=>`<div class="notif-item" data-${gotoAttr}="${v.tipo}"><span class="n-dot"></span><span>${v.txt}</span></div>`).join('')
     : '';
   const attivitaHtml = attivita.length
     ? attivita.slice(0,20).map(n=>`
-      <div class="notif-item ${n.letto?'':'unread'}">
+      <div class="notif-item ${n.letto?'':'unread'}" ${n.tab?`data-${gotoNotificaAttr}="${n.propId}::${n.tab}"`:''}>
         <span class="n-dot ${n.letto?'read':''}"></span>
         <span>${n.testo}${n.propNome?` <span style="color:var(--ink-soft);">· ${n.propNome}</span>`:''}<div class="notif-item-sub">${fmtDate(n.data)}</div></span>
       </div>`).join('')
@@ -3496,7 +3496,7 @@ function renderNotificheGestore(alert){
   ].filter(Boolean);
   const attivita = notificheNonLette(state.properties, 'gestore');
   const nonLette = attivita.filter(n=>!n.letto).length;
-  return renderNotifBellHtml(voci, attivita, alert.totale + nonLette, 'goto-alert');
+  return renderNotifBellHtml(voci, attivita, alert.totale + nonLette, 'goto-alert', 'goto-notifica-gestore');
 }
 function renderNotificheProprietario(mieiImmobili, alertProprietario){
   const voci = [
@@ -3506,12 +3506,12 @@ function renderNotificheProprietario(mieiImmobili, alertProprietario){
   ].filter(Boolean);
   const attivita = notificheNonLette(mieiImmobili, 'proprietario');
   const nonLette = attivita.filter(n=>!n.letto).length;
-  return renderNotifBellHtml(voci, attivita, voci.length + nonLette, 'goto-owner-alert');
+  return renderNotifBellHtml(voci, attivita, voci.length + nonLette, 'goto-owner-alert', 'goto-notifica-owner');
 }
 function renderTopNav(){
   const alert = calcolaAlertPortfolio();
   let ownerBell = '';
-  if(state.ownerAuth){
+  if(state.ownerAuth && state.view==='proprietari'){
     const clienteLoggato = getClienteByEmail(state.ownerAuth.email);
     const mieiImmobili = clienteLoggato ? state.properties.filter(x=>x.clienteId===clienteLoggato.id) : [];
     if(mieiImmobili.length){
@@ -3526,7 +3526,7 @@ function renderTopNav(){
       <button class="tab-btn ${state.view==='gestore'?'active':''}" data-view="gestore">Gestore${alert.totale>0?`<span class="nav-badge">${alert.totale}</span>`:''}</button>
       <button class="tab-btn ${state.view==='proprietari'?'active':''}" data-view="proprietari">Area Proprietari</button>
       <button class="tab-btn ${state.view==='ospiti'?'active':''}" data-view="ospiti">Prenota un soggiorno</button>
-      ${state.gestoreUnlocked ? renderNotificheGestore(alert) : ''}
+      ${(state.gestoreUnlocked && state.view==='gestore') ? renderNotificheGestore(alert) : ''}
       ${ownerBell}
     </div>
   </div>`;
@@ -4179,6 +4179,32 @@ function attachHandlers(){
     el.addEventListener('click', ()=>{
       const tipo = el.getAttribute('data-goto-owner-alert');
       state.ownerDossierTab = tipo;
+      render();
+    });
+  });
+
+  document.querySelectorAll('[data-goto-notifica-gestore]').forEach(el=>{
+    el.addEventListener('click', ()=>{
+      const [propId, tab] = el.getAttribute('data-goto-notifica-gestore').split('::');
+      const p = state.properties.find(x=>x.id===propId);
+      state.notifOpen = false;
+      if(!p) return;
+      state.view = 'gestore';
+      state.selectedId = p.id;
+      state.selectedClienteId = null;
+      state.dossierTab = tab;
+      if(tab==='messaggi'){ segnaMessaggiLetti(p.id); segnaMessaggiBookingLetti(p.id); }
+      render();
+    });
+  });
+
+  document.querySelectorAll('[data-goto-notifica-owner]').forEach(el=>{
+    el.addEventListener('click', ()=>{
+      const [propId, tab] = el.getAttribute('data-goto-notifica-owner').split('::');
+      state.notifOpen = false;
+      state.ownerPropId = propId;
+      state.ownerDossierTab = tab;
+      if(tab==='messaggi') segnaMessaggiLetti(propId);
       render();
     });
   });

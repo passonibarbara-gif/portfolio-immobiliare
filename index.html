@@ -2669,29 +2669,43 @@ function renderClienteCRM(c){
   }).join('');
 
   // attività aggregate su tutti gli immobili del cliente
+  const COLORE_TIPO_EVENTO = {
+    messaggio: 'var(--brass-deep)', intervento: 'var(--terracotta)',
+    controllo: 'var(--sage)', pagamento: 'var(--sage)', prenotazione: 'var(--brass-deep)'
+  };
   let eventi = [];
   immobili.forEach(p=>{
-    (p.messaggi||[]).forEach(m=>eventi.push({data:m.data, testo:`Messaggio (${m.autore==='gestore'?'a':'da'} ${c.nome}) su ${p.nome}: "${m.testo}"`}));
-    (p.manutenzioni||[]).forEach(m=>(m.storico||[]).forEach(s=>eventi.push({data:s.data, testo:`${p.nome}: ${s.testo}`})));
-    (p.controlli||[]).forEach(ct=>eventi.push({data:ct.data, testo:`${p.nome}: controllo periodico registrato`}));
-    (p.versamentiProprietario||[]).forEach(v=>eventi.push({data:v.data, testo:`${p.nome}: versamento di ${fmtCurrency(v.importo)}`}));
-    (p.prenotazioni||[]).forEach(b=>eventi.push({data:b.createdAt, testo:`${p.nome}: richiesta prenotazione da ${b.nome} (${b.stato})`}));
+    (p.messaggi||[]).forEach(m=>eventi.push({data:m.data, tipo:'messaggio', immobile:p.nome, testo:`Messaggio ${m.autore==='gestore'?'inviato':'ricevuto'}: "${m.testo}"`}));
+    (p.manutenzioni||[]).forEach(m=>(m.storico||[]).forEach(s=>eventi.push({data:s.data, tipo:'intervento', immobile:p.nome, testo:s.testo})));
+    (p.controlli||[]).forEach(ct=>eventi.push({data:ct.data, tipo:'controllo', immobile:p.nome, testo:'Controllo periodico registrato'}));
+    (p.versamentiProprietario||[]).forEach(v=>eventi.push({data:v.data, tipo:'pagamento', immobile:p.nome, testo:`Versamento di ${fmtCurrency(v.importo)}`}));
+    (p.prenotazioni||[]).forEach(b=>eventi.push({data:b.createdAt, tipo:'prenotazione', immobile:p.nome, testo:`Richiesta prenotazione da ${b.nome} (${b.stato})`}));
   });
   eventi.sort((a,b)=>new Date(b.data)-new Date(a.data));
-  const eventiHtml = eventi.length ? eventi.slice(0,40).map(e=>`<div class="storico-item"><span class="storico-data">${fmtDate(e.data)}</span>${e.testo}</div>`).join('') : `<p style="font-size:12.5px;color:var(--ink-soft);">Nessuna attività registrata ancora.</p>`;
+  const eventiHtml = eventi.length ? eventi.slice(0,40).map(e=>`
+    <div class="notif-item" style="cursor:default;">
+      <span class="n-dot" style="background:${COLORE_TIPO_EVENTO[e.tipo]||'var(--ink-soft)'};"></span>
+      <span>${e.testo}<div class="notif-item-sub">${e.immobile} · ${fmtDate(e.data)}</div></span>
+    </div>
+  `).join('') : `<p style="font-size:12.5px;color:var(--ink-soft);">Nessuna attività registrata ancora.</p>`;
 
   return `
     <div class="dossier-header">
       <div>
         <p class="prop-catasto" style="margin-bottom:4px;">CLIENTE</p>
         <h1 class="page-title" style="margin-bottom:2px;">${c.nome||'(senza nome)'}</h1>
-        <p class="page-sub" style="margin-bottom:0;">${c.telefono||'—'}${c.email?' · '+c.email:''}${c.indirizzo?' · '+c.indirizzo:''}</p>
       </div>
       <div class="dossier-actions">
         ${waButton(c.telefono, `Salve ${c.nome}, la contatto riguardo ai suoi immobili.`, 'WhatsApp')}
         <button class="icon-btn" data-action="edit-cliente">Modifica</button>
         <button class="icon-btn danger" data-action="delete-cliente">Elimina</button>
       </div>
+    </div>
+
+    <div style="display:flex;gap:14px;flex-wrap:wrap;margin:16px 0 8px 0;">
+      <div class="stat-card" style="flex:1;min-width:170px;"><div class="stat-label">Telefono</div><div class="stat-value" style="font-size:15px;">${c.telefono||'—'}</div></div>
+      <div class="stat-card" style="flex:1;min-width:170px;"><div class="stat-label">Email</div><div class="stat-value" style="font-size:15px;overflow-wrap:anywhere;">${c.email||'—'}</div></div>
+      <div class="stat-card" style="flex:1;min-width:170px;"><div class="stat-label">Indirizzo</div><div class="stat-value" style="font-size:15px;">${c.indirizzo||'—'}</div></div>
     </div>
 
     ${(c.documenti && c.documenti.length) ? `
@@ -2704,7 +2718,7 @@ function renderClienteCRM(c){
     <button class="add-inline" data-action="new-immobile-cliente">+ Aggiungi un immobile a questo cliente</button>
 
     <p class="section-label">Attività recente su tutti gli immobili</p>
-    <div class="storico-list" style="border-top:none;padding-top:0;">${eventiHtml}</div>
+    <div class="chart-card">${eventiHtml}</div>
   `;
 }
 

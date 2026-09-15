@@ -1,4 +1,4 @@
-const CACHE_NAME = 'portfolio-immobiliare-v1';
+const CACHE_NAME = 'portfolio-immobiliare-v2';
 const CORE_ASSETS = [
   './index.html',
   './manifest.webmanifest',
@@ -32,7 +32,7 @@ self.addEventListener('fetch', (event) => {
   if (url.hostname.includes('supabase.co')) return; // mai intercettare le chiamate al database
 
   event.respondWith(
-    fetch(req)
+    fetch(req, { cache: 'no-store' })
       .then((res) => {
         const resClone = res.clone();
         caches.open(CACHE_NAME).then((cache) => cache.put(req, resClone)).catch(()=>{});

@@ -8,23 +8,25 @@
 <link rel="icon" href="icon-192.png" sizes="192x192" type="image/png">
 <link rel="apple-touch-icon" href="apple-touch-icon.png">
 <style>
-  @import url('https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,600;0,700;0,900;1,600&family=Work+Sans:wght@400;500;600;700&display=swap');
+  @import url('https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Roboto+Slab:wght@500;700&family=Archivo:wght@400;500;600;700;800&display=swap');
 
   :root{
-    --cream:#FFF8EC;
-    --cream-2:#FBE9CB;
-    --ink:#1E2A2E;
-    --ink-soft:#5B6864;
-    --sea-deep:#0B3B4A;
-    --sea:#157A96;
-    --sea-light:#5FB8CE;
-    --sun:#F0A93A;
-    --sun-deep:#D6852A;
-    --terracotta:#C1502E;
-    --majolica-blue:#2C5F86;
-    --majolica-green:#4F7A5B;
-    --line:#E6D6B3;
-    --shadow: 0 14px 34px rgba(11,59,74,.14);
+    --cream:#F2E4C4;
+    --cream-2:#EAD8AD;
+    --paper:#FBF3DD;
+    --ink:#2B2118;
+    --ink-soft:#6B5C46;
+    --sea-deep:#123C40;
+    --petrol:#1B5E63;
+    --petrol-light:#3D8A8F;
+    --mustard:#E0A526;
+    --mustard-deep:#B9821A;
+    --vermillion:#D9432B;
+    --vermillion-deep:#AD3120;
+    --forest:#3C6B4A;
+    --line:#C9AD74;
+    --shadow: 6px 6px 0 var(--ink);
+    --shadow-sm: 4px 4px 0 var(--ink);
   }
   *{box-sizing:border-box;}
   html{scroll-behavior:smooth;}
@@ -32,14 +34,14 @@
     margin:0;
     background:var(--cream);
     color:var(--ink);
-    font-family:'Work Sans',sans-serif;
+    font-family:'Archivo',sans-serif;
     -webkit-font-smoothing:antialiased;
     line-height:1.55;
     overflow-x:hidden;
   }
   a{color:inherit;}
   img,svg{max-width:100%;}
-  .wrap{max-width:1100px; margin:0 auto; padding:0 24px;}
+  .wrap{max-width:1120px; margin:0 auto; padding:0 24px;}
   .icon{width:20px; height:20px; flex:none; vertical-align:-4px; stroke:currentColor; fill:none;}
 
   @media (prefers-reduced-motion: reduce){
@@ -49,123 +51,113 @@
   /* ---------- Motion ---------- */
   @keyframes fadeUp{ from{opacity:0; transform:translateY(16px);} to{opacity:1; transform:translateY(0);} }
   @keyframes pulseRing{ 0%{transform:scale(.75); opacity:.55;} 100%{transform:scale(1.9); opacity:0;} }
-  @keyframes floatY{ 0%,50%,100%{transform:translateY(0);} 25%{transform:translateY(-6px);} 75%{transform:translateY(4px);} }
-  @keyframes wiggle{ 0%,100%{transform:rotate(0deg) translateY(0);} 25%{transform:rotate(-2deg) translateY(-3px);} 75%{transform:rotate(2deg) translateY(-3px);} }
-  @keyframes popIn{ 0%{opacity:0; transform:scale(.8) rotate(-2deg);} 60%{opacity:1; transform:scale(1.04) rotate(.5deg);} 100%{opacity:1; transform:scale(1) rotate(0);} }
+  @keyframes stampIn{ 0%{opacity:0; transform:scale(1.3) rotate(-4deg);} 55%{opacity:1; transform:scale(.94) rotate(1.5deg);} 100%{opacity:1; transform:scale(1) rotate(0deg);} }
+  @keyframes wiggle{ 0%,100%{transform:rotate(var(--r,0deg));} 25%{transform:rotate(calc(var(--r,0deg) - 3deg));} 75%{transform:rotate(calc(var(--r,0deg) + 3deg));} }
   @keyframes tickerScroll{ from{transform:translateX(0);} to{transform:translateX(-50%);} }
-  @keyframes blobDrift1{ 0%,100%{transform:translate(-8%,-8%) scale(1);} 50%{transform:translate(10%,8%) scale(1.2);} }
-  @keyframes blobDrift2{ 0%,100%{transform:translate(6%,10%) scale(1.1);} 50%{transform:translate(-10%,-6%) scale(.95);} }
-  @keyframes blobDrift3{ 0%,100%{transform:translate(0,0) scale(1);} 50%{transform:translate(-8%,10%) scale(1.15);} }
+  @keyframes spinSlow{ from{transform:rotate(0deg);} to{transform:rotate(360deg);} }
   @keyframes confettiFall{ 0%{transform:translate(0,0) rotate(0deg); opacity:1;} 100%{transform:translate(var(--dx), var(--dy)) rotate(var(--rot)); opacity:0;} }
+  @keyframes rayTurn{ from{transform:rotate(0deg);} to{transform:rotate(360deg);} }
 
-  .reveal{opacity:0; transform:translateY(24px) scale(.92) rotate(-1deg); transition:opacity .6s cubic-bezier(.34,1.56,.64,1), transform .6s cubic-bezier(.34,1.56,.64,1);}
-  .reveal.in-view{opacity:1; transform:translateY(0) scale(1) rotate(0deg);}
-  .stagger > *{transition-delay:calc(var(--i,0) * 70ms);}
+  .reveal{opacity:0;}
+  .reveal.in-view{animation:stampIn .55s cubic-bezier(.22,.9,.3,1.1) forwards;}
+  .stagger > *{animation-delay:calc(var(--i,0) * 90ms) !important;}
 
-  /* ---------- Fun ticker banner ---------- */
-  .ticker{background:var(--terracotta); overflow:hidden; white-space:nowrap; padding:14px 0; position:relative;}
-  .ticker-track{display:inline-flex; align-items:center; animation:tickerScroll 26s linear infinite;}
-  .ticker-track span.txt{
-    font-family:'Playfair Display',serif; font-weight:700; font-style:italic; font-size:16px; color:#FFF3E2; padding:0 22px;
+  /* ---------- Ticker (ticket-strip banner) ---------- */
+  .ticker{
+    background:var(--vermillion); overflow:hidden; white-space:nowrap; padding:13px 0; position:relative;
+    border-top:3px solid var(--ink); border-bottom:3px solid var(--ink);
+    box-shadow:0 0 0 4px var(--cream) inset;
   }
-  .ticker-track span.dot{color:var(--sun); font-size:14px;}
+  .ticker-track{display:inline-flex; align-items:center; animation:tickerScroll 28s linear infinite;}
+  .ticker-track span.txt{
+    font-family:'Bebas Neue',sans-serif; letter-spacing:.05em; font-size:19px; color:var(--cream); padding:0 20px;
+  }
+  .ticker-track span.dot{color:var(--mustard); font-size:13px;}
 
   /* ---------- Nav ---------- */
   .site-nav{
     position:sticky; top:0; z-index:40;
     display:flex; justify-content:center;
-    padding:20px 24px; transition:padding .3s ease, background .3s ease, box-shadow .3s ease;
-    background:linear-gradient(180deg, rgba(11,59,74,.96) 0%, rgba(11,59,74,.9) 100%);
+    padding:16px 24px; transition:padding .3s ease, box-shadow .3s ease;
+    background:var(--sea-deep); border-bottom:3px solid var(--ink);
   }
-  .site-nav.scrolled{padding:11px 24px; box-shadow:0 8px 24px rgba(0,0,0,.18);}
-  .site-nav-inner{max-width:1100px; width:100%; display:flex; justify-content:space-between; align-items:center; gap:16px; flex-wrap:wrap;}
+  .site-nav.scrolled{padding:9px 24px;}
+  .site-nav-inner{max-width:1120px; width:100%; display:flex; justify-content:space-between; align-items:center; gap:16px; flex-wrap:wrap;}
   .brand{
-    font-family:'Playfair Display',serif; font-weight:700; font-size:18px; letter-spacing:.02em;
-    color:#FBE9CB;
+    font-family:'Bebas Neue',sans-serif; font-size:26px; letter-spacing:.04em;
+    color:var(--cream);
   }
-  .brand em{font-style:italic; color:var(--sun);}
-  .nav-links{display:flex; align-items:center; gap:24px; flex-wrap:wrap;}
-  .nav-links a{font-size:13px; color:rgba(251,233,203,.8); text-decoration:none; letter-spacing:.02em; transition:color .15s ease;}
-  .nav-links a:hover{color:#fff;}
+  .brand em{font-style:normal; color:var(--mustard);}
+  .nav-links{display:flex; align-items:center; gap:22px; flex-wrap:wrap;}
+  .nav-links a{font-size:13px; font-weight:600; color:var(--cream-2); text-decoration:none; letter-spacing:.02em; transition:color .15s ease;}
+  .nav-links a:hover{color:var(--mustard);}
   .nav-cta{
-    background:var(--sun); color:var(--sea-deep); border:none; padding:10px 20px; border-radius:100px;
-    font-size:12.5px; font-weight:700; text-decoration:none; letter-spacing:.02em; white-space:nowrap;
-    transition:transform .2s ease, box-shadow .2s ease;
+    background:var(--mustard); color:var(--ink); border:2.5px solid var(--ink); padding:9px 18px; border-radius:7px;
+    font-size:12.5px; font-weight:800; text-decoration:none; letter-spacing:.02em; white-space:nowrap;
+    box-shadow:var(--shadow-sm); transition:transform .15s ease, box-shadow .15s ease;
   }
-  .nav-cta:hover{transform:translateY(-2px); box-shadow:0 8px 18px rgba(240,169,58,.45);}
+  .nav-cta:hover{transform:translate(4px,4px); box-shadow:0 0 0 var(--ink);}
 
   /* ---------- Hero ---------- */
-  .hero{
-    position:relative; overflow:hidden; text-align:center; color:#fff;
-    padding:76px 24px 0;
-    background:linear-gradient(180deg, var(--sea-deep) 0%, #16495c 38%, #8a5a34 72%, var(--sun) 100%);
-  }
-  .hero-content{position:relative; z-index:3; max-width:760px; margin:0 auto;}
+  .hero{padding:56px 24px 0;}
+  .hero-grid{max-width:1120px; margin:0 auto; display:grid; grid-template-columns:1fr 1fr; gap:40px; align-items:center;}
+  .hero-text{text-align:left;}
   .eyebrow{
-    display:inline-flex; align-items:center; gap:8px; font-size:11.5px; letter-spacing:.18em; text-transform:uppercase;
-    color:#FCE4B8; border:1px solid rgba(252,228,184,.4); border-radius:100px; padding:7px 16px; margin-bottom:24px;
-    opacity:0; animation:fadeUp .7s ease .05s forwards;
+    display:inline-block; font-family:'Archivo',sans-serif; font-weight:800; font-size:11.5px; letter-spacing:.1em; text-transform:uppercase;
+    color:var(--ink); background:var(--mustard); border:2.5px solid var(--ink); border-radius:6px; padding:7px 14px; margin-bottom:20px;
+    transform:rotate(-1.5deg); box-shadow:var(--shadow-sm);
   }
   .hero h1{
-    font-family:'Playfair Display',serif; font-weight:700; font-size:clamp(32px,5.4vw,54px); line-height:1.14;
-    margin:0 0 20px;
+    font-family:'Bebas Neue',sans-serif; font-weight:400; font-size:clamp(42px,6.4vw,76px); line-height:.98; letter-spacing:.01em;
+    margin:0 0 20px; color:var(--ink);
   }
-  .hero h1 .line{display:block; overflow:hidden;}
-  .hero h1 .line span{display:block; opacity:0; transform:translateY(100%); animation:fadeUp .8s cubic-bezier(.16,.8,.3,1) forwards;}
-  .hero h1 .line:nth-child(1) span{animation-delay:.15s;}
-  .hero h1 .line:nth-child(2) span{animation-delay:.28s;}
-  .hero h1 em{font-style:italic; color:var(--sun); text-shadow:0 0 26px rgba(240,169,58,.5);}
+  .hero h1 em{font-style:normal; color:var(--vermillion);}
   .hero p.lead{
-    font-size:17px; color:#F3E7D3; max-width:560px; margin:0 auto 32px; opacity:0; animation:fadeUp .8s ease .42s forwards;
+    font-size:17px; color:var(--ink-soft); max-width:480px; margin:0 0 30px;
   }
-  .hero-ctas{display:flex; gap:12px; justify-content:center; flex-wrap:wrap; margin-bottom:44px; opacity:0; animation:fadeUp .8s ease .55s forwards;}
+  .hero-ctas{display:flex; gap:14px; flex-wrap:wrap; margin-bottom:38px;}
   .btn-primary, .btn-secondary{
-    font-family:'Work Sans',sans-serif; font-size:14.5px; font-weight:700; letter-spacing:.01em;
-    padding:15px 28px; border-radius:100px; cursor:pointer; text-decoration:none; display:inline-flex; align-items:center; gap:9px;
-    border:none; transition:transform .2s ease, box-shadow .2s ease, background .2s ease;
+    font-family:'Archivo',sans-serif; font-size:14.5px; font-weight:800; letter-spacing:.01em;
+    padding:14px 24px; border-radius:8px; cursor:pointer; text-decoration:none; display:inline-flex; align-items:center; gap:9px;
+    border:2.5px solid var(--ink); transition:transform .15s ease, box-shadow .15s ease;
   }
-  .btn-primary{background:var(--sun); color:#3A2308; box-shadow:0 10px 26px rgba(240,169,58,.35); position:relative; overflow:hidden;}
-  .btn-primary::after{
-    content:''; position:absolute; top:0; left:-60%; width:40%; height:100%;
-    background:linear-gradient(115deg, transparent, rgba(255,255,255,.65), transparent);
-    transform:skewX(-20deg); transition:left .6s ease;
-  }
-  .btn-primary:hover::after{left:130%;}
-  .btn-primary:hover{background:#FFC266; transform:translateY(-3px); box-shadow:0 14px 30px rgba(240,169,58,.5);}
-  .btn-secondary{background:rgba(255,255,255,.08); color:#fff; border:1px solid rgba(255,255,255,.4); backdrop-filter:blur(2px);}
-  .btn-secondary:hover{border-color:#fff; background:rgba(255,255,255,.16); transform:translateY(-3px);}
-  .hero-stats{display:flex; gap:44px; justify-content:center; flex-wrap:wrap; position:relative; z-index:3; padding-bottom:36px; opacity:0; animation:fadeUp .8s ease .68s forwards;}
-  .hero-stat-num{font-family:'Playfair Display',serif; font-size:30px; font-weight:700; color:#fff; font-variant-numeric:tabular-nums;}
-  .hero-stat-label{font-size:12px; color:#F3E7D3; letter-spacing:.02em; margin-top:2px;}
+  .btn-primary{background:var(--vermillion); color:#fff; box-shadow:var(--shadow);}
+  .btn-primary:hover{transform:translate(6px,6px); box-shadow:0 0 0 var(--ink);}
+  .btn-secondary{background:var(--paper); color:var(--ink); box-shadow:var(--shadow);}
+  .btn-secondary:hover{transform:translate(6px,6px); box-shadow:0 0 0 var(--ink);}
+  .hero-stats{display:flex; gap:0;}
+  .hero-stat{padding:0 20px; border-left:2px dashed var(--ink-soft);}
+  .hero-stat:first-child{padding-left:0; border-left:none;}
+  .hero-stat-num{font-family:'Bebas Neue',sans-serif; font-size:32px; color:var(--vermillion); line-height:1; font-variant-numeric:tabular-nums;}
+  .hero-stat-label{font-size:11.5px; color:var(--ink-soft); letter-spacing:.02em; margin-top:2px; max-width:110px;}
 
-  .hero-mesh{position:absolute; inset:0; z-index:0; overflow:hidden;}
-  .blob{position:absolute; border-radius:50%; filter:blur(70px); mix-blend-mode:screen; opacity:.75;}
-  .blob-1{width:480px; height:480px; background:radial-gradient(circle, var(--sea-light), transparent 70%); top:-160px; left:-100px; animation:blobDrift1 16s ease-in-out infinite;}
-  .blob-2{width:420px; height:420px; background:radial-gradient(circle, var(--sun), transparent 70%); bottom:-180px; right:-60px; animation:blobDrift2 20s ease-in-out infinite;}
-  .blob-3{width:360px; height:360px; background:radial-gradient(circle, var(--terracotta), transparent 70%); top:10%; right:18%; animation:blobDrift3 24s ease-in-out infinite;}
-  .hero-grain{
-    position:absolute; inset:0; z-index:1; pointer-events:none; opacity:.4; mix-blend-mode:overlay;
-    background:#fff; filter:url(#grainFilter);
+  /* ---------- Hero poster illustration ---------- */
+  .poster-frame{
+    position:relative; background:var(--paper); border:3px solid var(--ink); border-radius:10px; padding:14px;
+    box-shadow:var(--shadow); transform:rotate(1.2deg);
   }
-  .ghost-text{
-    position:absolute; top:52%; left:50%; transform:translate(-50%,-50%); z-index:1;
-    font-family:'Playfair Display',serif; font-weight:900; font-size:clamp(90px,20vw,300px); line-height:1;
-    color:transparent; -webkit-text-stroke:1.5px rgba(255,255,255,.14); white-space:nowrap; pointer-events:none; user-select:none;
+  .poster-inner{
+    position:relative; border:2px dashed var(--ink); border-radius:4px; overflow:hidden; background:var(--sea-deep);
+    aspect-ratio:4/5;
   }
-  .hero-spotlight{
-    position:absolute; inset:0; z-index:2; pointer-events:none;
-    background:radial-gradient(circle 280px at var(--sx,50%) var(--sy,28%), rgba(255,214,138,.22), transparent 70%);
+  .poster-inner svg{position:absolute; inset:0; width:100%; height:100%;}
+  .poster-rays{animation:rayTurn 70s linear infinite; transform-origin:50% 38%;}
+  .poster-seal{
+    position:absolute; top:-26px; right:-26px; width:92px; height:92px; z-index:4; animation:spinSlow 26s linear infinite;
+    filter:drop-shadow(3px 3px 0 var(--ink));
   }
 
   /* ---------- Section shell ---------- */
-  section{padding:80px 24px;}
+  section{padding:76px 24px;}
   .section-tag{
-    font-size:11.5px; letter-spacing:.18em; text-transform:uppercase; color:var(--terracotta);
-    font-weight:700; margin-bottom:12px; display:block; text-align:center;
+    display:inline-block; font-family:'Archivo',sans-serif; font-weight:800; font-size:11px; letter-spacing:.1em; text-transform:uppercase;
+    color:var(--ink); background:var(--cream-2); border:2px solid var(--ink); border-radius:5px; padding:5px 12px; margin:0 auto 14px;
+    transform:rotate(-1deg);
   }
+  .section-tag-wrap{text-align:center;}
   h2.section-title{
-    font-family:'Playfair Display',serif; font-weight:700; font-size:clamp(26px,3.6vw,38px);
-    text-align:center; margin:0 0 16px; text-wrap:balance;
+    font-family:'Bebas Neue',sans-serif; font-weight:400; font-size:clamp(30px,4.4vw,50px); letter-spacing:.01em;
+    text-align:center; margin:0 0 16px; line-height:1.02;
   }
   p.section-sub{
     text-align:center; color:var(--ink-soft); max-width:580px; margin:0 auto 52px; font-size:15.5px;
@@ -173,124 +165,111 @@
   .alt-bg{background:var(--cream-2);}
 
   /* ---------- Pain -> solution ---------- */
-  .pain-grid{display:grid; grid-template-columns:1fr 1fr; gap:28px; align-items:stretch; max-width:1000px; margin:0 auto;}
-  .pain-card{background:#fff; border:1px solid var(--line); border-radius:26px 26px 14px 14px; padding:30px; box-shadow:var(--shadow); transition:transform .3s ease;}
-  .pain-card:hover{animation:wiggle .5s ease;}
-  .pain-card h3{font-family:'Playfair Display',serif; font-weight:700; font-size:19px; margin:0 0 14px; color:var(--terracotta); display:flex; align-items:center; gap:10px;}
+  .pain-grid{display:grid; grid-template-columns:1fr 1fr; gap:30px; align-items:stretch; max-width:1000px; margin:0 auto;}
+  .pain-card{background:var(--paper); border:2.5px solid var(--ink); border-radius:10px; padding:28px; box-shadow:var(--shadow); transform:rotate(-.6deg);}
+  .pain-card h3{font-family:'Bebas Neue',sans-serif; font-weight:400; font-size:24px; letter-spacing:.02em; margin:0 0 14px; color:var(--vermillion-deep); display:flex; align-items:center; gap:10px;}
   .pain-card ul{margin:0; padding-left:20px; color:var(--ink-soft); font-size:14px;}
   .pain-card li{margin-bottom:9px;}
-  .solution-card{background:linear-gradient(160deg, var(--sea-deep) 0%, #123B52 100%); color:#F3E7D3; border-radius:26px 26px 14px 14px; padding:30px; box-shadow:var(--shadow); transition:transform .3s ease;}
-  .solution-card:hover{animation:wiggle .5s ease;}
-  .solution-card h3{font-family:'Playfair Display',serif; font-weight:700; font-size:19px; margin:0 0 14px; color:var(--sun); display:flex; align-items:center; gap:10px;}
-  .solution-card ul{margin:0; padding-left:20px; color:#E3D6BC; font-size:14px;}
+  .solution-card{background:var(--sea-deep); color:var(--cream-2); border:2.5px solid var(--ink); border-radius:10px; padding:28px; box-shadow:var(--shadow); transform:rotate(.6deg);}
+  .solution-card h3{font-family:'Bebas Neue',sans-serif; font-weight:400; font-size:24px; letter-spacing:.02em; margin:0 0 14px; color:var(--mustard); display:flex; align-items:center; gap:10px;}
+  .solution-card ul{margin:0; padding-left:20px; color:#DCE7D8; font-size:14px;}
   .solution-card li{margin-bottom:9px;}
 
   /* ---------- Services grid ---------- */
-  .services-grid{display:grid; grid-template-columns:repeat(3,1fr); gap:22px; max-width:1100px; margin:0 auto;}
+  .services-grid{display:grid; grid-template-columns:repeat(3,1fr); gap:24px; max-width:1120px; margin:0 auto;}
   .service-card{
-    background:#fff; border:1px solid var(--line); border-radius:20px; padding:30px 24px 24px; text-align:center;
-    transition:transform .3s cubic-bezier(.2,.8,.3,1), box-shadow .3s ease, border-color .3s ease; position:relative;
+    background:var(--paper); border:2.5px solid var(--ink); border-radius:12px; padding:28px 22px 22px; text-align:center;
+    box-shadow:var(--shadow-sm); transition:transform .2s ease, box-shadow .2s ease;
   }
-  .service-card:nth-child(odd){transform:rotate(-.6deg);}
-  .service-card:nth-child(even){transform:rotate(.6deg);}
-  .service-card:hover{transform:translateY(-6px) rotate(0deg); box-shadow:var(--shadow); border-color:var(--sea-light);}
+  .service-card:nth-child(1){--r:-1.4deg;} .service-card:nth-child(2){--r:1deg;} .service-card:nth-child(3){--r:-.6deg;}
+  .service-card:nth-child(4){--r:1.2deg;} .service-card:nth-child(5){--r:-1deg;} .service-card:nth-child(6){--r:.8deg;}
+  .service-card:nth-child(7){--r:-1.2deg;} .service-card:nth-child(8){--r:1.4deg;} .service-card:nth-child(9){--r:-.8deg;}
+  .service-card{transform:rotate(var(--r,0deg));}
+  .service-card:hover{animation:wiggle .5s ease;}
   .service-icon{
-    width:56px; height:56px; border-radius:50% 50% 50% 4px; background:linear-gradient(140deg, var(--sea) 0%, var(--sea-deep) 100%);
-    color:#FCE4B8; display:flex; align-items:center; justify-content:center; margin:0 auto 18px;
-    box-shadow:0 10px 20px rgba(11,59,74,.25); transition:transform .3s ease;
+    width:54px; height:54px; border-radius:50%; background:var(--mustard); border:2.5px solid var(--ink);
+    color:var(--ink); display:flex; align-items:center; justify-content:center; margin:0 auto 16px;
   }
-  .service-card:hover .service-icon{transform:rotate(-8deg) scale(1.06);}
-  .service-icon .icon{width:26px; height:26px;}
-  .service-card h3{font-size:16px; margin:0 0 8px; font-weight:700; font-family:'Playfair Display',serif;}
+  .service-icon .icon{width:24px; height:24px;}
+  .service-card h3{font-family:'Bebas Neue',sans-serif; font-weight:400; font-size:19px; letter-spacing:.02em; margin:0 0 8px;}
   .service-card p{font-size:13.5px; color:var(--ink-soft); margin:0;}
 
   /* ---------- How it works ---------- */
-  .steps{display:grid; grid-template-columns:repeat(4,1fr); gap:24px; max-width:1100px; margin:0 auto;}
+  .steps{display:grid; grid-template-columns:repeat(4,1fr); gap:24px; max-width:1120px; margin:0 auto;}
   .step-card{position:relative; text-align:left;}
   .step-num{
-    font-family:'Playfair Display',serif; font-size:40px; font-weight:700; color:transparent;
-    -webkit-text-stroke:1.6px var(--terracotta); display:block; margin-bottom:12px;
+    font-family:'Bebas Neue',sans-serif; font-size:52px; color:var(--vermillion); display:block; margin-bottom:8px; line-height:1;
   }
-  .step-card h3{font-size:15.5px; margin:0 0 8px; font-weight:700;}
+  .step-card h3{font-family:'Bebas Neue',sans-serif; font-weight:400; font-size:19px; letter-spacing:.02em; margin:0 0 8px;}
   .step-card p{font-size:13.5px; color:var(--ink-soft); margin:0;}
 
   /* ---------- Trust / why us ---------- */
-  .trust-band{background:linear-gradient(160deg, var(--sea-deep) 0%, #0F4257 100%); color:#F3E7D3; position:relative; overflow:hidden;}
-  .trust-grid{display:grid; grid-template-columns:repeat(4,1fr); gap:26px; max-width:1100px; margin:0 auto; position:relative; z-index:2;}
+  .trust-band{background:var(--sea-deep); color:var(--cream-2); border-top:3px solid var(--ink); border-bottom:3px solid var(--ink);}
+  .trust-grid{display:grid; grid-template-columns:repeat(4,1fr); gap:26px; max-width:1120px; margin:0 auto;}
   .trust-item{text-align:center;}
   .trust-item .icon-badge{
-    width:52px; height:52px; border-radius:50%; background:rgba(240,169,58,.14); border:1px solid rgba(240,169,58,.4);
-    display:flex; align-items:center; justify-content:center; margin:0 auto 14px; color:var(--sun);
-    animation:floatY 5s ease-in-out infinite;
+    width:56px; height:56px; border-radius:50%; background:var(--mustard); border:2.5px solid var(--cream);
+    display:flex; align-items:center; justify-content:center; margin:0 auto 14px; color:var(--ink);
   }
-  .trust-item:nth-child(2) .icon-badge{animation-delay:.3s;}
-  .trust-item:nth-child(3) .icon-badge{animation-delay:.6s;}
-  .trust-item:nth-child(4) .icon-badge{animation-delay:.9s;}
-  .trust-item h3{font-size:14.5px; margin:0 0 6px; font-weight:700;}
-  .trust-item p{font-size:12.5px; color:#CBD9D3; margin:0;}
+  .trust-item h3{font-family:'Bebas Neue',sans-serif; font-weight:400; font-size:18px; letter-spacing:.02em; margin:0 0 6px;}
+  .trust-item p{font-size:12.5px; color:#B9CFC9; margin:0;}
 
   /* ---------- Testimonials ---------- */
-  .testi-grid{display:grid; grid-template-columns:repeat(3,1fr); gap:22px; max-width:1100px; margin:0 auto;}
-  .testi-card{background:#fff; border:1px solid var(--line); border-radius:20px; padding:26px; box-shadow:var(--shadow); transition:transform .3s ease;}
+  .testi-grid{display:grid; grid-template-columns:repeat(3,1fr); gap:22px; max-width:1120px; margin:0 auto;}
+  .testi-card{background:var(--paper); border:2.5px solid var(--ink); border-radius:10px; padding:24px; box-shadow:var(--shadow-sm);}
+  .testi-card:nth-child(1){transform:rotate(-1deg);} .testi-card:nth-child(2){transform:rotate(.8deg);} .testi-card:nth-child(3){transform:rotate(-.5deg);}
   .testi-card:hover{animation:wiggle .5s ease;}
-  .testi-stars{color:var(--sun-deep); font-size:14px; margin-bottom:12px; letter-spacing:2px;}
-  .testi-card p.quote{font-size:14.5px; color:var(--ink); margin:0 0 16px; font-style:italic; font-family:'Playfair Display',serif;}
-  .testi-author{font-size:12.5px; color:var(--ink-soft); font-weight:600;}
-  .testi-note{text-align:center; font-size:11.5px; color:var(--ink-soft); margin-top:24px; opacity:.75;}
+  .testi-stars{color:var(--mustard-deep); font-size:14px; margin-bottom:12px; letter-spacing:2px;}
+  .testi-card p.quote{font-family:'Roboto Slab',serif; font-weight:500; font-size:14.5px; color:var(--ink); margin:0 0 16px;}
   .testi-foot{display:flex; align-items:center; gap:10px;}
   .testi-avatar{
     width:34px; height:34px; border-radius:50%; flex:none; display:flex; align-items:center; justify-content:center;
-    color:#fff; font-weight:700; font-size:12px; font-family:'Playfair Display',serif;
+    color:#fff; font-weight:800; font-size:12px; font-family:'Archivo',sans-serif; border:2px solid var(--ink);
   }
-
-  /* ---------- Trust band mesh ---------- */
-  .trust-mesh{position:absolute; inset:0; z-index:0; overflow:hidden; pointer-events:none;}
-  .trust-mesh .blob{opacity:.5;}
-
-  /* ---------- Wiggle on hover ---------- */
-  .wiggle-hover:hover{animation:wiggle .5s ease;}
+  .testi-author{font-size:12.5px; color:var(--ink-soft); font-weight:600;}
+  .testi-note{text-align:center; font-size:11.5px; color:var(--ink-soft); margin-top:24px; opacity:.8;}
 
   /* ---------- FAQ ---------- */
   .faq-list{max-width:740px; margin:0 auto;}
-  .faq-item{border-bottom:1px solid var(--line); padding:20px 0;}
+  .faq-item{border-bottom:2px dashed var(--line); padding:20px 0;}
   .faq-item summary{
     cursor:pointer; font-weight:700; font-size:15px; list-style:none; display:flex; justify-content:space-between; align-items:center; gap:12px;
   }
   .faq-item summary::-webkit-details-marker{display:none;}
-  .faq-item summary::after{content:'+'; font-size:22px; color:var(--terracotta); font-weight:400; transition:transform .25s ease;}
+  .faq-item summary::after{content:'+'; font-size:22px; color:var(--vermillion); font-weight:400; transition:transform .25s ease;}
   .faq-item[open] summary::after{transform:rotate(135deg);}
   .faq-item p{font-size:13.5px; color:var(--ink-soft); margin:14px 0 0;}
 
   /* ---------- Contact / form ---------- */
   .contact-shell{
-    max-width:960px; margin:0 auto; background:#fff; border:1px solid var(--line);
-    border-radius:28px; padding:46px; display:grid; grid-template-columns:1fr 1.1fr; gap:44px; box-shadow:var(--shadow);
+    max-width:980px; margin:0 auto; background:var(--paper); border:3px solid var(--ink);
+    border-radius:14px; padding:44px; display:grid; grid-template-columns:1fr 1.1fr; gap:44px; box-shadow:var(--shadow);
   }
-  .contact-info h2{font-family:'Playfair Display',serif; font-weight:700; font-size:25px; margin:0 0 14px;}
+  .contact-info h2{font-family:'Bebas Neue',sans-serif; font-weight:400; font-size:30px; margin:0 0 14px;}
   .contact-info p{font-size:14px; color:var(--ink-soft); margin:0 0 24px;}
   .contact-info .info-row{display:flex; align-items:center; gap:11px; font-size:13.5px; margin-bottom:13px;}
-  .contact-info .info-row .icon{color:var(--sea);}
+  .contact-info .info-row .icon{color:var(--vermillion-deep);}
   .field{margin-bottom:14px;}
-  .field label{display:block; font-size:12px; font-weight:600; margin-bottom:6px; color:var(--ink-soft);}
+  .field label{display:block; font-size:12px; font-weight:700; margin-bottom:6px; color:var(--ink-soft);}
   .field input, .field select, .field textarea{
-    width:100%; padding:11px 13px; border:1px solid var(--line); border-radius:10px; font-size:14px;
-    font-family:'Work Sans',sans-serif; background:var(--cream); color:var(--ink); transition:border-color .15s ease, box-shadow .15s ease;
+    width:100%; padding:11px 13px; border:2px solid var(--ink); border-radius:7px; font-size:14px;
+    font-family:'Archivo',sans-serif; background:var(--cream); color:var(--ink); transition:box-shadow .15s ease;
   }
-  .field input:focus, .field select:focus, .field textarea:focus{outline:none; border-color:var(--sea); box-shadow:0 0 0 3px rgba(21,122,150,.15);}
+  .field input:focus, .field select:focus, .field textarea:focus{outline:none; box-shadow:3px 3px 0 var(--ink);}
   .field textarea{resize:vertical; min-height:80px;}
   .field-row{display:grid; grid-template-columns:1fr 1fr; gap:12px;}
   .form-note{font-size:11.5px; color:var(--ink-soft); margin-top:10px;}
   .form-success{
-    display:none; text-align:center; padding:20px; background:#EAF3E5; border-radius:14px; color:var(--majolica-green); font-size:14px; font-weight:700;
+    display:none; text-align:center; padding:20px; background:var(--forest); border:2.5px solid var(--ink); border-radius:10px; color:#fff; font-size:14px; font-weight:700;
   }
 
   /* ---------- Footer ---------- */
-  footer{background:var(--sea-deep); color:#CBD9D3; padding:44px 24px; text-align:center; font-size:12.5px;}
-  footer a{color:var(--sun); text-decoration:none;}
+  footer{background:var(--sea-deep); color:#B9CFC9; padding:44px 24px; text-align:center; font-size:12.5px; border-top:3px solid var(--ink);}
+  footer a{color:var(--mustard); text-decoration:none;}
   .wa-float{
     position:fixed; bottom:24px; right:24px; z-index:50; background:#25D366; color:#fff; width:56px; height:56px;
-    border-radius:50%; display:flex; align-items:center; justify-content:center; text-decoration:none;
-    box-shadow:0 8px 22px rgba(0,0,0,.28);
+    border-radius:50%; display:flex; align-items:center; justify-content:center; text-decoration:none; border:2.5px solid var(--ink);
+    box-shadow:var(--shadow-sm);
   }
   .wa-float .icon{width:26px; height:26px;}
   .wa-float::before{
@@ -299,13 +278,17 @@
   }
 
   @media (max-width: 860px){
+    .hero-grid{grid-template-columns:1fr; gap:32px;}
+    .hero-text{text-align:center;}
+    .hero-ctas, .hero-stats{justify-content:center;}
+    .poster-frame{max-width:380px; margin:0 auto;}
     .pain-grid, .contact-shell{grid-template-columns:1fr;}
     .services-grid{grid-template-columns:repeat(2,1fr);}
     .steps{grid-template-columns:repeat(2,1fr);}
     .trust-grid{grid-template-columns:repeat(2,1fr);}
     .testi-grid{grid-template-columns:1fr;}
     .contact-shell{padding:30px;}
-    section{padding:64px 20px;}
+    section{padding:60px 20px;}
   }
   @media (max-width: 520px){
     .services-grid{grid-template-columns:1fr;}
@@ -313,39 +296,95 @@
     .trust-grid{grid-template-columns:1fr;}
     .field-row{grid-template-columns:1fr;}
     .nav-links{display:none;}
-    .hero{padding-top:64px;}
-    .ghost-text{font-size:70px;}
-    .blob{filter:blur(46px);}
-    .ticker-track span.txt{font-size:14px; padding:0 14px;}
+    .hero-stats{flex-wrap:wrap; gap:10px;}
+    .hero-stat{border-left:none; padding:0 14px 0 0;}
+    .ticker-track span.txt{font-size:15px; padding:0 14px;}
   }
 </style>
 </head>
 <body>
 
 <svg style="position:absolute; width:0; height:0; overflow:hidden;" aria-hidden="true">
-  <filter id="grainFilter">
-    <feTurbulence type="fractalNoise" baseFrequency="0.85" numOctaves="2" stitchTiles="stitch" result="noise"/>
-    <feColorMatrix in="noise" type="matrix" values="0 0 0 0 1  0 0 0 0 1  0 0 0 0 1  0 0 0 0.6 0"/>
-  </filter>
-  <symbol id="i-plane" viewBox="0 0 24 24"><path d="M3 11l18-8-8 18-2-7-8-3z" stroke-width="1.7" stroke-linejoin="round"/></symbol>
-  <symbol id="i-phone" viewBox="0 0 24 24"><path d="M5 4h4l2 5-2.5 2A12 12 0 0 0 13 15.5L15 13l5 2v4a2 2 0 0 1-2 2A16 16 0 0 1 3 6a2 2 0 0 1 2-2z" stroke-width="1.7" stroke-linejoin="round"/></symbol>
-  <symbol id="i-alert" viewBox="0 0 24 24"><path d="M12 3 2 20h20L12 3z" stroke-width="1.7" stroke-linejoin="round"/><line x1="12" y1="9.5" x2="12" y2="14" stroke-width="1.7" stroke-linecap="round"/><circle cx="12" cy="17" r="1" fill="currentColor" stroke="none"/></symbol>
-  <symbol id="i-check" viewBox="0 0 24 24"><polyline points="4 13 9 18 20 6" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></symbol>
-  <symbol id="i-house-check" viewBox="0 0 24 24"><path d="M4 11 12 4l8 7" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"/><path d="M6 10v11h12V10" stroke-width="1.7" stroke-linejoin="round"/><polyline points="9 15 11 17 15 12" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"/></symbol>
-  <symbol id="i-key" viewBox="0 0 24 24"><circle cx="8" cy="15" r="4" stroke-width="1.7"/><path d="M11 12l9-9" stroke-width="1.7" stroke-linecap="round"/><path d="M16 7l3 3" stroke-width="1.7" stroke-linecap="round"/><path d="M13 10l2 2" stroke-width="1.7" stroke-linecap="round"/></symbol>
-  <symbol id="i-document" viewBox="0 0 24 24"><path d="M6 2h9l5 5v15H6z" stroke-width="1.7" stroke-linejoin="round"/><path d="M15 2v5h5" stroke-width="1.7" stroke-linejoin="round"/><line x1="9" y1="13" x2="17" y2="13" stroke-width="1.7" stroke-linecap="round"/><line x1="9" y1="17" x2="17" y2="17" stroke-width="1.7" stroke-linecap="round"/></symbol>
-  <symbol id="i-checklist" viewBox="0 0 24 24"><rect x="5" y="4" width="14" height="17" rx="2" stroke-width="1.7"/><path d="M9 4V2h6v2" stroke-width="1.7"/><polyline points="8.5 13 11 15.5 16 10" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"/></symbol>
-  <symbol id="i-verify" viewBox="0 0 24 24"><line x1="4" y1="6" x2="14" y2="6" stroke-width="1.7" stroke-linecap="round"/><line x1="4" y1="12" x2="14" y2="12" stroke-width="1.7" stroke-linecap="round"/><line x1="4" y1="18" x2="10" y2="18" stroke-width="1.7" stroke-linecap="round"/><polyline points="15 16 18 19 22 13" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"/></symbol>
-  <symbol id="i-pin" viewBox="0 0 24 24"><path d="M12 22s7-7.58 7-12A7 7 0 0 0 5 10c0 4.42 7 12 7 12z" stroke-width="1.7" stroke-linejoin="round"/><circle cx="12" cy="10" r="2.4" stroke-width="1.7"/></symbol>
-  <symbol id="i-tool" viewBox="0 0 24 24"><path d="M14.7 6.3a4 4 0 0 1-5.4 5.4L4 17l3 3 5.3-5.3a4 4 0 0 1 5.4-5.4l-3.6 3.6-2-2z" stroke-width="1.7" stroke-linejoin="round"/></symbol>
-  <symbol id="i-calendar" viewBox="0 0 24 24"><rect x="3" y="5" width="18" height="16" rx="2" stroke-width="1.7"/><line x1="3" y1="10" x2="21" y2="10" stroke-width="1.7"/><line x1="8" y1="3" x2="8" y2="7" stroke-width="1.7" stroke-linecap="round"/><line x1="16" y1="3" x2="16" y2="7" stroke-width="1.7" stroke-linecap="round"/><circle cx="12" cy="15" r="1.6" fill="currentColor" stroke="none"/></symbol>
-  <symbol id="i-wallet" viewBox="0 0 24 24"><path d="M3 7a2 2 0 0 1 2-2h13a1 1 0 0 1 1 1v3H5" stroke-width="1.7" stroke-linejoin="round"/><rect x="3" y="7" width="18" height="12" rx="2" stroke-width="1.7"/><circle cx="16.5" cy="13" r="1.4" fill="currentColor" stroke="none"/></symbol>
-  <symbol id="i-grid" viewBox="0 0 24 24"><rect x="3" y="3" width="8" height="10" rx="1.5" stroke-width="1.7"/><rect x="13" y="3" width="8" height="6" rx="1.5" stroke-width="1.7"/><rect x="13" y="11" width="8" height="10" rx="1.5" stroke-width="1.7"/><rect x="3" y="15" width="8" height="6" rx="1.5" stroke-width="1.7"/></symbol>
-  <symbol id="i-chat" viewBox="0 0 24 24"><path d="M4 12a8 8 0 1 1 3 6.2L3 20l1.3-4.3A8 8 0 0 1 4 12z" stroke-width="1.7" stroke-linejoin="round"/></symbol>
-  <symbol id="i-compass" viewBox="0 0 24 24"><circle cx="12" cy="12" r="9" stroke-width="1.7"/><polygon points="15 9 13 13 9 15 11 11" stroke-width="1.7" stroke-linejoin="round"/></symbol>
-  <symbol id="i-shield" viewBox="0 0 24 24"><path d="M12 2l8 3v6c0 5-3.5 9-8 11-4.5-2-8-6-8-11V5l8-3z" stroke-width="1.7" stroke-linejoin="round"/><polyline points="8.5 12 11 14.5 15.5 9.5" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"/></symbol>
-  <symbol id="i-headset" viewBox="0 0 24 24"><path d="M4 13a8 8 0 0 1 16 0" stroke-width="1.7"/><rect x="3" y="13" width="4" height="6" rx="1.5" stroke-width="1.7"/><rect x="17" y="13" width="4" height="6" rx="1.5" stroke-width="1.7"/><path d="M20 19v1a3 3 0 0 1-3 3h-4" stroke-width="1.7"/></symbol>
-  <symbol id="i-mail" viewBox="0 0 24 24"><rect x="3" y="5" width="18" height="14" rx="2" stroke-width="1.7"/><path d="M3 7l9 6 9-6" stroke-width="1.7" stroke-linejoin="round"/></symbol>
+  <symbol id="i-plane" viewBox="0 0 24 24"><path d="M3 11l18-8-8 18-2-7-8-3z" stroke-width="1.8" stroke-linejoin="round"/></symbol>
+  <symbol id="i-phone" viewBox="0 0 24 24"><path d="M5 4h4l2 5-2.5 2A12 12 0 0 0 13 15.5L15 13l5 2v4a2 2 0 0 1-2 2A16 16 0 0 1 3 6a2 2 0 0 1 2-2z" stroke-width="1.8" stroke-linejoin="round"/></symbol>
+  <symbol id="i-alert" viewBox="0 0 24 24"><path d="M12 3 2 20h20L12 3z" stroke-width="1.8" stroke-linejoin="round"/><line x1="12" y1="9.5" x2="12" y2="14" stroke-width="1.8" stroke-linecap="round"/><circle cx="12" cy="17" r="1" fill="currentColor" stroke="none"/></symbol>
+  <symbol id="i-check" viewBox="0 0 24 24"><polyline points="4 13 9 18 20 6" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/></symbol>
+  <symbol id="i-house-check" viewBox="0 0 24 24"><path d="M4 11 12 4l8 7" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/><path d="M6 10v11h12V10" stroke-width="1.8" stroke-linejoin="round"/><polyline points="9 15 11 17 15 12" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></symbol>
+  <symbol id="i-key" viewBox="0 0 24 24"><circle cx="8" cy="15" r="4" stroke-width="1.8"/><path d="M11 12l9-9" stroke-width="1.8" stroke-linecap="round"/><path d="M16 7l3 3" stroke-width="1.8" stroke-linecap="round"/><path d="M13 10l2 2" stroke-width="1.8" stroke-linecap="round"/></symbol>
+  <symbol id="i-document" viewBox="0 0 24 24"><path d="M6 2h9l5 5v15H6z" stroke-width="1.8" stroke-linejoin="round"/><path d="M15 2v5h5" stroke-width="1.8" stroke-linejoin="round"/><line x1="9" y1="13" x2="17" y2="13" stroke-width="1.8" stroke-linecap="round"/><line x1="9" y1="17" x2="17" y2="17" stroke-width="1.8" stroke-linecap="round"/></symbol>
+  <symbol id="i-checklist" viewBox="0 0 24 24"><rect x="5" y="4" width="14" height="17" rx="2" stroke-width="1.8"/><path d="M9 4V2h6v2" stroke-width="1.8"/><polyline points="8.5 13 11 15.5 16 10" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></symbol>
+  <symbol id="i-verify" viewBox="0 0 24 24"><line x1="4" y1="6" x2="14" y2="6" stroke-width="1.8" stroke-linecap="round"/><line x1="4" y1="12" x2="14" y2="12" stroke-width="1.8" stroke-linecap="round"/><line x1="4" y1="18" x2="10" y2="18" stroke-width="1.8" stroke-linecap="round"/><polyline points="15 16 18 19 22 13" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></symbol>
+  <symbol id="i-pin" viewBox="0 0 24 24"><path d="M12 22s7-7.58 7-12A7 7 0 0 0 5 10c0 4.42 7 12 7 12z" stroke-width="1.8" stroke-linejoin="round"/><circle cx="12" cy="10" r="2.4" stroke-width="1.8"/></symbol>
+  <symbol id="i-tool" viewBox="0 0 24 24"><path d="M14.7 6.3a4 4 0 0 1-5.4 5.4L4 17l3 3 5.3-5.3a4 4 0 0 1 5.4-5.4l-3.6 3.6-2-2z" stroke-width="1.8" stroke-linejoin="round"/></symbol>
+  <symbol id="i-calendar" viewBox="0 0 24 24"><rect x="3" y="5" width="18" height="16" rx="2" stroke-width="1.8"/><line x1="3" y1="10" x2="21" y2="10" stroke-width="1.8"/><line x1="8" y1="3" x2="8" y2="7" stroke-width="1.8" stroke-linecap="round"/><line x1="16" y1="3" x2="16" y2="7" stroke-width="1.8" stroke-linecap="round"/><circle cx="12" cy="15" r="1.6" fill="currentColor" stroke="none"/></symbol>
+  <symbol id="i-wallet" viewBox="0 0 24 24"><path d="M3 7a2 2 0 0 1 2-2h13a1 1 0 0 1 1 1v3H5" stroke-width="1.8" stroke-linejoin="round"/><rect x="3" y="7" width="18" height="12" rx="2" stroke-width="1.8"/><circle cx="16.5" cy="13" r="1.4" fill="currentColor" stroke="none"/></symbol>
+  <symbol id="i-grid" viewBox="0 0 24 24"><rect x="3" y="3" width="8" height="10" rx="1.5" stroke-width="1.8"/><rect x="13" y="3" width="8" height="6" rx="1.5" stroke-width="1.8"/><rect x="13" y="11" width="8" height="10" rx="1.5" stroke-width="1.8"/><rect x="3" y="15" width="8" height="6" rx="1.5" stroke-width="1.8"/></symbol>
+  <symbol id="i-chat" viewBox="0 0 24 24"><path d="M4 12a8 8 0 1 1 3 6.2L3 20l1.3-4.3A8 8 0 0 1 4 12z" stroke-width="1.8" stroke-linejoin="round"/></symbol>
+  <symbol id="i-compass" viewBox="0 0 24 24"><circle cx="12" cy="12" r="9" stroke-width="1.8"/><polygon points="15 9 13 13 9 15 11 11" stroke-width="1.8" stroke-linejoin="round"/></symbol>
+  <symbol id="i-shield" viewBox="0 0 24 24"><path d="M12 2l8 3v6c0 5-3.5 9-8 11-4.5-2-8-6-8-11V5l8-3z" stroke-width="1.8" stroke-linejoin="round"/><polyline points="8.5 12 11 14.5 15.5 9.5" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></symbol>
+  <symbol id="i-headset" viewBox="0 0 24 24"><path d="M4 13a8 8 0 0 1 16 0" stroke-width="1.8"/><rect x="3" y="13" width="4" height="6" rx="1.5" stroke-width="1.8"/><rect x="17" y="13" width="4" height="6" rx="1.5" stroke-width="1.8"/><path d="M20 19v1a3 3 0 0 1-3 3h-4" stroke-width="1.8"/></symbol>
+  <symbol id="i-mail" viewBox="0 0 24 24"><rect x="3" y="5" width="18" height="14" rx="2" stroke-width="1.8"/><path d="M3 7l9 6 9-6" stroke-width="1.8" stroke-linejoin="round"/></symbol>
+  <symbol id="poster-art" viewBox="0 0 400 500">
+    <rect width="400" height="500" fill="#123C40"/>
+    <g class="poster-rays">
+      <g fill="#E0A526">
+        <rect x="196" y="10" width="8" height="90"/>
+        <rect x="196" y="10" width="8" height="90" transform="rotate(30 200 190)"/>
+        <rect x="196" y="10" width="8" height="90" transform="rotate(60 200 190)"/>
+        <rect x="196" y="10" width="8" height="90" transform="rotate(90 200 190)"/>
+        <rect x="196" y="10" width="8" height="90" transform="rotate(120 200 190)"/>
+        <rect x="196" y="10" width="8" height="90" transform="rotate(150 200 190)"/>
+        <rect x="196" y="10" width="8" height="90" transform="rotate(180 200 190)"/>
+        <rect x="196" y="10" width="8" height="90" transform="rotate(210 200 190)"/>
+        <rect x="196" y="10" width="8" height="90" transform="rotate(240 200 190)"/>
+        <rect x="196" y="10" width="8" height="90" transform="rotate(270 200 190)"/>
+        <rect x="196" y="10" width="8" height="90" transform="rotate(300 200 190)"/>
+        <rect x="196" y="10" width="8" height="90" transform="rotate(330 200 190)"/>
+      </g>
+      <circle cx="200" cy="190" r="78" fill="#D9432B"/>
+      <circle cx="200" cy="190" r="60" fill="#E0A526"/>
+    </g>
+    <g fill="#3C6B4A">
+      <ellipse cx="70" cy="330" rx="10" ry="60"/>
+      <ellipse cx="100" cy="345" rx="9" ry="48"/>
+      <ellipse cx="305" cy="335" rx="10" ry="58"/>
+      <ellipse cx="335" cy="350" rx="8" ry="42"/>
+    </g>
+    <rect x="0" y="330" width="400" height="34" fill="#B9821A"/>
+    <rect x="0" y="364" width="400" height="30" fill="#3C6B4A"/>
+    <rect x="160" y="270" width="34" height="94" fill="#FBF3DD"/>
+    <polygon points="153,270 177,240 201,270" fill="#D9432B"/>
+    <rect x="171" y="290" width="12" height="16" fill="#123C40"/>
+    <rect x="0" y="394" width="400" height="106" fill="#1B5E63"/>
+    <g fill="#3D8A8F">
+      <polygon points="0,394 40,394 20,414 0,414"/>
+      <polygon points="40,394 80,394 60,414 20,414"/>
+      <polygon points="80,394 120,394 100,414 60,414"/>
+      <polygon points="120,394 160,394 140,414 100,414"/>
+      <polygon points="160,394 200,394 180,414 140,414"/>
+      <polygon points="200,394 240,394 220,414 180,414"/>
+      <polygon points="240,394 280,394 260,414 220,414"/>
+      <polygon points="280,394 320,394 300,414 260,414"/>
+      <polygon points="320,394 360,394 340,414 300,414"/>
+      <polygon points="360,394 400,394 380,414 340,414"/>
+    </g>
+    <g fill="#FBF3DD" opacity=".85">
+      <polygon points="0,424 40,424 20,444 0,444"/>
+      <polygon points="80,424 120,424 100,444 60,444"/>
+      <polygon points="160,424 200,424 180,444 140,444"/>
+      <polygon points="240,424 280,424 260,444 220,444"/>
+      <polygon points="320,424 360,424 340,444 300,444"/>
+    </g>
+  </symbol>
+  <symbol id="poster-seal" viewBox="0 0 100 100">
+    <circle cx="50" cy="50" r="46" fill="#E0A526" stroke="#2B2118" stroke-width="3"/>
+    <circle cx="50" cy="50" r="36" fill="none" stroke="#2B2118" stroke-width="1.5" stroke-dasharray="2 3"/>
+    <path id="sealCirclePath" d="M50,14 A36,36 0 1 1 49.9,14" fill="none"/>
+    <text font-family="Archivo, sans-serif" font-weight="800" font-size="8.2" fill="#2B2118" letter-spacing="1.5">
+      <textPath href="#sealCirclePath" startOffset="2">SOLO IN SICILIA • SEMPRE VERIFICABILE •</textPath>
+    </text>
+    <path d="M38 52l8 8 16-18" fill="none" stroke="#2B2118" stroke-width="4" stroke-linecap="round" stroke-linejoin="round"/>
+  </symbol>
 </svg>
 
 <nav class="site-nav" id="siteNav"><div class="site-nav-inner">
@@ -360,56 +399,52 @@
 </div></nav>
 
 <header class="hero">
-  <div class="hero-content">
-    <div class="eyebrow">Gestione immobili in Sicilia, per proprietari fuori sede</div>
-    <h1>
-      <span class="line"><span>Hai un immobile in Sicilia</span></span>
-      <span class="line"><span>ma <em>non puoi seguirlo?</em> Ci pensiamo noi</span></span>
-    </h1>
-    <p class="lead">Documenti, scadenze, manutenzioni e ospiti: gestiamo tutto noi, anche se vivi lontano. Tu controlli ogni cosa — e ogni lavoro svolto — dalla tua area riservata.</p>
-    <div class="hero-ctas">
-      <a class="btn-primary" href="#contatti"><svg class="icon"><use href="#i-plane"></use></svg>Richiedi una valutazione gratuita</a>
-      <a class="btn-secondary" id="waHeroBtn" href="#" target="_blank" rel="noopener"><svg class="icon"><use href="#i-phone"></use></svg>Scrivici su WhatsApp</a>
+  <div class="hero-grid">
+    <div class="hero-text">
+      <div class="eyebrow">Gestione immobili in Sicilia, per proprietari fuori sede</div>
+      <h1>Hai un immobile<br>in Sicilia ma<br><em>non puoi seguirlo?</em></h1>
+      <p class="lead">Documenti, scadenze, manutenzioni e ospiti: gestiamo tutto noi, anche se vivi lontano. Tu controlli ogni cosa — e ogni lavoro svolto — dalla tua area riservata.</p>
+      <div class="hero-ctas">
+        <a class="btn-primary" href="#contatti"><svg class="icon"><use href="#i-plane"></use></svg>Richiedi una valutazione</a>
+        <a class="btn-secondary" id="waHeroBtn" href="#" target="_blank" rel="noopener"><svg class="icon"><use href="#i-phone"></use></svg>WhatsApp</a>
+      </div>
+      <div class="hero-stats">
+        <div class="hero-stat"><div class="hero-stat-num" data-count="100" data-suffix="%">0%</div><div class="hero-stat-label">gestione a distanza</div></div>
+        <div class="hero-stat"><div class="hero-stat-num">0</div><div class="hero-stat-label">scadenze dimenticate</div></div>
+        <div class="hero-stat"><div class="hero-stat-num">24/7</div><div class="hero-stat-label">lavoro verificabile</div></div>
+      </div>
     </div>
-    <div class="hero-stats">
-      <div><div class="hero-stat-num" data-count="100" data-suffix="%">0%</div><div class="hero-stat-label">gestione a distanza</div></div>
-      <div><div class="hero-stat-num">0</div><div class="hero-stat-label">scadenze dimenticate</div></div>
-      <div><div class="hero-stat-num">24/7</div><div class="hero-stat-label">lavoro verificabile online</div></div>
+    <div class="poster-frame">
+      <svg class="poster-seal" viewBox="0 0 100 100" aria-hidden="true"><use href="#poster-seal"></use></svg>
+      <div class="poster-inner">
+        <svg viewBox="0 0 400 500" aria-hidden="true"><use href="#poster-art"></use></svg>
+      </div>
     </div>
   </div>
-
-  <div class="hero-mesh" aria-hidden="true">
-    <div class="blob blob-1"></div>
-    <div class="blob blob-2"></div>
-    <div class="blob blob-3"></div>
-  </div>
-  <div class="hero-grain" aria-hidden="true"></div>
-  <div class="ghost-text" aria-hidden="true">SICILIA</div>
-  <div class="hero-spotlight" id="heroSpotlight" aria-hidden="true"></div>
 </header>
 
 <div class="ticker" aria-hidden="true">
   <div class="ticker-track">
-    <span class="txt">Niente pensieri per te</span><span class="dot">●</span>
-    <span class="txt">Documenti &amp; scadenze sotto controllo</span><span class="dot">●</span>
-    <span class="txt">Manutenzioni gestite</span><span class="dot">●</span>
-    <span class="txt">Tutto verificabile online</span><span class="dot">●</span>
-    <span class="txt">Solo in Sicilia</span><span class="dot">●</span>
-    <span class="txt">Niente pensieri per te</span><span class="dot">●</span>
-    <span class="txt">Documenti &amp; scadenze sotto controllo</span><span class="dot">●</span>
-    <span class="txt">Manutenzioni gestite</span><span class="dot">●</span>
-    <span class="txt">Tutto verificabile online</span><span class="dot">●</span>
-    <span class="txt">Solo in Sicilia</span><span class="dot">●</span>
+    <span class="txt">Niente pensieri per te</span><span class="dot">★</span>
+    <span class="txt">Documenti &amp; scadenze sotto controllo</span><span class="dot">★</span>
+    <span class="txt">Manutenzioni gestite</span><span class="dot">★</span>
+    <span class="txt">Tutto verificabile online</span><span class="dot">★</span>
+    <span class="txt">Solo in Sicilia</span><span class="dot">★</span>
+    <span class="txt">Niente pensieri per te</span><span class="dot">★</span>
+    <span class="txt">Documenti &amp; scadenze sotto controllo</span><span class="dot">★</span>
+    <span class="txt">Manutenzioni gestite</span><span class="dot">★</span>
+    <span class="txt">Tutto verificabile online</span><span class="dot">★</span>
+    <span class="txt">Solo in Sicilia</span><span class="dot">★</span>
   </div>
 </div>
 
 <section class="reveal">
-  <span class="section-tag">Il problema</span>
+  <div class="section-tag-wrap"><span class="section-tag">Il problema</span></div>
   <h2 class="section-title">Un immobile in Sicilia, ma tu vivi altrove?</h2>
   <p class="section-sub">Tra documenti da rinnovare, scadenze da non dimenticare e manutenzioni da seguire, gestire un immobile a distanza è complicato. Basta un imprevisto non seguito per creare problemi seri.</p>
   <div class="pain-grid">
     <div class="pain-card">
-      <h3><svg class="icon" style="width:22px;height:22px;color:var(--terracotta)"><use href="#i-alert"></use></svg> Senza un gestore</h3>
+      <h3><svg class="icon" style="width:22px;height:22px;color:var(--vermillion)"><use href="#i-alert"></use></svg> Senza un gestore</h3>
       <ul>
         <li>Scadenze fiscali, assicurative o amministrative rischiano di sfuggirti</li>
         <li>Non sai chi controlla davvero l'immobile quando è vuoto</li>
@@ -418,7 +453,7 @@
       </ul>
     </div>
     <div class="solution-card">
-      <h3><svg class="icon" style="width:22px;height:22px;color:var(--sun)"><use href="#i-check"></use></svg> Con noi</h3>
+      <h3><svg class="icon" style="width:22px;height:22px;color:var(--mustard)"><use href="#i-check"></use></svg> Con noi</h3>
       <ul>
         <li>Teniamo traccia di documenti e scadenze e ti avvisiamo per tempo</li>
         <li>Controlli periodici regolari, anche quando l'immobile è vuoto</li>
@@ -430,12 +465,12 @@
 </section>
 
 <section class="alt-bg reveal">
-  <span class="section-tag">Due livelli di servizio</span>
+  <div class="section-tag-wrap"><span class="section-tag">Due livelli di servizio</span></div>
   <h2 class="section-title">Custodia sempre, affitto se lo vuoi tu</h2>
   <p class="section-sub">La gestione di base copre documenti, scadenze e manutenzioni. Se in più vuoi generare un reddito, ci occupiamo anche di affittarlo.</p>
   <div class="pain-grid">
-    <div class="pain-card" style="border-color:var(--sea-light);">
-      <h3 style="color:var(--sea);"><svg class="icon" style="width:22px;height:22px;color:var(--sea)"><use href="#i-house-check"></use></svg> Custodia e gestione</h3>
+    <div class="pain-card" style="border-color:var(--ink);">
+      <h3 style="color:var(--petrol);"><svg class="icon" style="width:22px;height:22px;color:var(--petrol)"><use href="#i-house-check"></use></svg> Custodia e gestione</h3>
       <ul>
         <li>Documenti, assicurazioni e scadenze sempre monitorati</li>
         <li>Controlli periodici e manutenzione programmata</li>
@@ -444,7 +479,7 @@
       </ul>
     </div>
     <div class="solution-card">
-      <h3><svg class="icon" style="width:22px;height:22px;color:var(--sun)"><use href="#i-key"></use></svg> Vuoi anche affittarlo?</h3>
+      <h3><svg class="icon" style="width:22px;height:22px;color:var(--mustard)"><use href="#i-key"></use></svg> Vuoi anche affittarlo?</h3>
       <ul>
         <li>In più, gestiamo prenotazioni, calendario e ospiti per te</li>
         <li>Assistenza agli ospiti 24/7, dall'accoglienza alla partenza</li>
@@ -456,7 +491,7 @@
 </section>
 
 <section id="servizi" class="reveal">
-  <span class="section-tag">Cosa facciamo</span>
+  <div class="section-tag-wrap"><span class="section-tag">Cosa facciamo</span></div>
   <h2 class="section-title">Gestiamo tutto, tu resti sempre informato</h2>
   <p class="section-sub">Documenti, scadenze, manutenzioni, ospiti: seguiamo ogni aspetto del tuo immobile in Sicilia, anche se tu sei lontano, e ti diamo modo di verificare tutto.</p>
   <div class="services-grid stagger">
@@ -464,7 +499,7 @@
     <div class="service-card" style="--i:1"><div class="service-icon"><svg class="icon"><use href="#i-verify"></use></svg></div><h3>Verifica del lavoro svolto</h3><p>Ogni intervento e controllo viene documentato: puoi rivedere cosa è stato fatto, e quando, dalla piattaforma.</p></div>
     <div class="service-card" style="--i:2"><div class="service-icon"><svg class="icon"><use href="#i-pin"></use></svg></div><h3>Gestione a distanza</h3><p>Non serve essere presenti: siamo noi sul posto in Sicilia, tu segui tutto comodamente da remoto.</p></div>
     <div class="service-card" style="--i:3"><div class="service-icon"><svg class="icon"><use href="#i-tool"></use></svg></div><h3>Manutenzioni e interventi</h3><p>Ti inviamo i preventivi da approvare prima di ogni intervento: decidi tu, senza sorprese in bolletta.</p></div>
-    <div class="service-card" style="--i:4"><div class="service-icon"><svg class="icon"><use href="#i-checklist"></use></svg></div><h3>Controlli periodici</h3><p>Verifichiamo regolarmente lo stato dell'immobile, così resta curato anche quando non lo vedi.</p></div>
+    <div class="service-card" style="--i:4"><div class="service-icon"><svg class="icon"><use href="#i-calendar"></use></svg></div><h3>Controlli periodici</h3><p>Verifichiamo regolarmente lo stato dell'immobile, così resta curato anche quando non lo vedi.</p></div>
     <div class="service-card" style="--i:5"><div class="service-icon"><svg class="icon"><use href="#i-calendar"></use></svg></div><h3>Gestione prenotazioni</h3><p>Curiamo calendario, richieste e comunicazioni con gli ospiti dall'inizio alla fine del soggiorno.</p></div>
     <div class="service-card" style="--i:6"><div class="service-icon"><svg class="icon"><use href="#i-wallet"></use></svg></div><h3>Spese &amp; guadagno</h3><p>Ogni spesa e ogni incasso è tracciato e consultabile, senza calcoli da fare a fine mese.</p></div>
     <div class="service-card" style="--i:7"><div class="service-icon"><svg class="icon"><use href="#i-grid"></use></svg></div><h3>Dashboard trasparente</h3><p>Accedi in ogni momento alla tua area riservata per vedere stato, occupazione e attività del tuo immobile.</p></div>
@@ -473,7 +508,7 @@
 </section>
 
 <section id="come-funziona" class="alt-bg reveal">
-  <span class="section-tag">Come funziona</span>
+  <div class="section-tag-wrap"><span class="section-tag">Come funziona</span></div>
   <h2 class="section-title">Dal contatto alla prima prenotazione</h2>
   <p class="section-sub">Un percorso semplice, pensato per farti risparmiare tempo fin dal primo giorno.</p>
   <div class="steps stagger">
@@ -485,12 +520,8 @@
 </section>
 
 <section class="trust-band reveal">
-  <div class="trust-mesh" aria-hidden="true">
-    <div class="blob blob-1"></div>
-    <div class="blob blob-3"></div>
-  </div>
-  <span class="section-tag" style="color:var(--sun); position:relative; z-index:2;">Perché sceglierci</span>
-  <h2 class="section-title" style="color:#fff; position:relative; z-index:2;">La tranquillità di un partner serio</h2>
+  <div class="section-tag-wrap"><span class="section-tag" style="background:var(--mustard);">Perché sceglierci</span></div>
+  <h2 class="section-title" style="color:#fff;">La tranquillità di un partner serio</h2>
   <div class="trust-grid">
     <div class="trust-item"><div class="icon-badge"><svg class="icon"><use href="#i-compass"></use></svg></div><h3>Presenti sul territorio</h3><p>Siamo fisicamente in Sicilia: interveniamo di persona, non solo da remoto.</p></div>
     <div class="trust-item"><div class="icon-badge"><svg class="icon"><use href="#i-shield"></use></svg></div><h3>Documenti e scadenze sotto controllo</h3><p>Nessuna scadenza dimenticata: monitoriamo tutto e ti avvisiamo per tempo.</p></div>
@@ -500,30 +531,30 @@
 </section>
 
 <section id="recensioni" class="reveal">
-  <span class="section-tag">Chi si è già affidato a noi</span>
+  <div class="section-tag-wrap"><span class="section-tag">Chi si è già affidato a noi</span></div>
   <h2 class="section-title">Cosa dicono i proprietari</h2>
   <div class="testi-grid">
     <div class="testi-card">
       <div class="testi-stars">★★★★★</div>
       <p class="quote">"Vivo fuori dalla Sicilia e non riuscivo a seguire scadenze e manutenzioni del mio appartamento. Ora ricevo solo i report da controllare."</p>
-      <div class="testi-foot"><div class="testi-avatar" style="background:var(--sea)">M.R.</div><div class="testi-author">Esempio di testimonianza</div></div>
+      <div class="testi-foot"><div class="testi-avatar" style="background:var(--petrol)">M.R.</div><div class="testi-author">Esempio di testimonianza</div></div>
     </div>
     <div class="testi-card">
       <div class="testi-stars">★★★★★</div>
       <p class="quote">"Finalmente so sempre cosa succede al mio immobile, anche vivendo lontano: ogni intervento è documentato sulla piattaforma."</p>
-      <div class="testi-foot"><div class="testi-avatar" style="background:var(--terracotta)">A.C.</div><div class="testi-author">Esempio di testimonianza</div></div>
+      <div class="testi-foot"><div class="testi-avatar" style="background:var(--vermillion)">A.C.</div><div class="testi-author">Esempio di testimonianza</div></div>
     </div>
     <div class="testi-card">
       <div class="testi-stars">★★★★★</div>
       <p class="quote">"Non dovevo più preoccuparmi di documenti e scadenze: mi avvisano loro prima che sia un problema."</p>
-      <div class="testi-foot"><div class="testi-avatar" style="background:var(--majolica-green)">G.T.</div><div class="testi-author">Esempio di testimonianza</div></div>
+      <div class="testi-foot"><div class="testi-avatar" style="background:var(--forest)">G.T.</div><div class="testi-author">Esempio di testimonianza</div></div>
     </div>
   </div>
   <p class="testi-note">* Testi segnaposto: sostituiscili con recensioni reali dei tuoi proprietari prima di pubblicare.</p>
 </section>
 
 <section id="faq" class="alt-bg reveal">
-  <span class="section-tag">Domande frequenti</span>
+  <div class="section-tag-wrap"><span class="section-tag">Domande frequenti</span></div>
   <h2 class="section-title">Tutto quello che vuoi sapere</h2>
   <div class="faq-list">
     <details class="faq-item"><summary>Quanto costa il servizio di gestione?</summary><p>Il costo dipende dalla tipologia di immobile e dal livello di servizio richiesto. Dopo una valutazione gratuita ti proponiamo una tariffa chiara, senza costi nascosti.</p></details>
@@ -537,7 +568,7 @@
 </section>
 
 <section id="contatti" class="reveal">
-  <span class="section-tag">Contattaci</span>
+  <div class="section-tag-wrap"><span class="section-tag">Contattaci</span></div>
   <h2 class="section-title">Richiedi una valutazione gratuita</h2>
   <p class="section-sub">Raccontaci qualcosa del tuo immobile: ti risponderemo con una proposta su misura.</p>
 
@@ -578,7 +609,7 @@
           </select>
         </div>
         <div class="field"><label for="fMsg">Messaggio (facoltativo)</label><textarea id="fMsg" name="messaggio" placeholder="Raccontaci qualcosa in più sul tuo immobile"></textarea></div>
-        <button type="submit" class="btn-primary" style="width:100%;justify-content:center;background:var(--terracotta); color:#fff; box-shadow:0 10px 26px rgba(193,80,46,.3);">Invia richiesta</button>
+        <button type="submit" class="btn-primary" style="width:100%;justify-content:center;">Invia richiesta</button>
         <p class="form-note">Inviando il modulo verrai reindirizzato su WhatsApp con il messaggio già pronto, oppure potrai scriverci via email.</p>
       </form>
       <div class="form-success" id="formSuccess">Grazie! Apri WhatsApp per completare l'invio del messaggio.</div>
@@ -587,7 +618,7 @@
 </section>
 
 <footer>
-  <div id="footerBrand" style="font-family:'Playfair Display',serif; font-weight:700; color:#fff; font-size:16px; margin-bottom:10px;">Property Manager</div>
+  <div id="footerBrand" style="font-family:'Bebas Neue',sans-serif; font-size:22px; color:#fff; margin-bottom:10px; letter-spacing:.03em;">Property Manager</div>
   <div>Sei già un proprietario in gestione? <a href="index.html">Accedi alla tua area riservata</a></div>
   <div style="margin-top:10px; opacity:.7;">© <span id="year"></span> — Tutti i diritti riservati</div>
 </footer>
@@ -637,13 +668,13 @@
   // Fun confetti burst
   function fireConfetti(anchorEl){
     if(window.matchMedia('(prefers-reduced-motion: reduce)').matches) return;
-    const colors = ['#F0A93A', '#C1502E', '#157A96', '#4F7A5B'];
+    const colors = ['#E0A526', '#D9432B', '#1B5E63', '#3C6B4A'];
     const rect = anchorEl.getBoundingClientRect();
     const originX = rect.left + rect.width / 2, originY = rect.top + window.scrollY + 14;
     for(let i = 0; i < 26; i++){
       const el = document.createElement('div');
       const angle = Math.random() * Math.PI * 2, dist = 60 + Math.random() * 90;
-      el.style.cssText = `position:absolute; left:${originX}px; top:${originY}px; width:${5+Math.random()*4}px; height:${5+Math.random()*4}px; background:${colors[i%colors.length]}; border-radius:${Math.random()>.5?'50%':'2px'}; pointer-events:none; z-index:999; --dx:${Math.cos(angle)*dist}px; --dy:${Math.sin(angle)*dist - 40}px; --rot:${(Math.random()*540-270)}deg; animation:confettiFall .9s ease-out forwards;`;
+      el.style.cssText = `position:absolute; left:${originX}px; top:${originY}px; width:${5+Math.random()*4}px; height:${5+Math.random()*4}px; background:${colors[i%colors.length]}; border:1.5px solid #2B2118; border-radius:${Math.random()>.5?'50%':'1px'}; pointer-events:none; z-index:999; --dx:${Math.cos(angle)*dist}px; --dy:${Math.sin(angle)*dist - 40}px; --rot:${(Math.random()*540-270)}deg; animation:confettiFall .9s ease-out forwards;`;
       document.body.appendChild(el);
       setTimeout(()=>el.remove(), 950);
     }
@@ -657,17 +688,6 @@
 
   // Scroll reveal
   const reduceMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
-
-  // Hero spotlight follows the cursor
-  const heroHeader = document.querySelector('.hero');
-  const heroSpotlight = document.getElementById('heroSpotlight');
-  if(heroHeader && heroSpotlight && !reduceMotion && window.matchMedia('(pointer: fine)').matches){
-    heroHeader.addEventListener('mousemove', function(e){
-      const r = heroHeader.getBoundingClientRect();
-      heroSpotlight.style.setProperty('--sx', ((e.clientX - r.left) / r.width * 100) + '%');
-      heroSpotlight.style.setProperty('--sy', ((e.clientY - r.top) / r.height * 100) + '%');
-    });
-  }
   const revealEls = document.querySelectorAll('.reveal');
   if(reduceMotion || !('IntersectionObserver' in window)){
     revealEls.forEach(el=>el.classList.add('in-view'));
@@ -690,7 +710,7 @@
       entries.forEach(entry=>{
         if(entry.isIntersecting && !started){
           started = true;
-          const dur = 1400, t0 = performance.now();
+          const dur = 1200, t0 = performance.now();
           function tick(t){
             const p = Math.min(1, (t - t0) / dur);
             const eased = 1 - Math.pow(1 - p, 3);

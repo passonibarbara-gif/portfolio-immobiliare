@@ -114,11 +114,31 @@
   .hero-stat-num{font-family:'Cormorant Garamond',serif; font-weight:600; font-size:28px; color:var(--gold-deep); line-height:1; font-variant-numeric:tabular-nums;}
   .hero-stat-label{font-size:10.5px; color:var(--ink-soft); letter-spacing:.06em; text-transform:uppercase; margin-top:6px; max-width:110px;}
 
-  /* ---------- Hero illustration ---------- */
-  .hero-art{max-width:190px; margin:36px auto 0;}
-  .hero-art svg{display:block; width:100%; height:auto;}
-  .mascot-inline{width:76px; height:auto; flex:none;}
-  .mascot-center{width:84px; margin:0 auto 18px; display:block;}
+  /* ---------- Crest emblem ---------- */
+  .crest-wrap{position:relative; max-width:150px; margin:8px auto 32px;}
+  .crest-wrap svg{display:block; width:100%; height:auto; overflow:visible;}
+  .crest-ring{
+    stroke-dasharray:452; stroke-dashoffset:452;
+    animation:drawRing 1.6s ease-out .2s forwards;
+  }
+  .crest-leaves path{
+    opacity:0; transform-box:fill-box;
+    animation:leafGrow .6s cubic-bezier(.2,.8,.3,1) calc(.5s + var(--i,0) * 90ms) forwards;
+  }
+  @keyframes drawRing{ to{stroke-dashoffset:0;} }
+  @keyframes leafGrow{ from{opacity:0; transform:scale(0);} to{opacity:1; transform:scale(1);} }
+
+  /* ---------- Ambient particles ---------- */
+  .hero{position:relative;}
+  .hero-particles{position:absolute; inset:0; overflow:hidden; pointer-events:none; z-index:0;}
+  .particle{position:absolute; width:3px; height:3px; border-radius:50%; background:var(--gold); opacity:0; animation:driftUp 9s ease-in infinite;}
+  @keyframes driftUp{
+    0%{opacity:0; transform:translateY(0);}
+    12%{opacity:.55;}
+    88%{opacity:.35;}
+    100%{opacity:0; transform:translateY(-160px);}
+  }
+  .hero > *:not(.hero-particles){position:relative; z-index:1;}
 
   /* ---------- Section shell ---------- */
   section{padding:88px 24px;}
@@ -282,55 +302,23 @@
   <symbol id="i-shield" viewBox="0 0 24 24"><path d="M12 2l8 3v6c0 5-3.5 9-8 11-4.5-2-8-6-8-11V5l8-3z" stroke-width="1.5" stroke-linejoin="round"/><polyline points="8.5 12 11 14.5 15.5 9.5" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></symbol>
   <symbol id="i-headset" viewBox="0 0 24 24"><path d="M4 13a8 8 0 0 1 16 0" stroke-width="1.5"/><rect x="3" y="13" width="4" height="6" rx="1.5" stroke-width="1.5"/><rect x="17" y="13" width="4" height="6" rx="1.5" stroke-width="1.5"/><path d="M20 19v1a3 3 0 0 1-3 3h-4" stroke-width="1.5"/></symbol>
   <symbol id="i-mail" viewBox="0 0 24 24"><rect x="3" y="5" width="18" height="14" rx="2" stroke-width="1.5"/><path d="M3 7l9 6 9-6" stroke-width="1.5" stroke-linejoin="round"/></symbol>
-  <g id="gecko-parts">
-    <g id="gecko-body">
-      <path d="M138 150 C160 145 176 130 178 108 C170 122 156 132 142 136 Z" fill="var(--terracotta)" stroke="var(--ink)" stroke-width="3" stroke-linejoin="round"/>
-      <path d="M62 118 C58 150 62 185 78 206 L122 206 C138 185 142 150 138 118 C138 108 62 108 62 118 Z" fill="var(--terracotta)" stroke="var(--ink)" stroke-width="3" stroke-linejoin="round"/>
-      <ellipse cx="100" cy="168" rx="24" ry="32" fill="var(--paper)" opacity=".9"/>
-      <ellipse cx="78" cy="206" rx="15" ry="8" fill="var(--terracotta)" stroke="var(--ink)" stroke-width="2.5"/>
-      <ellipse cx="122" cy="206" rx="15" ry="8" fill="var(--terracotta)" stroke="var(--ink)" stroke-width="2.5"/>
-      <ellipse cx="100" cy="66" rx="52" ry="50" fill="var(--terracotta)" stroke="var(--ink)" stroke-width="3"/>
-      <ellipse cx="100" cy="104" rx="15" ry="9" fill="var(--terracotta)" stroke="var(--ink)" stroke-width="2.5"/>
-      <circle cx="78" cy="58" r="15" fill="#fff" stroke="var(--ink)" stroke-width="2.5"/>
-      <circle cx="122" cy="58" r="15" fill="#fff" stroke="var(--ink)" stroke-width="2.5"/>
-      <circle cx="81" cy="56" r="6.5" fill="var(--ink)"/>
-      <circle cx="125" cy="56" r="6.5" fill="var(--ink)"/>
-      <circle cx="84" cy="53" r="2" fill="#fff"/>
-      <circle cx="128" cy="53" r="2" fill="#fff"/>
-      <path d="M84 92 Q100 102 116 92" stroke="var(--ink)" stroke-width="3" fill="none" stroke-linecap="round"/>
+  <symbol id="crest" viewBox="0 0 200 200">
+    <circle class="crest-ring" cx="100" cy="100" r="72" fill="none" stroke="var(--gold)" stroke-width="1.3"/>
+    <g class="crest-leaves">
+      <g transform="rotate(200 100 100) translate(0,-80) rotate(18) scale(1.15)"><path style="--i:0" d="M0,-13 C5,-7 5,7 0,13 C-5,7 -5,-7 0,-13 Z" fill="var(--gold)"/></g>
+      <g transform="rotate(224 100 100) translate(0,-80) rotate(18) scale(1.0)"><path style="--i:1" d="M0,-13 C5,-7 5,7 0,13 C-5,7 -5,-7 0,-13 Z" fill="var(--gold)"/></g>
+      <g transform="rotate(248 100 100) translate(0,-80) rotate(18) scale(0.88)"><path style="--i:2" d="M0,-13 C5,-7 5,7 0,13 C-5,7 -5,-7 0,-13 Z" fill="var(--gold)"/></g>
+      <g transform="rotate(272 100 100) translate(0,-80) rotate(18) scale(0.76)"><path style="--i:3" d="M0,-13 C5,-7 5,7 0,13 C-5,7 -5,-7 0,-13 Z" fill="var(--gold)"/></g>
+      <g transform="rotate(296 100 100) translate(0,-80) rotate(18) scale(0.64)"><path style="--i:4" d="M0,-13 C5,-7 5,7 0,13 C-5,7 -5,-7 0,-13 Z" fill="var(--gold)"/></g>
+      <g transform="rotate(320 100 100) translate(0,-80) rotate(18) scale(0.55)"><path style="--i:5" d="M0,-13 C5,-7 5,7 0,13 C-5,7 -5,-7 0,-13 Z" fill="var(--gold)"/></g>
+      <g transform="rotate(160 100 100) translate(0,-80) rotate(-18) scale(1.15)"><path style="--i:0" d="M0,-13 C5,-7 5,7 0,13 C-5,7 -5,-7 0,-13 Z" fill="var(--gold)"/></g>
+      <g transform="rotate(136 100 100) translate(0,-80) rotate(-18) scale(1.0)"><path style="--i:1" d="M0,-13 C5,-7 5,7 0,13 C-5,7 -5,-7 0,-13 Z" fill="var(--gold)"/></g>
+      <g transform="rotate(112 100 100) translate(0,-80) rotate(-18) scale(0.88)"><path style="--i:2" d="M0,-13 C5,-7 5,7 0,13 C-5,7 -5,-7 0,-13 Z" fill="var(--gold)"/></g>
+      <g transform="rotate(88 100 100) translate(0,-80) rotate(-18) scale(0.76)"><path style="--i:3" d="M0,-13 C5,-7 5,7 0,13 C-5,7 -5,-7 0,-13 Z" fill="var(--gold)"/></g>
+      <g transform="rotate(64 100 100) translate(0,-80) rotate(-18) scale(0.64)"><path style="--i:4" d="M0,-13 C5,-7 5,7 0,13 C-5,7 -5,-7 0,-13 Z" fill="var(--gold)"/></g>
+      <g transform="rotate(40 100 100) translate(0,-80) rotate(-18) scale(0.55)"><path style="--i:5" d="M0,-13 C5,-7 5,7 0,13 C-5,7 -5,-7 0,-13 Z" fill="var(--gold)"/></g>
     </g>
-    <path id="gecko-arm-rest" d="M68 132 C56 145 52 162 58 178" stroke="var(--terracotta)" stroke-width="16" fill="none" stroke-linecap="round"/>
-    <circle id="gecko-hand-rest" cx="58" cy="180" r="9" fill="var(--terracotta)" stroke="var(--ink)" stroke-width="2.5"/>
-  </g>
-  <symbol id="mascot-wave" viewBox="0 0 220 220">
-    <use href="#gecko-body"/>
-    <use href="#gecko-arm-rest"/><use href="#gecko-hand-rest"/>
-    <path d="M132 130 C148 110 158 86 152 62" stroke="var(--terracotta)" stroke-width="16" fill="none" stroke-linecap="round"/>
-    <circle cx="152" cy="60" r="10" fill="var(--terracotta)" stroke="var(--ink)" stroke-width="2.5"/>
-    <path d="M168 44 q6 4 6 10" stroke="var(--ink)" stroke-width="2" fill="none" stroke-linecap="round" opacity=".6"/>
-    <path d="M172 56 q7 2 8 8" stroke="var(--ink)" stroke-width="2" fill="none" stroke-linecap="round" opacity=".6"/>
-  </symbol>
-  <symbol id="mascot-magnify" viewBox="0 0 220 220">
-    <use href="#gecko-body"/>
-    <use href="#gecko-arm-rest"/><use href="#gecko-hand-rest"/>
-    <path d="M132 128 C144 116 150 100 148 84" stroke="var(--terracotta)" stroke-width="16" fill="none" stroke-linecap="round"/>
-    <circle cx="148" cy="82" r="9" fill="var(--terracotta)" stroke="var(--ink)" stroke-width="2.5"/>
-    <line x1="181" y1="82" x2="190" y2="94" stroke="var(--ink)" stroke-width="5" stroke-linecap="round"/>
-    <circle cx="170" cy="70" r="16" fill="var(--paper)" fill-opacity=".5" stroke="var(--ink)" stroke-width="4"/>
-  </symbol>
-  <symbol id="mascot-doc" viewBox="0 0 220 220">
-    <use href="#gecko-body"/>
-    <path d="M66 130 C60 145 66 158 82 164" stroke="var(--terracotta)" stroke-width="16" fill="none" stroke-linecap="round"/>
-    <path d="M134 130 C140 145 134 158 118 164" stroke="var(--terracotta)" stroke-width="16" fill="none" stroke-linecap="round"/>
-    <rect x="78" y="138" width="44" height="32" rx="3" fill="var(--paper)" stroke="var(--ink)" stroke-width="3"/>
-    <path d="M78 140 L100 158 L122 140" stroke="var(--ink)" stroke-width="2.5" fill="none" stroke-linecap="round" stroke-linejoin="round"/>
-  </symbol>
-  <symbol id="mascot-thumbsup" viewBox="0 0 220 220">
-    <use href="#gecko-body"/>
-    <use href="#gecko-arm-rest"/><use href="#gecko-hand-rest"/>
-    <path d="M132 128 C146 122 156 108 154 92" stroke="var(--terracotta)" stroke-width="16" fill="none" stroke-linecap="round"/>
-    <circle cx="154" cy="90" r="11" fill="var(--terracotta)" stroke="var(--ink)" stroke-width="2.5"/>
-    <rect x="148" y="66" width="11" height="22" rx="5.5" fill="var(--terracotta)" stroke="var(--ink)" stroke-width="2.5"/>
+    <use href="#i-key" class="icon" x="86" y="86" width="28" height="28" style="color:var(--gold-deep); width:28px; height:28px;"/>
   </symbol>
 </svg>
 
@@ -346,6 +334,15 @@
 </div></nav>
 
 <header class="hero reveal">
+  <div class="hero-particles" aria-hidden="true">
+    <span class="particle" style="left:14%; animation-delay:.2s;"></span>
+    <span class="particle" style="left:26%; animation-delay:2.4s;"></span>
+    <span class="particle" style="left:41%; animation-delay:4.6s;"></span>
+    <span class="particle" style="left:58%; animation-delay:1.3s;"></span>
+    <span class="particle" style="left:72%; animation-delay:3.5s;"></span>
+    <span class="particle" style="left:86%; animation-delay:5.7s;"></span>
+  </div>
+  <div class="crest-wrap"><svg viewBox="0 0 200 200" aria-hidden="true"><use href="#crest"></use></svg></div>
   <div class="hero-inner">
     <div class="eyebrow">Gestione immobili in Sicilia, per proprietari fuori sede</div>
     <h1>Hai un immobile in Sicilia<br>ma <em>non puoi seguirlo?</em></h1>
@@ -360,7 +357,6 @@
       <div class="hero-stat"><div class="hero-stat-num">24/7</div><div class="hero-stat-label">Lavoro verificabile</div></div>
     </div>
   </div>
-  <div class="hero-art"><svg viewBox="0 0 220 220" aria-hidden="true"><use href="#mascot-wave"></use></svg></div>
 </header>
 
 <div class="ornament" aria-hidden="true"><span class="orn-line"></span><span class="orn-dot"></span><span class="orn-line"></span></div>
@@ -392,7 +388,6 @@
 </section>
 
 <section class="alt-bg reveal">
-  <svg class="mascot-center" viewBox="0 0 220 220" aria-hidden="true"><use href="#mascot-doc"></use></svg>
   <div class="section-tag-wrap"><span class="section-tag">Due livelli di servizio</span></div>
   <h2 class="section-title">Custodia sempre, affitto se lo vuoi tu</h2>
   <p class="section-sub">La gestione di base copre documenti, scadenze e manutenzioni. Se in più vuoi generare un reddito, ci occupiamo anche di affittarlo.</p>
@@ -448,7 +443,6 @@
 </section>
 
 <section class="trust-band reveal">
-  <svg class="mascot-center" viewBox="0 0 220 220" aria-hidden="true"><use href="#mascot-magnify"></use></svg>
   <div class="section-tag-wrap"><span class="section-tag" style="color:var(--gold);">Perché sceglierci</span></div>
   <h2 class="section-title" style="color:#fff;">La tranquillità di un partner serio</h2>
   <div class="trust-grid">
@@ -460,7 +454,6 @@
 </section>
 
 <section id="recensioni" class="reveal">
-  <svg class="mascot-center" viewBox="0 0 220 220" aria-hidden="true"><use href="#mascot-thumbsup"></use></svg>
   <div class="section-tag-wrap"><span class="section-tag">Chi si è già affidato a noi</span></div>
   <h2 class="section-title">Cosa dicono i proprietari</h2>
   <div class="testi-grid">

@@ -1,0 +1,569 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+<meta charset="UTF-8">
+<title>Affida il tuo immobile in Sicilia — Property Manager</title>
+<meta name="description" content="Hai un immobile in Sicilia e non puoi seguirlo di persona? Gestiamo documenti, scadenze, manutenzioni e, se vuoi, anche l'affitto. Verifica tutto il lavoro svolto dalla tua area riservata.">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<link rel="icon" href="icon-192.png" sizes="192x192" type="image/png">
+<link rel="apple-touch-icon" href="apple-touch-icon.png">
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@tabler/icons-webfont@2.47.0/tabler-icons.min.css">
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,400;0,9..144,500;0,9..144,600;0,9..144,700;1,9..144,600;1,9..144,700&family=IBM+Plex+Sans:wght@400;500;600&family=IBM+Plex+Mono:wght@400;500&display=swap');
+
+  :root{
+    --ink:#241F1A;
+    --ink-soft:#6E6558;
+    --paper:#F3EFE7;
+    --paper-raised:#FBF9F4;
+    --brass:#0ABAB5;
+    --brass-soft:#D6EFEC;
+    --brass-deep:#0F8C86;
+    --terracotta:#BC4632;
+    --sage:#3E8C6E;
+    --line:#DEDACB;
+    --line-soft:#E9E4D5;
+    --surface-dark:#12302C;
+    --surface-dark-2:#193B36;
+    --text-on-dark:#EAF6F3;
+    --text-on-dark-soft:#9AC7C0;
+    --tiffany:#7FEDE0;
+    --brand-gradient: linear-gradient(120deg, var(--brass-deep) 0%, var(--brass) 55%, var(--tiffany) 100%);
+  }
+  *{box-sizing:border-box;}
+  html{scroll-behavior:smooth;}
+  body{
+    margin:0;
+    background:var(--paper);
+    color:var(--ink);
+    font-family:'IBM Plex Sans',sans-serif;
+    -webkit-font-smoothing:antialiased;
+    line-height:1.5;
+  }
+  a{color:inherit;}
+  .wrap{max-width:1080px; margin:0 auto; padding:0 24px;}
+  .ti{vertical-align:-2px; margin-right:6px;}
+
+  /* ---------- Nav ---------- */
+  .site-nav{
+    position:sticky; top:0; z-index:20;
+    display:flex; justify-content:space-between; align-items:center;
+    padding:16px 24px; gap:16px; flex-wrap:wrap;
+    background:linear-gradient(180deg,var(--surface-dark) 0%, var(--surface-dark-2) 100%);
+    border-bottom:1px solid rgba(10,186,181,.35);
+  }
+  .site-nav-inner{max-width:1080px; margin:0 auto; width:100%; display:flex; justify-content:space-between; align-items:center; gap:16px; flex-wrap:wrap;}
+  .brand{
+    font-family:'Fraunces',serif; font-weight:600; font-size:15px; letter-spacing:.1em;
+    color:var(--brass-soft); text-transform:uppercase;
+  }
+  .nav-links{display:flex; align-items:center; gap:22px; flex-wrap:wrap;}
+  .nav-links a{font-size:13px; color:var(--text-on-dark-soft); text-decoration:none; letter-spacing:.02em;}
+  .nav-links a:hover{color:var(--text-on-dark);}
+  .nav-cta{
+    background:var(--brass); color:var(--surface-dark); border:none; padding:9px 18px; border-radius:8px;
+    font-size:12.5px; font-weight:600; text-decoration:none; letter-spacing:.02em; white-space:nowrap;
+  }
+
+  /* ---------- Hero ---------- */
+  .hero{
+    background:linear-gradient(180deg,var(--surface-dark) 0%, var(--surface-dark-2) 100%);
+    color:var(--text-on-dark); padding:64px 24px 80px; text-align:center;
+  }
+  .eyebrow{
+    display:inline-block; font-size:11.5px; letter-spacing:.16em; text-transform:uppercase;
+    color:var(--tiffany); border:1px solid rgba(127,237,224,.35); border-radius:100px; padding:6px 14px; margin-bottom:22px;
+  }
+  .hero h1{
+    font-family:'Fraunces',serif; font-weight:600; font-size:clamp(30px,5vw,48px); line-height:1.15;
+    margin:0 0 18px; max-width:760px; margin-left:auto; margin-right:auto;
+  }
+  .hero h1 em{font-style:normal; background:var(--brand-gradient); -webkit-background-clip:text; background-clip:text; color:transparent;}
+  .hero p.lead{
+    font-size:16.5px; color:var(--text-on-dark-soft); max-width:560px; margin:0 auto 34px;
+  }
+  .hero-ctas{display:flex; gap:12px; justify-content:center; flex-wrap:wrap; margin-bottom:40px;}
+  .btn-primary, .btn-secondary{
+    font-family:'IBM Plex Sans',sans-serif; font-size:14.5px; font-weight:600; letter-spacing:.02em;
+    padding:14px 26px; border-radius:9px; cursor:pointer; text-decoration:none; display:inline-flex; align-items:center; gap:8px;
+    border:none;
+  }
+  .btn-primary{background:var(--brass); color:var(--surface-dark);}
+  .btn-primary:hover{background:var(--tiffany);}
+  .btn-secondary{background:transparent; color:var(--text-on-dark); border:1px solid rgba(234,246,243,.35);}
+  .btn-secondary:hover{border-color:var(--tiffany); color:var(--tiffany);}
+  .hero-stats{display:flex; gap:36px; justify-content:center; flex-wrap:wrap;}
+  .hero-stat-num{font-family:'Fraunces',serif; font-size:26px; font-weight:600; color:var(--tiffany);}
+  .hero-stat-label{font-size:12px; color:var(--text-on-dark-soft); letter-spacing:.02em;}
+
+  /* ---------- Section shell ---------- */
+  section{padding:72px 24px;}
+  .section-tag{
+    font-size:11.5px; letter-spacing:.16em; text-transform:uppercase; color:var(--brass-deep);
+    font-weight:600; margin-bottom:10px; display:block; text-align:center;
+  }
+  h2.section-title{
+    font-family:'Fraunces',serif; font-weight:600; font-size:clamp(24px,3.4vw,34px);
+    text-align:center; margin:0 0 14px;
+  }
+  p.section-sub{
+    text-align:center; color:var(--ink-soft); max-width:560px; margin:0 auto 48px; font-size:15px;
+  }
+
+  /* ---------- Pain -> solution ---------- */
+  .pain-grid{display:grid; grid-template-columns:1fr 1fr; gap:36px; align-items:center; max-width:1000px; margin:0 auto;}
+  .pain-card{background:var(--paper-raised); border:1px solid var(--line); border-radius:14px; padding:28px;}
+  .pain-card h3{font-family:'Fraunces',serif; font-size:18px; margin:0 0 12px; color:var(--terracotta);}
+  .pain-card ul{margin:0; padding-left:18px; color:var(--ink-soft); font-size:14px;}
+  .pain-card li{margin-bottom:8px;}
+  .solution-card{background:var(--surface-dark); color:var(--text-on-dark); border-radius:14px; padding:28px;}
+  .solution-card h3{font-family:'Fraunces',serif; font-size:18px; margin:0 0 12px; color:var(--tiffany);}
+  .solution-card ul{margin:0; padding-left:18px; color:var(--text-on-dark-soft); font-size:14px;}
+  .solution-card li{margin-bottom:8px;}
+
+  /* ---------- Services grid ---------- */
+  .services-grid{display:grid; grid-template-columns:repeat(3,1fr); gap:20px; max-width:1080px; margin:0 auto 0;}
+  .service-card{
+    background:var(--paper-raised); border:1px solid var(--line); border-radius:14px; padding:26px;
+    transition:border-color .15s ease, transform .15s ease;
+  }
+  .service-card:hover{border-color:var(--brass); transform:translateY(-2px);}
+  .service-icon{
+    width:42px; height:42px; border-radius:10px; background:var(--brass-soft); color:var(--brass-deep);
+    display:flex; align-items:center; justify-content:center; font-size:20px; margin-bottom:16px;
+  }
+  .service-card h3{font-size:15.5px; margin:0 0 8px; font-weight:600;}
+  .service-card p{font-size:13.5px; color:var(--ink-soft); margin:0;}
+
+  /* ---------- How it works ---------- */
+  .steps{display:grid; grid-template-columns:repeat(4,1fr); gap:20px; max-width:1080px; margin:0 auto;}
+  .step-card{position:relative; padding:24px 20px 0; text-align:left;}
+  .step-num{
+    font-family:'Fraunces',serif; font-size:34px; font-weight:600; color:var(--brass-soft);
+    -webkit-text-stroke:1.5px var(--brass-deep); display:block; margin-bottom:10px;
+  }
+  .step-card h3{font-size:15px; margin:0 0 8px; font-weight:600;}
+  .step-card p{font-size:13.5px; color:var(--ink-soft); margin:0;}
+
+  /* ---------- Trust / why us ---------- */
+  .trust-band{background:var(--surface-dark); color:var(--text-on-dark);}
+  .trust-grid{display:grid; grid-template-columns:repeat(4,1fr); gap:24px; max-width:1080px; margin:0 auto;}
+  .trust-item{text-align:center;}
+  .trust-item i{font-size:26px; color:var(--tiffany); margin-bottom:12px; display:block;}
+  .trust-item h3{font-size:14.5px; margin:0 0 6px; font-weight:600;}
+  .trust-item p{font-size:12.5px; color:var(--text-on-dark-soft); margin:0;}
+
+  /* ---------- Testimonials ---------- */
+  .testi-grid{display:grid; grid-template-columns:repeat(3,1fr); gap:20px; max-width:1080px; margin:0 auto;}
+  .testi-card{background:var(--paper-raised); border:1px solid var(--line); border-radius:14px; padding:24px;}
+  .testi-stars{color:var(--brass-deep); font-size:13px; margin-bottom:12px;}
+  .testi-card p.quote{font-size:14px; color:var(--ink); margin:0 0 16px; font-style:italic;}
+  .testi-author{font-size:12.5px; color:var(--ink-soft); font-weight:600;}
+  .testi-note{
+    text-align:center; font-size:11.5px; color:var(--ink-soft); margin-top:20px; opacity:.75;
+  }
+
+  /* ---------- FAQ ---------- */
+  .faq-list{max-width:720px; margin:0 auto;}
+  .faq-item{border-bottom:1px solid var(--line); padding:18px 0;}
+  .faq-item summary{
+    cursor:pointer; font-weight:600; font-size:14.5px; list-style:none; display:flex; justify-content:space-between; align-items:center;
+  }
+  .faq-item summary::-webkit-details-marker{display:none;}
+  .faq-item summary::after{content:'+'; font-size:20px; color:var(--brass-deep); font-weight:400;}
+  .faq-item[open] summary::after{content:'–';}
+  .faq-item p{font-size:13.5px; color:var(--ink-soft); margin:12px 0 0;}
+
+  /* ---------- Contact / form ---------- */
+  .contact-shell{
+    max-width:920px; margin:0 auto; background:var(--paper-raised); border:1px solid var(--line);
+    border-radius:18px; padding:44px; display:grid; grid-template-columns:1fr 1.1fr; gap:40px;
+  }
+  .contact-info h2{font-family:'Fraunces',serif; font-size:24px; margin:0 0 14px;}
+  .contact-info p{font-size:14px; color:var(--ink-soft); margin:0 0 24px;}
+  .contact-info .info-row{display:flex; align-items:center; gap:10px; font-size:13.5px; margin-bottom:12px;}
+  .contact-info .info-row i{color:var(--brass-deep); font-size:17px;}
+  .field{margin-bottom:14px;}
+  .field label{display:block; font-size:12px; font-weight:600; margin-bottom:6px; color:var(--ink-soft);}
+  .field input, .field select, .field textarea{
+    width:100%; padding:11px 12px; border:1px solid var(--line); border-radius:8px; font-size:14px;
+    font-family:'IBM Plex Sans',sans-serif; background:#fff; color:var(--ink);
+  }
+  .field textarea{resize:vertical; min-height:80px;}
+  .field-row{display:grid; grid-template-columns:1fr 1fr; gap:12px;}
+  .form-note{font-size:11.5px; color:var(--ink-soft); margin-top:10px;}
+  .form-success{
+    display:none; text-align:center; padding:20px; background:var(--brass-soft); border-radius:10px; color:var(--brass-deep); font-size:14px; font-weight:600;
+  }
+
+  /* ---------- Footer ---------- */
+  footer{background:var(--surface-dark); color:var(--text-on-dark-soft); padding:40px 24px; text-align:center; font-size:12.5px;}
+  footer a{color:var(--tiffany); text-decoration:none;}
+  .wa-float{
+    position:fixed; bottom:22px; right:22px; z-index:30; background:#25D366; color:#fff; width:54px; height:54px;
+    border-radius:50%; display:flex; align-items:center; justify-content:center; font-size:26px; text-decoration:none;
+    box-shadow:0 6px 20px rgba(0,0,0,.25);
+  }
+
+  @media (max-width: 860px){
+    .pain-grid, .contact-shell{grid-template-columns:1fr;}
+    .services-grid{grid-template-columns:repeat(2,1fr);}
+    .steps{grid-template-columns:repeat(2,1fr);}
+    .trust-grid{grid-template-columns:repeat(2,1fr);}
+    .testi-grid{grid-template-columns:1fr;}
+    .contact-shell{padding:28px;}
+  }
+  @media (max-width: 520px){
+    .services-grid{grid-template-columns:1fr;}
+    .steps{grid-template-columns:1fr;}
+    .trust-grid{grid-template-columns:1fr;}
+    .field-row{grid-template-columns:1fr;}
+    .nav-links{display:none;}
+  }
+</style>
+</head>
+<body>
+
+<nav class="site-nav"><div class="site-nav-inner">
+  <div class="brand" id="brandName">Property Manager</div>
+  <div class="nav-links">
+    <a href="#servizi">Servizi</a>
+    <a href="#come-funziona">Come funziona</a>
+    <a href="#faq">Domande frequenti</a>
+    <a href="index.html">Sei già cliente? Accedi</a>
+  </div>
+  <a class="nav-cta" href="#contatti">Richiedi una valutazione</a>
+</div></nav>
+
+<header class="hero">
+  <div class="eyebrow">Gestione immobili in Sicilia, per proprietari fuori sede</div>
+  <h1>Hai un immobile in Sicilia<br>ma <em>non puoi seguirlo</em>? Ci pensiamo noi</h1>
+  <p class="lead">Documenti, scadenze, manutenzioni e ospiti: gestiamo tutto noi, anche se vivi lontano. Tu controlli ogni cosa — e ogni lavoro svolto — dalla tua area riservata.</p>
+  <div class="hero-ctas">
+    <a class="btn-primary" href="#contatti"><i class="ti ti-clipboard-text"></i>Richiedi una valutazione gratuita</a>
+    <a class="btn-secondary" id="waHeroBtn" href="#" target="_blank" rel="noopener"><i class="ti ti-brand-whatsapp"></i>Scrivici su WhatsApp</a>
+  </div>
+  <div class="hero-stats">
+    <div><div class="hero-stat-num">100%</div><div class="hero-stat-label">gestione a distanza</div></div>
+    <div><div class="hero-stat-num">0</div><div class="hero-stat-label">scadenze dimenticate</div></div>
+    <div><div class="hero-stat-num">24/7</div><div class="hero-stat-label">lavoro verificabile online</div></div>
+  </div>
+</header>
+
+<section>
+  <span class="section-tag">Il problema</span>
+  <h2 class="section-title">Un immobile in Sicilia, ma tu vivi altrove?</h2>
+  <p class="section-sub">Tra documenti da rinnovare, scadenze da non dimenticare e manutenzioni da seguire, gestire un immobile a distanza è complicato. Basta un imprevisto non seguito per creare problemi seri.</p>
+  <div class="pain-grid">
+    <div class="pain-card">
+      <h3><i class="ti ti-alert-triangle"></i> Senza un gestore</h3>
+      <ul>
+        <li>Scadenze fiscali, assicurative o amministrative rischiano di sfuggirti</li>
+        <li>Non sai chi controlla davvero l'immobile quando è vuoto</li>
+        <li>Manutenzioni gestite in ritardo, o non gestite affatto</li>
+        <li>Nessun modo semplice per verificare il lavoro svolto</li>
+      </ul>
+    </div>
+    <div class="solution-card">
+      <h3><i class="ti ti-check"></i> Con noi</h3>
+      <ul>
+        <li>Teniamo traccia di documenti e scadenze e ti avvisiamo per tempo</li>
+        <li>Controlli periodici regolari, anche quando l'immobile è vuoto</li>
+        <li>Interventi programmati, con preventivi da approvare tu</li>
+        <li>Ogni lavoro svolto è verificabile dalla tua area riservata</li>
+      </ul>
+    </div>
+  </div>
+</section>
+
+<section>
+  <span class="section-tag">Due livelli di servizio</span>
+  <h2 class="section-title">Custodia sempre, affitto se lo vuoi tu</h2>
+  <p class="section-sub">La gestione di base copre documenti, scadenze e manutenzioni. Se in più vuoi generare un reddito, ci occupiamo anche di affittarlo.</p>
+  <div class="pain-grid">
+    <div class="pain-card" style="border-color:var(--brass-deep);">
+      <h3 style="color:var(--brass-deep);"><i class="ti ti-home-check"></i> Custodia e gestione</h3>
+      <ul>
+        <li>Documenti, assicurazioni e scadenze sempre monitorati</li>
+        <li>Controlli periodici e manutenzione programmata</li>
+        <li>Interventi con preventivi da approvare tu</li>
+        <li>Tutto verificabile in ogni momento dalla piattaforma</li>
+      </ul>
+    </div>
+    <div class="solution-card">
+      <h3><i class="ti ti-key"></i> Vuoi anche affittarlo?</h3>
+      <ul>
+        <li>In più, gestiamo prenotazioni, calendario e ospiti per te</li>
+        <li>Assistenza agli ospiti 24/7, dall'accoglienza alla partenza</li>
+        <li>Incassi e rendiconto sempre tracciati e consultabili</li>
+        <li>Decidi tu se e quando attivare l'affitto: nessun obbligo</li>
+      </ul>
+    </div>
+  </div>
+</section>
+
+<section id="servizi">
+  <span class="section-tag">Cosa facciamo</span>
+  <h2 class="section-title">Gestiamo tutto, tu resti sempre informato</h2>
+  <p class="section-sub">Documenti, scadenze, manutenzioni, ospiti: seguiamo ogni aspetto del tuo immobile in Sicilia, anche se tu sei lontano, e ti diamo modo di verificare tutto.</p>
+  <div class="services-grid">
+    <div class="service-card">
+      <div class="service-icon"><i class="ti ti-file-text"></i></div>
+      <h3>Documenti e scadenze</h3>
+      <p>Teniamo sotto controllo assicurazioni, certificazioni e adempimenti, e ti avvisiamo prima che scadano.</p>
+    </div>
+    <div class="service-card">
+      <div class="service-icon"><i class="ti ti-checkup-list"></i></div>
+      <h3>Verifica del lavoro svolto</h3>
+      <p>Ogni intervento e controllo viene documentato: puoi rivedere cosa è stato fatto, e quando, dalla piattaforma.</p>
+    </div>
+    <div class="service-card">
+      <div class="service-icon"><i class="ti ti-map-pin"></i></div>
+      <h3>Gestione a distanza</h3>
+      <p>Non serve essere presenti: siamo noi sul posto in Sicilia, tu segui tutto comodamente da remoto.</p>
+    </div>
+    <div class="service-card">
+      <div class="service-icon"><i class="ti ti-tool"></i></div>
+      <h3>Manutenzioni e interventi</h3>
+      <p>Ti inviamo i preventivi da approvare prima di ogni intervento: decidi tu, senza sorprese in bolletta.</p>
+    </div>
+    <div class="service-card">
+      <div class="service-icon"><i class="ti ti-clipboard-check"></i></div>
+      <h3>Controlli periodici</h3>
+      <p>Verifichiamo regolarmente lo stato dell'immobile, così resta curato anche quando non lo vedi.</p>
+    </div>
+    <div class="service-card">
+      <div class="service-icon"><i class="ti ti-calendar-event"></i></div>
+      <h3>Gestione prenotazioni</h3>
+      <p>Curiamo calendario, richieste e comunicazioni con gli ospiti dall'inizio alla fine del soggiorno.</p>
+    </div>
+    <div class="service-card">
+      <div class="service-icon"><i class="ti ti-wallet"></i></div>
+      <h3>Spese &amp; guadagno</h3>
+      <p>Ogni spesa e ogni incasso è tracciato e consultabile, senza calcoli da fare a fine mese.</p>
+    </div>
+    <div class="service-card">
+      <div class="service-icon"><i class="ti ti-layout-dashboard"></i></div>
+      <h3>Dashboard trasparente</h3>
+      <p>Accedi in ogni momento alla tua area riservata per vedere stato, occupazione e attività del tuo immobile.</p>
+    </div>
+    <div class="service-card">
+      <div class="service-icon"><i class="ti ti-message-circle"></i></div>
+      <h3>Messaggistica diretta</h3>
+      <p>Un canale diretto con il nostro team per domande, richieste o aggiornamenti, quando vuoi tu.</p>
+    </div>
+  </div>
+</section>
+
+<section id="come-funziona">
+  <span class="section-tag">Come funziona</span>
+  <h2 class="section-title">Dal contatto alla prima prenotazione</h2>
+  <p class="section-sub">Un percorso semplice, pensato per farti risparmiare tempo fin dal primo giorno.</p>
+  <div class="steps">
+    <div class="step-card">
+      <span class="step-num">01</span>
+      <h3>Ci contatti</h3>
+      <p>Compili il modulo o ci scrivi su WhatsApp, anche da fuori Sicilia, con qualche informazione sul tuo immobile.</p>
+    </div>
+    <div class="step-card">
+      <span class="step-num">02</span>
+      <h3>Valutazione gratuita</h3>
+      <p>Analizziamo l'immobile, i documenti esistenti e le scadenze da monitorare, e ti proponiamo una gestione su misura.</p>
+    </div>
+    <div class="step-card">
+      <span class="step-num">03</span>
+      <h3>Attivazione</h3>
+      <p>Definiamo insieme i termini del servizio e prendiamo in carico documenti, scadenze e stato dell'immobile.</p>
+    </div>
+    <div class="step-card">
+      <span class="step-num">04</span>
+      <h3>Ti prendiamo in carico</h3>
+      <p>Da qui in poi pensiamo a tutto noi: tu verifichi ogni attività comodamente dalla tua area riservata.</p>
+    </div>
+  </div>
+</section>
+
+<section class="trust-band">
+  <span class="section-tag" style="color:var(--tiffany);">Perché sceglierci</span>
+  <h2 class="section-title" style="color:var(--text-on-dark);">La tranquillità di un partner serio</h2>
+  <div class="trust-grid">
+    <div class="trust-item">
+      <i class="ti ti-map-2"></i>
+      <h3>Presenti sul territorio</h3>
+      <p>Siamo fisicamente in Sicilia: interveniamo di persona, non solo da remoto.</p>
+    </div>
+    <div class="trust-item">
+      <i class="ti ti-shield-check"></i>
+      <h3>Documenti e scadenze sotto controllo</h3>
+      <p>Nessuna scadenza dimenticata: monitoriamo tutto e ti avvisiamo per tempo.</p>
+    </div>
+    <div class="trust-item">
+      <i class="ti ti-checkup-list"></i>
+      <h3>Lavoro sempre verificabile</h3>
+      <p>Ogni attività è tracciata: puoi controllare cosa è stato fatto in qualsiasi momento.</p>
+    </div>
+    <div class="trust-item">
+      <i class="ti ti-headset"></i>
+      <h3>Sempre raggiungibili</h3>
+      <p>Un referente dedicato per te, anche se vivi fuori dalla Sicilia.</p>
+    </div>
+  </div>
+</section>
+
+<section id="recensioni">
+  <span class="section-tag">Chi si è già affidato a noi</span>
+  <h2 class="section-title">Cosa dicono i proprietari</h2>
+  <div class="testi-grid">
+    <div class="testi-card">
+      <div class="testi-stars">★★★★★</div>
+      <p class="quote">"Vivo fuori dalla Sicilia e non riuscivo a seguire scadenze e manutenzioni del mio appartamento. Ora ricevo solo i report da controllare."</p>
+      <div class="testi-author">— Esempio di testimonianza</div>
+    </div>
+    <div class="testi-card">
+      <div class="testi-stars">★★★★★</div>
+      <p class="quote">"Finalmente so sempre cosa succede al mio immobile, anche vivendo lontano: ogni intervento è documentato sulla piattaforma."</p>
+      <div class="testi-author">— Esempio di testimonianza</div>
+    </div>
+    <div class="testi-card">
+      <div class="testi-stars">★★★★★</div>
+      <p class="quote">"Non dovevo più preoccuparmi di documenti e scadenze: mi avvisano loro prima che sia un problema."</p>
+      <div class="testi-author">— Esempio di testimonianza</div>
+    </div>
+  </div>
+  <p class="testi-note">* Testi segnaposto: sostituiscili con recensioni reali dei tuoi proprietari prima di pubblicare.</p>
+</section>
+
+<section id="faq">
+  <span class="section-tag">Domande frequenti</span>
+  <h2 class="section-title">Tutto quello che vuoi sapere</h2>
+  <div class="faq-list">
+    <details class="faq-item">
+      <summary>Quanto costa il servizio di gestione?</summary>
+      <p>Il costo dipende dalla tipologia di immobile e dal livello di servizio richiesto. Dopo una valutazione gratuita ti proponiamo una tariffa chiara, senza costi nascosti.</p>
+    </details>
+    <details class="faq-item">
+      <summary>Devo occuparmi io delle pulizie o della manutenzione?</summary>
+      <p>No, coordiniamo noi pulizie e manutenzioni. Per gli interventi più importanti ricevi sempre un preventivo da approvare prima che venga eseguito.</p>
+    </details>
+    <details class="faq-item">
+      <summary>Posso vedere in ogni momento come va il mio immobile?</summary>
+      <p>Sì, hai accesso a un'area riservata con occupazione, prenotazioni, spese, guadagni e ogni intervento svolto, sempre aggiornati.</p>
+    </details>
+    <details class="faq-item">
+      <summary>Vivo fuori dalla Sicilia, posso comunque affidarvi l'immobile?</summary>
+      <p>Sì, è proprio il caso più frequente: siamo noi sul posto e gestiamo tutto, tu segui l'andamento e verifichi il lavoro svolto da remoto.</p>
+    </details>
+    <details class="faq-item">
+      <summary>Come gestite documenti e scadenze?</summary>
+      <p>Monitoriamo assicurazioni, certificazioni e adempimenti dell'immobile e ti avvisiamo con anticipo prima di ogni scadenza, così non rischi mai di dimenticarla.</p>
+    </details>
+    <details class="faq-item">
+      <summary>Sono obbligato ad affittare l'immobile?</summary>
+      <p>No. Puoi affidarci solo la custodia e la gestione (documenti, scadenze, manutenzioni) oppure, se lo desideri, chiederci di occuparci anche dell'affitto e degli ospiti.</p>
+    </details>
+    <details class="faq-item">
+      <summary>C'è un vincolo di durata?</summary>
+      <p>Le condizioni contrattuali vengono definite insieme durante l'attivazione del servizio, in base alle tue esigenze.</p>
+    </details>
+  </div>
+</section>
+
+<section id="contatti">
+  <span class="section-tag">Contattaci</span>
+  <h2 class="section-title">Richiedi una valutazione gratuita</h2>
+  <p class="section-sub">Raccontaci qualcosa del tuo immobile: ti risponderemo con una proposta su misura.</p>
+
+  <div class="contact-shell">
+    <div class="contact-info">
+      <h2>Parliamone</h2>
+      <p>Puoi scriverci direttamente o compilare il modulo: ti risponderemo entro 24 ore.</p>
+      <div class="info-row"><i class="ti ti-brand-whatsapp"></i><span id="waTextLine">WhatsApp: configura il numero</span></div>
+      <div class="info-row"><i class="ti ti-mail"></i><span id="emailTextLine">Email: configura l'indirizzo</span></div>
+      <div class="info-row"><i class="ti ti-map-pin"></i><span>Gestiamo immobili sul territorio locale</span></div>
+    </div>
+    <div>
+      <form id="leadForm">
+        <div class="field-row">
+          <div class="field"><label>Nome e cognome</label><input name="nome" required></div>
+          <div class="field"><label>Telefono</label><input name="telefono" required placeholder="+39..."></div>
+        </div>
+        <div class="field"><label>Email</label><input type="email" name="email" required></div>
+        <div class="field-row">
+          <div class="field"><label>Città dell'immobile (Sicilia)</label><input name="citta" required></div>
+          <div class="field">
+            <label>Tipo di immobile</label>
+            <select name="tipo">
+              <option>Appartamento</option>
+              <option>Villa</option>
+              <option>Attico</option>
+              <option>Trilocale</option>
+              <option>Altro</option>
+            </select>
+          </div>
+        </div>
+        <div class="field">
+          <label>Cosa ti serve?</label>
+          <select name="servizio">
+            <option>Solo custodia e gestione (documenti, scadenze, manutenzioni)</option>
+            <option>Custodia e gestione + affitto</option>
+            <option>Non so ancora, vorrei essere consigliato</option>
+          </select>
+        </div>
+        <div class="field"><label>Messaggio (facoltativo)</label><textarea name="messaggio" placeholder="Raccontaci qualcosa in più sul tuo immobile"></textarea></div>
+        <button type="submit" class="btn-primary" style="width:100%;justify-content:center;">Invia richiesta</button>
+        <p class="form-note">Inviando il modulo verrai reindirizzato su WhatsApp con il messaggio già pronto, oppure potrai scriverci via email.</p>
+      </form>
+      <div class="form-success" id="formSuccess">Grazie! Apri WhatsApp per completare l'invio del messaggio.</div>
+    </div>
+  </div>
+</section>
+
+<footer>
+  <div id="footerBrand" style="font-family:'Fraunces',serif; color:var(--text-on-dark); font-size:15px; margin-bottom:10px;">Property Manager</div>
+  <div>Sei già un proprietario in gestione? <a href="index.html">Accedi alla tua area riservata</a></div>
+  <div style="margin-top:10px; opacity:.7;">© <span id="year"></span> — Tutti i diritti riservati</div>
+</footer>
+
+<a class="wa-float" id="waFloat" href="#" target="_blank" rel="noopener" aria-label="Scrivici su WhatsApp"><i class="ti ti-brand-whatsapp"></i></a>
+
+<script>
+  // ---------------------------------------------------------------
+  // CONFIGURAZIONE: personalizza questi valori prima di pubblicare
+  // ---------------------------------------------------------------
+  const CONFIG = {
+    nomeAgenzia: 'Property Manager',       // nome della tua agenzia/attività
+    telefonoWhatsApp: '390000000000',      // numero WhatsApp, solo cifre con prefisso internazionale (es. 39 per l'Italia)
+    email: 'info@tuaagenzia.it'            // email di contatto
+  };
+  // ---------------------------------------------------------------
+
+  document.getElementById('brandName').textContent = CONFIG.nomeAgenzia;
+  document.getElementById('footerBrand').textContent = CONFIG.nomeAgenzia;
+  document.getElementById('year').textContent = new Date().getFullYear();
+
+  function waLink(testo){
+    const digits = (CONFIG.telefonoWhatsApp||'').replace(/\D/g,'');
+    return `https://wa.me/${digits}?text=${encodeURIComponent(testo||'')}`;
+  }
+  const waIntro = `Ciao ${CONFIG.nomeAgenzia}, vorrei ricevere una valutazione gratuita per il mio immobile.`;
+  document.getElementById('waHeroBtn').href = waLink(waIntro);
+  document.getElementById('waFloat').href = waLink(waIntro);
+  document.getElementById('waTextLine').textContent = 'WhatsApp: +' + (CONFIG.telefonoWhatsApp||'').replace(/\D/g,'');
+  document.getElementById('emailTextLine').textContent = 'Email: ' + CONFIG.email;
+
+  document.getElementById('leadForm').addEventListener('submit', function(e){
+    e.preventDefault();
+    const fd = new FormData(e.target);
+    const nome = fd.get('nome'), telefono = fd.get('telefono'), email = fd.get('email');
+    const citta = fd.get('citta'), tipo = fd.get('tipo'), servizio = fd.get('servizio'), messaggio = fd.get('messaggio');
+    const testo = `Ciao ${CONFIG.nomeAgenzia}, sono ${nome}.\n`
+      + `Vorrei una valutazione gratuita per il mio immobile (${tipo}) a ${citta}.\n`
+      + `Servizio richiesto: ${servizio}\n`
+      + `Telefono: ${telefono}\nEmail: ${email}`
+      + (messaggio ? `\nMessaggio: ${messaggio}` : '');
+    document.getElementById('formSuccess').style.display = 'block';
+    window.open(waLink(testo), '_blank', 'noopener');
+  });
+</script>
+</body>
+</html>

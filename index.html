@@ -227,7 +227,7 @@
   .stat-value.terracotta{color:var(--terracotta);}
 
   /* ---- riepilogo Panoramica in stile "bento" ---- */
-  .bento-row{display:grid; grid-template-columns:repeat(4,1fr); gap:14px; margin-bottom:36px;}
+  .bento-row{display:grid; grid-template-columns:repeat(3,1fr); gap:14px; margin-bottom:36px;}
   @media (max-width:700px){ .bento-row{grid-template-columns:repeat(2,1fr);} }
   .bento-tile{
     background:var(--line-soft); border:1px solid var(--line-soft); border-radius:14px;
@@ -2828,8 +2828,6 @@ function renderTuttePrenotazioni(){
 
 function renderOverview(){
   const props = immobiliVisibili();
-  const anno = new Date().getFullYear();
-  const speseAnno = props.reduce((s,p)=>s + (p.spese||[]).filter(e=>new Date(e.data).getFullYear()===anno).reduce((a,e)=>a+Number(e.importo||0),0),0);
   const manutenzioniUrgenti = props.reduce((s,p)=>s + (p.manutenzioni||[]).filter(m=>m.stato!=='completata' && daysUntil(m.scadenza)<=30).length, 0);
   const affittati = props.filter(p=>p.locazione && p.locazione.attivo);
   const canoneMensile = affittati.reduce((s,p)=>s+(Number(p.locazione.canone)||0),0);
@@ -2910,7 +2908,6 @@ function renderOverview(){
     <p class="page-sub">Il tuo portfolio immobiliare, in un colpo d'occhio.</p>
     ${alertBanner}
     <div class="bento-row">
-      <div class="bento-tile"><div class="bento-label">Spese ${anno}</div><div class="bento-value" data-count="${speseAnno}" data-format="currency">${fmtCurrency(0)}</div></div>
       <div class="bento-tile"><div class="bento-label">Manutenzioni entro 30gg</div><div class="bento-value ${manutenzioniUrgenti>0?'terracotta':''}" data-count="${manutenzioniUrgenti}">0</div></div>
       <div class="bento-tile"><div class="bento-label">Immobili in portfolio</div><div class="bento-value" data-count="${props.length}">0</div></div>
       <div class="bento-tile"><div class="bento-label">Richieste da evadere</div><div class="bento-value ${richiestePendenti>0?'terracotta':''}" data-count="${richiestePendenti}">0</div></div>

@@ -2,207 +2,274 @@
 <html lang="it">
 <head>
 <meta charset="UTF-8">
-<title>Affida il tuo immobile in Sicilia — Property Manager</title>
+<title>Affida il tuo immobile in Sicilia</title>
 <meta name="description" content="Hai un immobile in Sicilia e non puoi seguirlo di persona? Gestiamo documenti, scadenze, manutenzioni e, se vuoi, anche l'affitto. Verifica tutto il lavoro svolto dalla tua area riservata.">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <link rel="icon" href="icon-192.png" sizes="192x192" type="image/png">
 <link rel="apple-touch-icon" href="apple-touch-icon.png">
-<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@tabler/icons-webfont@2.47.0/tabler-icons.min.css">
 <style>
-  @import url('https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,400;0,9..144,500;0,9..144,600;0,9..144,700;1,9..144,600;1,9..144,700&family=IBM+Plex+Sans:wght@400;500;600&family=IBM+Plex+Mono:wght@400;500&display=swap');
+  @import url('https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,600;0,700;0,900;1,600&family=Work+Sans:wght@400;500;600;700&display=swap');
 
   :root{
-    --ink:#241F1A;
-    --ink-soft:#6E6558;
-    --paper:#F3EFE7;
-    --paper-raised:#FBF9F4;
-    --brass:#0ABAB5;
-    --brass-soft:#D6EFEC;
-    --brass-deep:#0F8C86;
-    --terracotta:#BC4632;
-    --sage:#3E8C6E;
-    --line:#DEDACB;
-    --line-soft:#E9E4D5;
-    --surface-dark:#12302C;
-    --surface-dark-2:#193B36;
-    --text-on-dark:#EAF6F3;
-    --text-on-dark-soft:#9AC7C0;
-    --tiffany:#7FEDE0;
-    --brand-gradient: linear-gradient(120deg, var(--brass-deep) 0%, var(--brass) 55%, var(--tiffany) 100%);
+    --cream:#FFF8EC;
+    --cream-2:#FBE9CB;
+    --ink:#1E2A2E;
+    --ink-soft:#5B6864;
+    --sea-deep:#0B3B4A;
+    --sea:#157A96;
+    --sea-light:#5FB8CE;
+    --sun:#F0A93A;
+    --sun-deep:#D6852A;
+    --terracotta:#C1502E;
+    --majolica-blue:#2C5F86;
+    --majolica-green:#4F7A5B;
+    --line:#E6D6B3;
+    --shadow: 0 14px 34px rgba(11,59,74,.14);
   }
   *{box-sizing:border-box;}
   html{scroll-behavior:smooth;}
   body{
     margin:0;
-    background:var(--paper);
+    background:var(--cream);
     color:var(--ink);
-    font-family:'IBM Plex Sans',sans-serif;
+    font-family:'Work Sans',sans-serif;
     -webkit-font-smoothing:antialiased;
-    line-height:1.5;
+    line-height:1.55;
+    overflow-x:hidden;
   }
   a{color:inherit;}
-  .wrap{max-width:1080px; margin:0 auto; padding:0 24px;}
-  .ti{vertical-align:-2px; margin-right:6px;}
+  img,svg{max-width:100%;}
+  .wrap{max-width:1100px; margin:0 auto; padding:0 24px;}
+  .icon{width:20px; height:20px; flex:none; vertical-align:-4px; stroke:currentColor; fill:none;}
+
+  @media (prefers-reduced-motion: reduce){
+    *, *::before, *::after{animation-duration:.001s !important; animation-iteration-count:1 !important; transition-duration:.001s !important; scroll-behavior:auto !important;}
+  }
+
+  /* ---------- Motion ---------- */
+  @keyframes waveDrift{ from{transform:translateX(0);} to{transform:translateX(-33.33%);} }
+  @keyframes sunPulse{ 0%,100%{transform:translateX(-50%) scale(1); opacity:1;} 50%{transform:translateX(-50%) scale(1.05); opacity:.92;} }
+  @keyframes smokeRise{ 0%{transform:translateY(0) scale(.6); opacity:.55;} 100%{transform:translateY(-46px) translateX(10px) scale(1.5); opacity:0;} }
+  @keyframes fadeUp{ from{opacity:0; transform:translateY(16px);} to{opacity:1; transform:translateY(0);} }
+  @keyframes tileShift{ from{background-position:0 0;} to{background-position:-120px 0;} }
+  @keyframes pulseRing{ 0%{transform:scale(.75); opacity:.55;} 100%{transform:scale(1.9); opacity:0;} }
+  @keyframes floatY{ 0%,50%,100%{transform:translateY(0);} 25%{transform:translateY(-6px);} 75%{transform:translateY(4px);} }
+
+  .reveal{opacity:0; transform:translateY(26px); transition:opacity .8s cubic-bezier(.16,.8,.3,1), transform .8s cubic-bezier(.16,.8,.3,1);}
+  .reveal.in-view{opacity:1; transform:translateY(0);}
+  .stagger > *{transition-delay:calc(var(--i,0) * 70ms);}
+
+  /* ---------- Tile divider ---------- */
+  .tile-divider{
+    height:30px; width:100%;
+    background-image:url("data:image/svg+xml;base64,PHN2ZyB4bWxucz0naHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmcnIHdpZHRoPSc2MCcgaGVpZ2h0PSc0MCc+PHJlY3Qgd2lkdGg9JzYwJyBoZWlnaHQ9JzQwJyBmaWxsPScjRkZGOEVDJy8+PHBhdGggZD0nTTMwIDQgTDUwIDIwIEwzMCAzNiBMMTAgMjAgWicgZmlsbD0nI0MxNTAyRScvPjxjaXJjbGUgY3g9JzMwJyBjeT0nMjAnIHI9JzYnIGZpbGw9JyNGMEE5M0EnLz48cGF0aCBkPSdNMCAyMCBMMTAgMjAnIHN0cm9rZT0nIzJDNUY4Nicgc3Ryb2tlLXdpZHRoPSczJy8+PHBhdGggZD0nTTUwIDIwIEw2MCAyMCcgc3Ryb2tlPScjMkM1Rjg2JyBzdHJva2Utd2lkdGg9JzMnLz48L3N2Zz4K");
+    background-repeat:repeat-x; background-size:120px 30px; background-position:0 0;
+    animation:tileShift 16s linear infinite;
+  }
 
   /* ---------- Nav ---------- */
   .site-nav{
-    position:sticky; top:0; z-index:20;
-    display:flex; justify-content:space-between; align-items:center;
-    padding:16px 24px; gap:16px; flex-wrap:wrap;
-    background:linear-gradient(180deg,var(--surface-dark) 0%, var(--surface-dark-2) 100%);
-    border-bottom:1px solid rgba(10,186,181,.35);
+    position:sticky; top:0; z-index:40;
+    display:flex; justify-content:center;
+    padding:20px 24px; transition:padding .3s ease, background .3s ease, box-shadow .3s ease;
+    background:linear-gradient(180deg, rgba(11,59,74,.96) 0%, rgba(11,59,74,.9) 100%);
   }
-  .site-nav-inner{max-width:1080px; margin:0 auto; width:100%; display:flex; justify-content:space-between; align-items:center; gap:16px; flex-wrap:wrap;}
+  .site-nav.scrolled{padding:11px 24px; box-shadow:0 8px 24px rgba(0,0,0,.18);}
+  .site-nav-inner{max-width:1100px; width:100%; display:flex; justify-content:space-between; align-items:center; gap:16px; flex-wrap:wrap;}
   .brand{
-    font-family:'Fraunces',serif; font-weight:600; font-size:15px; letter-spacing:.1em;
-    color:var(--brass-soft); text-transform:uppercase;
+    font-family:'Playfair Display',serif; font-weight:700; font-size:18px; letter-spacing:.02em;
+    color:#FBE9CB;
   }
-  .nav-links{display:flex; align-items:center; gap:22px; flex-wrap:wrap;}
-  .nav-links a{font-size:13px; color:var(--text-on-dark-soft); text-decoration:none; letter-spacing:.02em;}
-  .nav-links a:hover{color:var(--text-on-dark);}
+  .brand em{font-style:italic; color:var(--sun);}
+  .nav-links{display:flex; align-items:center; gap:24px; flex-wrap:wrap;}
+  .nav-links a{font-size:13px; color:rgba(251,233,203,.8); text-decoration:none; letter-spacing:.02em; transition:color .15s ease;}
+  .nav-links a:hover{color:#fff;}
   .nav-cta{
-    background:var(--brass); color:var(--surface-dark); border:none; padding:9px 18px; border-radius:8px;
-    font-size:12.5px; font-weight:600; text-decoration:none; letter-spacing:.02em; white-space:nowrap;
+    background:var(--sun); color:var(--sea-deep); border:none; padding:10px 20px; border-radius:100px;
+    font-size:12.5px; font-weight:700; text-decoration:none; letter-spacing:.02em; white-space:nowrap;
+    transition:transform .2s ease, box-shadow .2s ease;
   }
+  .nav-cta:hover{transform:translateY(-2px); box-shadow:0 8px 18px rgba(240,169,58,.45);}
 
   /* ---------- Hero ---------- */
   .hero{
-    background:linear-gradient(180deg,var(--surface-dark) 0%, var(--surface-dark-2) 100%);
-    color:var(--text-on-dark); padding:64px 24px 80px; text-align:center;
+    position:relative; overflow:hidden; text-align:center; color:#fff;
+    padding:76px 24px 0;
+    background:linear-gradient(180deg, var(--sea-deep) 0%, #16495c 38%, #8a5a34 72%, var(--sun) 100%);
   }
+  .hero-content{position:relative; z-index:3; max-width:760px; margin:0 auto;}
   .eyebrow{
-    display:inline-block; font-size:11.5px; letter-spacing:.16em; text-transform:uppercase;
-    color:var(--tiffany); border:1px solid rgba(127,237,224,.35); border-radius:100px; padding:6px 14px; margin-bottom:22px;
+    display:inline-flex; align-items:center; gap:8px; font-size:11.5px; letter-spacing:.18em; text-transform:uppercase;
+    color:#FCE4B8; border:1px solid rgba(252,228,184,.4); border-radius:100px; padding:7px 16px; margin-bottom:24px;
+    opacity:0; animation:fadeUp .7s ease .05s forwards;
   }
   .hero h1{
-    font-family:'Fraunces',serif; font-weight:600; font-size:clamp(30px,5vw,48px); line-height:1.15;
-    margin:0 0 18px; max-width:760px; margin-left:auto; margin-right:auto;
+    font-family:'Playfair Display',serif; font-weight:700; font-size:clamp(32px,5.4vw,54px); line-height:1.14;
+    margin:0 0 20px;
   }
-  .hero h1 em{font-style:normal; background:var(--brand-gradient); -webkit-background-clip:text; background-clip:text; color:transparent;}
+  .hero h1 .line{display:block; overflow:hidden;}
+  .hero h1 .line span{display:block; opacity:0; transform:translateY(100%); animation:fadeUp .8s cubic-bezier(.16,.8,.3,1) forwards;}
+  .hero h1 .line:nth-child(1) span{animation-delay:.15s;}
+  .hero h1 .line:nth-child(2) span{animation-delay:.28s;}
+  .hero h1 em{font-style:italic; color:var(--sun); text-shadow:0 0 26px rgba(240,169,58,.5);}
   .hero p.lead{
-    font-size:16.5px; color:var(--text-on-dark-soft); max-width:560px; margin:0 auto 34px;
+    font-size:17px; color:#F3E7D3; max-width:560px; margin:0 auto 32px; opacity:0; animation:fadeUp .8s ease .42s forwards;
   }
-  .hero-ctas{display:flex; gap:12px; justify-content:center; flex-wrap:wrap; margin-bottom:40px;}
+  .hero-ctas{display:flex; gap:12px; justify-content:center; flex-wrap:wrap; margin-bottom:44px; opacity:0; animation:fadeUp .8s ease .55s forwards;}
   .btn-primary, .btn-secondary{
-    font-family:'IBM Plex Sans',sans-serif; font-size:14.5px; font-weight:600; letter-spacing:.02em;
-    padding:14px 26px; border-radius:9px; cursor:pointer; text-decoration:none; display:inline-flex; align-items:center; gap:8px;
-    border:none;
+    font-family:'Work Sans',sans-serif; font-size:14.5px; font-weight:700; letter-spacing:.01em;
+    padding:15px 28px; border-radius:100px; cursor:pointer; text-decoration:none; display:inline-flex; align-items:center; gap:9px;
+    border:none; transition:transform .2s ease, box-shadow .2s ease, background .2s ease;
   }
-  .btn-primary{background:var(--brass); color:var(--surface-dark);}
-  .btn-primary:hover{background:var(--tiffany);}
-  .btn-secondary{background:transparent; color:var(--text-on-dark); border:1px solid rgba(234,246,243,.35);}
-  .btn-secondary:hover{border-color:var(--tiffany); color:var(--tiffany);}
-  .hero-stats{display:flex; gap:36px; justify-content:center; flex-wrap:wrap;}
-  .hero-stat-num{font-family:'Fraunces',serif; font-size:26px; font-weight:600; color:var(--tiffany);}
-  .hero-stat-label{font-size:12px; color:var(--text-on-dark-soft); letter-spacing:.02em;}
+  .btn-primary{background:var(--sun); color:#3A2308; box-shadow:0 10px 26px rgba(240,169,58,.35);}
+  .btn-primary:hover{background:#FFC266; transform:translateY(-3px); box-shadow:0 14px 30px rgba(240,169,58,.5);}
+  .btn-secondary{background:rgba(255,255,255,.08); color:#fff; border:1px solid rgba(255,255,255,.4); backdrop-filter:blur(2px);}
+  .btn-secondary:hover{border-color:#fff; background:rgba(255,255,255,.16); transform:translateY(-3px);}
+  .hero-stats{display:flex; gap:44px; justify-content:center; flex-wrap:wrap; position:relative; z-index:3; padding-bottom:36px; opacity:0; animation:fadeUp .8s ease .68s forwards;}
+  .hero-stat-num{font-family:'Playfair Display',serif; font-size:30px; font-weight:700; color:#fff; font-variant-numeric:tabular-nums;}
+  .hero-stat-label{font-size:12px; color:#F3E7D3; letter-spacing:.02em; margin-top:2px;}
+
+  .hero-scene{position:relative; height:150px; z-index:1; margin-top:20px;}
+  .hero-sun{
+    position:absolute; left:50%; bottom:38px; width:120px; height:120px; border-radius:50%;
+    background:radial-gradient(circle at 40% 35%, #FFE7B0 0%, var(--sun) 55%, rgba(240,169,58,0) 72%);
+    box-shadow:0 0 70px 18px rgba(240,169,58,.55);
+    transform:translateX(-50%); animation:sunPulse 7s ease-in-out infinite;
+  }
+  .hero-skyline{position:absolute; left:0; bottom:26px; width:100%; height:auto; display:block; z-index:2;}
+  .smoke circle{animation:smokeRise 5s ease-out infinite;}
+  .smoke circle:nth-child(2){animation-delay:1.2s;}
+  .smoke circle:nth-child(3){animation-delay:2.4s;}
+  .hero-waves{position:absolute; left:0; bottom:0; width:100%; height:60px; z-index:3; line-height:0;}
+  .hero-waves svg{position:absolute; bottom:0; left:0; width:200%; height:100%;}
+  .wave-back{animation:waveDrift 22s linear infinite; opacity:.55;}
+  .wave-front{animation:waveDrift 14s linear infinite reverse;}
 
   /* ---------- Section shell ---------- */
-  section{padding:72px 24px;}
+  section{padding:80px 24px;}
   .section-tag{
-    font-size:11.5px; letter-spacing:.16em; text-transform:uppercase; color:var(--brass-deep);
-    font-weight:600; margin-bottom:10px; display:block; text-align:center;
+    font-size:11.5px; letter-spacing:.18em; text-transform:uppercase; color:var(--terracotta);
+    font-weight:700; margin-bottom:12px; display:block; text-align:center;
   }
   h2.section-title{
-    font-family:'Fraunces',serif; font-weight:600; font-size:clamp(24px,3.4vw,34px);
-    text-align:center; margin:0 0 14px;
+    font-family:'Playfair Display',serif; font-weight:700; font-size:clamp(26px,3.6vw,38px);
+    text-align:center; margin:0 0 16px; text-wrap:balance;
   }
   p.section-sub{
-    text-align:center; color:var(--ink-soft); max-width:560px; margin:0 auto 48px; font-size:15px;
+    text-align:center; color:var(--ink-soft); max-width:580px; margin:0 auto 52px; font-size:15.5px;
   }
+  .alt-bg{background:var(--cream-2);}
 
   /* ---------- Pain -> solution ---------- */
-  .pain-grid{display:grid; grid-template-columns:1fr 1fr; gap:36px; align-items:center; max-width:1000px; margin:0 auto;}
-  .pain-card{background:var(--paper-raised); border:1px solid var(--line); border-radius:14px; padding:28px;}
-  .pain-card h3{font-family:'Fraunces',serif; font-size:18px; margin:0 0 12px; color:var(--terracotta);}
-  .pain-card ul{margin:0; padding-left:18px; color:var(--ink-soft); font-size:14px;}
-  .pain-card li{margin-bottom:8px;}
-  .solution-card{background:var(--surface-dark); color:var(--text-on-dark); border-radius:14px; padding:28px;}
-  .solution-card h3{font-family:'Fraunces',serif; font-size:18px; margin:0 0 12px; color:var(--tiffany);}
-  .solution-card ul{margin:0; padding-left:18px; color:var(--text-on-dark-soft); font-size:14px;}
-  .solution-card li{margin-bottom:8px;}
+  .pain-grid{display:grid; grid-template-columns:1fr 1fr; gap:28px; align-items:stretch; max-width:1000px; margin:0 auto;}
+  .pain-card{background:#fff; border:1px solid var(--line); border-radius:26px 26px 14px 14px; padding:30px; box-shadow:var(--shadow); transition:transform .3s ease;}
+  .pain-card:hover{transform:translateY(-4px);}
+  .pain-card h3{font-family:'Playfair Display',serif; font-weight:700; font-size:19px; margin:0 0 14px; color:var(--terracotta); display:flex; align-items:center; gap:10px;}
+  .pain-card ul{margin:0; padding-left:20px; color:var(--ink-soft); font-size:14px;}
+  .pain-card li{margin-bottom:9px;}
+  .solution-card{background:linear-gradient(160deg, var(--sea-deep) 0%, #123B52 100%); color:#F3E7D3; border-radius:26px 26px 14px 14px; padding:30px; box-shadow:var(--shadow); transition:transform .3s ease;}
+  .solution-card:hover{transform:translateY(-4px);}
+  .solution-card h3{font-family:'Playfair Display',serif; font-weight:700; font-size:19px; margin:0 0 14px; color:var(--sun); display:flex; align-items:center; gap:10px;}
+  .solution-card ul{margin:0; padding-left:20px; color:#E3D6BC; font-size:14px;}
+  .solution-card li{margin-bottom:9px;}
 
   /* ---------- Services grid ---------- */
-  .services-grid{display:grid; grid-template-columns:repeat(3,1fr); gap:20px; max-width:1080px; margin:0 auto 0;}
+  .services-grid{display:grid; grid-template-columns:repeat(3,1fr); gap:22px; max-width:1100px; margin:0 auto;}
   .service-card{
-    background:var(--paper-raised); border:1px solid var(--line); border-radius:14px; padding:26px;
-    transition:border-color .15s ease, transform .15s ease;
+    background:#fff; border:1px solid var(--line); border-radius:20px; padding:30px 24px 24px; text-align:center;
+    transition:transform .3s cubic-bezier(.2,.8,.3,1), box-shadow .3s ease, border-color .3s ease; position:relative;
   }
-  .service-card:hover{border-color:var(--brass); transform:translateY(-2px);}
+  .service-card:hover{transform:translateY(-6px); box-shadow:var(--shadow); border-color:var(--sea-light);}
   .service-icon{
-    width:42px; height:42px; border-radius:10px; background:var(--brass-soft); color:var(--brass-deep);
-    display:flex; align-items:center; justify-content:center; font-size:20px; margin-bottom:16px;
+    width:56px; height:56px; border-radius:50% 50% 50% 4px; background:linear-gradient(140deg, var(--sea) 0%, var(--sea-deep) 100%);
+    color:#FCE4B8; display:flex; align-items:center; justify-content:center; margin:0 auto 18px;
+    box-shadow:0 10px 20px rgba(11,59,74,.25); transition:transform .3s ease;
   }
-  .service-card h3{font-size:15.5px; margin:0 0 8px; font-weight:600;}
+  .service-card:hover .service-icon{transform:rotate(-8deg) scale(1.06);}
+  .service-icon .icon{width:26px; height:26px;}
+  .service-card h3{font-size:16px; margin:0 0 8px; font-weight:700; font-family:'Playfair Display',serif;}
   .service-card p{font-size:13.5px; color:var(--ink-soft); margin:0;}
 
   /* ---------- How it works ---------- */
-  .steps{display:grid; grid-template-columns:repeat(4,1fr); gap:20px; max-width:1080px; margin:0 auto;}
-  .step-card{position:relative; padding:24px 20px 0; text-align:left;}
+  .steps{display:grid; grid-template-columns:repeat(4,1fr); gap:24px; max-width:1100px; margin:0 auto;}
+  .step-card{position:relative; text-align:left;}
   .step-num{
-    font-family:'Fraunces',serif; font-size:34px; font-weight:600; color:var(--brass-soft);
-    -webkit-text-stroke:1.5px var(--brass-deep); display:block; margin-bottom:10px;
+    font-family:'Playfair Display',serif; font-size:40px; font-weight:700; color:transparent;
+    -webkit-text-stroke:1.6px var(--terracotta); display:block; margin-bottom:12px;
   }
-  .step-card h3{font-size:15px; margin:0 0 8px; font-weight:600;}
+  .step-card h3{font-size:15.5px; margin:0 0 8px; font-weight:700;}
   .step-card p{font-size:13.5px; color:var(--ink-soft); margin:0;}
 
   /* ---------- Trust / why us ---------- */
-  .trust-band{background:var(--surface-dark); color:var(--text-on-dark);}
-  .trust-grid{display:grid; grid-template-columns:repeat(4,1fr); gap:24px; max-width:1080px; margin:0 auto;}
+  .trust-band{background:linear-gradient(160deg, var(--sea-deep) 0%, #0F4257 100%); color:#F3E7D3; position:relative; overflow:hidden;}
+  .trust-grid{display:grid; grid-template-columns:repeat(4,1fr); gap:26px; max-width:1100px; margin:0 auto; position:relative; z-index:2;}
   .trust-item{text-align:center;}
-  .trust-item i{font-size:26px; color:var(--tiffany); margin-bottom:12px; display:block;}
-  .trust-item h3{font-size:14.5px; margin:0 0 6px; font-weight:600;}
-  .trust-item p{font-size:12.5px; color:var(--text-on-dark-soft); margin:0;}
+  .trust-item .icon-badge{
+    width:52px; height:52px; border-radius:50%; background:rgba(240,169,58,.14); border:1px solid rgba(240,169,58,.4);
+    display:flex; align-items:center; justify-content:center; margin:0 auto 14px; color:var(--sun);
+    animation:floatY 5s ease-in-out infinite;
+  }
+  .trust-item:nth-child(2) .icon-badge{animation-delay:.3s;}
+  .trust-item:nth-child(3) .icon-badge{animation-delay:.6s;}
+  .trust-item:nth-child(4) .icon-badge{animation-delay:.9s;}
+  .trust-item h3{font-size:14.5px; margin:0 0 6px; font-weight:700;}
+  .trust-item p{font-size:12.5px; color:#CBD9D3; margin:0;}
 
   /* ---------- Testimonials ---------- */
-  .testi-grid{display:grid; grid-template-columns:repeat(3,1fr); gap:20px; max-width:1080px; margin:0 auto;}
-  .testi-card{background:var(--paper-raised); border:1px solid var(--line); border-radius:14px; padding:24px;}
-  .testi-stars{color:var(--brass-deep); font-size:13px; margin-bottom:12px;}
-  .testi-card p.quote{font-size:14px; color:var(--ink); margin:0 0 16px; font-style:italic;}
+  .testi-grid{display:grid; grid-template-columns:repeat(3,1fr); gap:22px; max-width:1100px; margin:0 auto;}
+  .testi-card{background:#fff; border:1px solid var(--line); border-radius:20px; padding:26px; box-shadow:var(--shadow); transition:transform .3s ease;}
+  .testi-card:hover{transform:translateY(-4px);}
+  .testi-stars{color:var(--sun-deep); font-size:14px; margin-bottom:12px; letter-spacing:2px;}
+  .testi-card p.quote{font-size:14.5px; color:var(--ink); margin:0 0 16px; font-style:italic; font-family:'Playfair Display',serif;}
   .testi-author{font-size:12.5px; color:var(--ink-soft); font-weight:600;}
-  .testi-note{
-    text-align:center; font-size:11.5px; color:var(--ink-soft); margin-top:20px; opacity:.75;
-  }
+  .testi-note{text-align:center; font-size:11.5px; color:var(--ink-soft); margin-top:24px; opacity:.75;}
 
   /* ---------- FAQ ---------- */
-  .faq-list{max-width:720px; margin:0 auto;}
-  .faq-item{border-bottom:1px solid var(--line); padding:18px 0;}
+  .faq-list{max-width:740px; margin:0 auto;}
+  .faq-item{border-bottom:1px solid var(--line); padding:20px 0;}
   .faq-item summary{
-    cursor:pointer; font-weight:600; font-size:14.5px; list-style:none; display:flex; justify-content:space-between; align-items:center;
+    cursor:pointer; font-weight:700; font-size:15px; list-style:none; display:flex; justify-content:space-between; align-items:center; gap:12px;
   }
   .faq-item summary::-webkit-details-marker{display:none;}
-  .faq-item summary::after{content:'+'; font-size:20px; color:var(--brass-deep); font-weight:400;}
-  .faq-item[open] summary::after{content:'–';}
-  .faq-item p{font-size:13.5px; color:var(--ink-soft); margin:12px 0 0;}
+  .faq-item summary::after{content:'+'; font-size:22px; color:var(--terracotta); font-weight:400; transition:transform .25s ease;}
+  .faq-item[open] summary::after{transform:rotate(135deg);}
+  .faq-item p{font-size:13.5px; color:var(--ink-soft); margin:14px 0 0;}
 
   /* ---------- Contact / form ---------- */
   .contact-shell{
-    max-width:920px; margin:0 auto; background:var(--paper-raised); border:1px solid var(--line);
-    border-radius:18px; padding:44px; display:grid; grid-template-columns:1fr 1.1fr; gap:40px;
+    max-width:960px; margin:0 auto; background:#fff; border:1px solid var(--line);
+    border-radius:28px; padding:46px; display:grid; grid-template-columns:1fr 1.1fr; gap:44px; box-shadow:var(--shadow);
   }
-  .contact-info h2{font-family:'Fraunces',serif; font-size:24px; margin:0 0 14px;}
+  .contact-info h2{font-family:'Playfair Display',serif; font-weight:700; font-size:25px; margin:0 0 14px;}
   .contact-info p{font-size:14px; color:var(--ink-soft); margin:0 0 24px;}
-  .contact-info .info-row{display:flex; align-items:center; gap:10px; font-size:13.5px; margin-bottom:12px;}
-  .contact-info .info-row i{color:var(--brass-deep); font-size:17px;}
+  .contact-info .info-row{display:flex; align-items:center; gap:11px; font-size:13.5px; margin-bottom:13px;}
+  .contact-info .info-row .icon{color:var(--sea);}
   .field{margin-bottom:14px;}
   .field label{display:block; font-size:12px; font-weight:600; margin-bottom:6px; color:var(--ink-soft);}
   .field input, .field select, .field textarea{
-    width:100%; padding:11px 12px; border:1px solid var(--line); border-radius:8px; font-size:14px;
-    font-family:'IBM Plex Sans',sans-serif; background:#fff; color:var(--ink);
+    width:100%; padding:11px 13px; border:1px solid var(--line); border-radius:10px; font-size:14px;
+    font-family:'Work Sans',sans-serif; background:var(--cream); color:var(--ink); transition:border-color .15s ease, box-shadow .15s ease;
   }
+  .field input:focus, .field select:focus, .field textarea:focus{outline:none; border-color:var(--sea); box-shadow:0 0 0 3px rgba(21,122,150,.15);}
   .field textarea{resize:vertical; min-height:80px;}
   .field-row{display:grid; grid-template-columns:1fr 1fr; gap:12px;}
   .form-note{font-size:11.5px; color:var(--ink-soft); margin-top:10px;}
   .form-success{
-    display:none; text-align:center; padding:20px; background:var(--brass-soft); border-radius:10px; color:var(--brass-deep); font-size:14px; font-weight:600;
+    display:none; text-align:center; padding:20px; background:#EAF3E5; border-radius:14px; color:var(--majolica-green); font-size:14px; font-weight:700;
   }
 
   /* ---------- Footer ---------- */
-  footer{background:var(--surface-dark); color:var(--text-on-dark-soft); padding:40px 24px; text-align:center; font-size:12.5px;}
-  footer a{color:var(--tiffany); text-decoration:none;}
+  footer{background:var(--sea-deep); color:#CBD9D3; padding:44px 24px; text-align:center; font-size:12.5px;}
+  footer a{color:var(--sun); text-decoration:none;}
   .wa-float{
-    position:fixed; bottom:22px; right:22px; z-index:30; background:#25D366; color:#fff; width:54px; height:54px;
-    border-radius:50%; display:flex; align-items:center; justify-content:center; font-size:26px; text-decoration:none;
-    box-shadow:0 6px 20px rgba(0,0,0,.25);
+    position:fixed; bottom:24px; right:24px; z-index:50; background:#25D366; color:#fff; width:56px; height:56px;
+    border-radius:50%; display:flex; align-items:center; justify-content:center; text-decoration:none;
+    box-shadow:0 8px 22px rgba(0,0,0,.28);
+  }
+  .wa-float .icon{width:26px; height:26px;}
+  .wa-float::before{
+    content:''; position:absolute; inset:0; border-radius:50%; background:#25D366;
+    animation:pulseRing 2.2s ease-out infinite; z-index:-1;
   }
 
   @media (max-width: 860px){
@@ -211,7 +278,8 @@
     .steps{grid-template-columns:repeat(2,1fr);}
     .trust-grid{grid-template-columns:repeat(2,1fr);}
     .testi-grid{grid-template-columns:1fr;}
-    .contact-shell{padding:28px;}
+    .contact-shell{padding:30px;}
+    section{padding:64px 20px;}
   }
   @media (max-width: 520px){
     .services-grid{grid-template-columns:1fr;}
@@ -219,13 +287,36 @@
     .trust-grid{grid-template-columns:1fr;}
     .field-row{grid-template-columns:1fr;}
     .nav-links{display:none;}
+    .hero{padding-top:64px;}
   }
 </style>
 </head>
 <body>
 
-<nav class="site-nav"><div class="site-nav-inner">
-  <div class="brand" id="brandName">Property Manager</div>
+<svg style="display:none">
+  <symbol id="i-plane" viewBox="0 0 24 24"><path d="M3 11l18-8-8 18-2-7-8-3z" stroke-width="1.7" stroke-linejoin="round"/></symbol>
+  <symbol id="i-phone" viewBox="0 0 24 24"><path d="M5 4h4l2 5-2.5 2A12 12 0 0 0 13 15.5L15 13l5 2v4a2 2 0 0 1-2 2A16 16 0 0 1 3 6a2 2 0 0 1 2-2z" stroke-width="1.7" stroke-linejoin="round"/></symbol>
+  <symbol id="i-alert" viewBox="0 0 24 24"><path d="M12 3 2 20h20L12 3z" stroke-width="1.7" stroke-linejoin="round"/><line x1="12" y1="9.5" x2="12" y2="14" stroke-width="1.7" stroke-linecap="round"/><circle cx="12" cy="17" r="1" fill="currentColor" stroke="none"/></symbol>
+  <symbol id="i-check" viewBox="0 0 24 24"><polyline points="4 13 9 18 20 6" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></symbol>
+  <symbol id="i-house-check" viewBox="0 0 24 24"><path d="M4 11 12 4l8 7" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"/><path d="M6 10v11h12V10" stroke-width="1.7" stroke-linejoin="round"/><polyline points="9 15 11 17 15 12" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"/></symbol>
+  <symbol id="i-key" viewBox="0 0 24 24"><circle cx="8" cy="15" r="4" stroke-width="1.7"/><path d="M11 12l9-9" stroke-width="1.7" stroke-linecap="round"/><path d="M16 7l3 3" stroke-width="1.7" stroke-linecap="round"/><path d="M13 10l2 2" stroke-width="1.7" stroke-linecap="round"/></symbol>
+  <symbol id="i-document" viewBox="0 0 24 24"><path d="M6 2h9l5 5v15H6z" stroke-width="1.7" stroke-linejoin="round"/><path d="M15 2v5h5" stroke-width="1.7" stroke-linejoin="round"/><line x1="9" y1="13" x2="17" y2="13" stroke-width="1.7" stroke-linecap="round"/><line x1="9" y1="17" x2="17" y2="17" stroke-width="1.7" stroke-linecap="round"/></symbol>
+  <symbol id="i-checklist" viewBox="0 0 24 24"><rect x="5" y="4" width="14" height="17" rx="2" stroke-width="1.7"/><path d="M9 4V2h6v2" stroke-width="1.7"/><polyline points="8.5 13 11 15.5 16 10" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"/></symbol>
+  <symbol id="i-verify" viewBox="0 0 24 24"><line x1="4" y1="6" x2="14" y2="6" stroke-width="1.7" stroke-linecap="round"/><line x1="4" y1="12" x2="14" y2="12" stroke-width="1.7" stroke-linecap="round"/><line x1="4" y1="18" x2="10" y2="18" stroke-width="1.7" stroke-linecap="round"/><polyline points="15 16 18 19 22 13" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"/></symbol>
+  <symbol id="i-pin" viewBox="0 0 24 24"><path d="M12 22s7-7.58 7-12A7 7 0 0 0 5 10c0 4.42 7 12 7 12z" stroke-width="1.7" stroke-linejoin="round"/><circle cx="12" cy="10" r="2.4" stroke-width="1.7"/></symbol>
+  <symbol id="i-tool" viewBox="0 0 24 24"><path d="M14.7 6.3a4 4 0 0 1-5.4 5.4L4 17l3 3 5.3-5.3a4 4 0 0 1 5.4-5.4l-3.6 3.6-2-2z" stroke-width="1.7" stroke-linejoin="round"/></symbol>
+  <symbol id="i-calendar" viewBox="0 0 24 24"><rect x="3" y="5" width="18" height="16" rx="2" stroke-width="1.7"/><line x1="3" y1="10" x2="21" y2="10" stroke-width="1.7"/><line x1="8" y1="3" x2="8" y2="7" stroke-width="1.7" stroke-linecap="round"/><line x1="16" y1="3" x2="16" y2="7" stroke-width="1.7" stroke-linecap="round"/><circle cx="12" cy="15" r="1.6" fill="currentColor" stroke="none"/></symbol>
+  <symbol id="i-wallet" viewBox="0 0 24 24"><path d="M3 7a2 2 0 0 1 2-2h13a1 1 0 0 1 1 1v3H5" stroke-width="1.7" stroke-linejoin="round"/><rect x="3" y="7" width="18" height="12" rx="2" stroke-width="1.7"/><circle cx="16.5" cy="13" r="1.4" fill="currentColor" stroke="none"/></symbol>
+  <symbol id="i-grid" viewBox="0 0 24 24"><rect x="3" y="3" width="8" height="10" rx="1.5" stroke-width="1.7"/><rect x="13" y="3" width="8" height="6" rx="1.5" stroke-width="1.7"/><rect x="13" y="11" width="8" height="10" rx="1.5" stroke-width="1.7"/><rect x="3" y="15" width="8" height="6" rx="1.5" stroke-width="1.7"/></symbol>
+  <symbol id="i-chat" viewBox="0 0 24 24"><path d="M4 12a8 8 0 1 1 3 6.2L3 20l1.3-4.3A8 8 0 0 1 4 12z" stroke-width="1.7" stroke-linejoin="round"/></symbol>
+  <symbol id="i-compass" viewBox="0 0 24 24"><circle cx="12" cy="12" r="9" stroke-width="1.7"/><polygon points="15 9 13 13 9 15 11 11" stroke-width="1.7" stroke-linejoin="round"/></symbol>
+  <symbol id="i-shield" viewBox="0 0 24 24"><path d="M12 2l8 3v6c0 5-3.5 9-8 11-4.5-2-8-6-8-11V5l8-3z" stroke-width="1.7" stroke-linejoin="round"/><polyline points="8.5 12 11 14.5 15.5 9.5" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"/></symbol>
+  <symbol id="i-headset" viewBox="0 0 24 24"><path d="M4 13a8 8 0 0 1 16 0" stroke-width="1.7"/><rect x="3" y="13" width="4" height="6" rx="1.5" stroke-width="1.7"/><rect x="17" y="13" width="4" height="6" rx="1.5" stroke-width="1.7"/><path d="M20 19v1a3 3 0 0 1-3 3h-4" stroke-width="1.7"/></symbol>
+  <symbol id="i-mail" viewBox="0 0 24 24"><rect x="3" y="5" width="18" height="14" rx="2" stroke-width="1.7"/><path d="M3 7l9 6 9-6" stroke-width="1.7" stroke-linejoin="round"/></symbol>
+</svg>
+
+<nav class="site-nav" id="siteNav"><div class="site-nav-inner">
+  <div class="brand" id="brandName">Property <em>Manager</em></div>
   <div class="nav-links">
     <a href="#servizi">Servizi</a>
     <a href="#come-funziona">Come funziona</a>
@@ -236,27 +327,63 @@
 </div></nav>
 
 <header class="hero">
-  <div class="eyebrow">Gestione immobili in Sicilia, per proprietari fuori sede</div>
-  <h1>Hai un immobile in Sicilia<br>ma <em>non puoi seguirlo</em>? Ci pensiamo noi</h1>
-  <p class="lead">Documenti, scadenze, manutenzioni e ospiti: gestiamo tutto noi, anche se vivi lontano. Tu controlli ogni cosa — e ogni lavoro svolto — dalla tua area riservata.</p>
-  <div class="hero-ctas">
-    <a class="btn-primary" href="#contatti"><i class="ti ti-clipboard-text"></i>Richiedi una valutazione gratuita</a>
-    <a class="btn-secondary" id="waHeroBtn" href="#" target="_blank" rel="noopener"><i class="ti ti-brand-whatsapp"></i>Scrivici su WhatsApp</a>
+  <div class="hero-content">
+    <div class="eyebrow">Gestione immobili in Sicilia, per proprietari fuori sede</div>
+    <h1>
+      <span class="line"><span>Hai un immobile in Sicilia</span></span>
+      <span class="line"><span>ma <em>non puoi seguirlo?</em> Ci pensiamo noi</span></span>
+    </h1>
+    <p class="lead">Documenti, scadenze, manutenzioni e ospiti: gestiamo tutto noi, anche se vivi lontano. Tu controlli ogni cosa — e ogni lavoro svolto — dalla tua area riservata.</p>
+    <div class="hero-ctas">
+      <a class="btn-primary" href="#contatti"><svg class="icon"><use href="#i-plane"></use></svg>Richiedi una valutazione gratuita</a>
+      <a class="btn-secondary" id="waHeroBtn" href="#" target="_blank" rel="noopener"><svg class="icon"><use href="#i-phone"></use></svg>Scrivici su WhatsApp</a>
+    </div>
+    <div class="hero-stats">
+      <div><div class="hero-stat-num" data-count="100" data-suffix="%">0%</div><div class="hero-stat-label">gestione a distanza</div></div>
+      <div><div class="hero-stat-num">0</div><div class="hero-stat-label">scadenze dimenticate</div></div>
+      <div><div class="hero-stat-num">24/7</div><div class="hero-stat-label">lavoro verificabile online</div></div>
+    </div>
   </div>
-  <div class="hero-stats">
-    <div><div class="hero-stat-num">100%</div><div class="hero-stat-label">gestione a distanza</div></div>
-    <div><div class="hero-stat-num">0</div><div class="hero-stat-label">scadenze dimenticate</div></div>
-    <div><div class="hero-stat-num">24/7</div><div class="hero-stat-label">lavoro verificabile online</div></div>
+
+  <div class="hero-scene" aria-hidden="true">
+    <div class="hero-sun"></div>
+    <svg class="hero-skyline" viewBox="0 0 1200 140" preserveAspectRatio="none">
+      <g fill="#0B3B4A">
+        <polygon points="980,140 1060,20 1140,140"/>
+        <rect x="60" y="90" width="46" height="50"/>
+        <rect x="112" y="70" width="30" height="70"/>
+        <polygon points="112,70 127,50 142,70"/>
+        <rect x="150" y="100" width="60" height="40"/>
+        <circle cx="330" cy="78" r="34"/>
+        <rect x="296" y="78" width="68" height="62"/>
+        <rect x="318" y="30" width="24" height="40"/>
+        <rect x="326" y="16" width="8" height="18"/>
+        <rect x="700" y="95" width="50" height="45"/>
+        <rect x="756" y="80" width="40" height="60"/>
+        <polygon points="756,80 776,58 796,80"/>
+      </g>
+      <g class="smoke">
+        <circle cx="1058" cy="18" r="5" fill="#cfd9dc"/>
+        <circle cx="1062" cy="14" r="4" fill="#cfd9dc"/>
+        <circle cx="1055" cy="10" r="3.5" fill="#cfd9dc"/>
+      </g>
+    </svg>
+    <div class="hero-waves">
+      <svg class="wave-back" viewBox="0 0 1200 60" preserveAspectRatio="none"><path d="M0 30 Q100 10 200 30 T400 30 T600 30 T800 30 T1000 30 T1200 30 V60 H0 Z" fill="#157A96"/></svg>
+      <svg class="wave-front" viewBox="0 0 1200 60" preserveAspectRatio="none"><path d="M0 38 Q100 18 200 38 T400 38 T600 38 T800 38 T1000 38 T1200 38 V60 H0 Z" fill="#0B3B4A"/></svg>
+    </div>
   </div>
 </header>
 
-<section>
+<div class="tile-divider"></div>
+
+<section class="reveal">
   <span class="section-tag">Il problema</span>
   <h2 class="section-title">Un immobile in Sicilia, ma tu vivi altrove?</h2>
   <p class="section-sub">Tra documenti da rinnovare, scadenze da non dimenticare e manutenzioni da seguire, gestire un immobile a distanza è complicato. Basta un imprevisto non seguito per creare problemi seri.</p>
   <div class="pain-grid">
     <div class="pain-card">
-      <h3><i class="ti ti-alert-triangle"></i> Senza un gestore</h3>
+      <h3><svg class="icon" style="width:22px;height:22px;color:var(--terracotta)"><use href="#i-alert"></use></svg> Senza un gestore</h3>
       <ul>
         <li>Scadenze fiscali, assicurative o amministrative rischiano di sfuggirti</li>
         <li>Non sai chi controlla davvero l'immobile quando è vuoto</li>
@@ -265,7 +392,7 @@
       </ul>
     </div>
     <div class="solution-card">
-      <h3><i class="ti ti-check"></i> Con noi</h3>
+      <h3><svg class="icon" style="width:22px;height:22px;color:var(--sun)"><use href="#i-check"></use></svg> Con noi</h3>
       <ul>
         <li>Teniamo traccia di documenti e scadenze e ti avvisiamo per tempo</li>
         <li>Controlli periodici regolari, anche quando l'immobile è vuoto</li>
@@ -276,13 +403,13 @@
   </div>
 </section>
 
-<section>
+<section class="alt-bg reveal">
   <span class="section-tag">Due livelli di servizio</span>
   <h2 class="section-title">Custodia sempre, affitto se lo vuoi tu</h2>
   <p class="section-sub">La gestione di base copre documenti, scadenze e manutenzioni. Se in più vuoi generare un reddito, ci occupiamo anche di affittarlo.</p>
   <div class="pain-grid">
-    <div class="pain-card" style="border-color:var(--brass-deep);">
-      <h3 style="color:var(--brass-deep);"><i class="ti ti-home-check"></i> Custodia e gestione</h3>
+    <div class="pain-card" style="border-color:var(--sea-light);">
+      <h3 style="color:var(--sea);"><svg class="icon" style="width:22px;height:22px;color:var(--sea)"><use href="#i-house-check"></use></svg> Custodia e gestione</h3>
       <ul>
         <li>Documenti, assicurazioni e scadenze sempre monitorati</li>
         <li>Controlli periodici e manutenzione programmata</li>
@@ -291,7 +418,7 @@
       </ul>
     </div>
     <div class="solution-card">
-      <h3><i class="ti ti-key"></i> Vuoi anche affittarlo?</h3>
+      <h3><svg class="icon" style="width:22px;height:22px;color:var(--sun)"><use href="#i-key"></use></svg> Vuoi anche affittarlo?</h3>
       <ul>
         <li>In più, gestiamo prenotazioni, calendario e ospiti per te</li>
         <li>Assistenza agli ospiti 24/7, dall'accoglienza alla partenza</li>
@@ -302,115 +429,47 @@
   </div>
 </section>
 
-<section id="servizi">
+<section id="servizi" class="reveal">
   <span class="section-tag">Cosa facciamo</span>
   <h2 class="section-title">Gestiamo tutto, tu resti sempre informato</h2>
   <p class="section-sub">Documenti, scadenze, manutenzioni, ospiti: seguiamo ogni aspetto del tuo immobile in Sicilia, anche se tu sei lontano, e ti diamo modo di verificare tutto.</p>
-  <div class="services-grid">
-    <div class="service-card">
-      <div class="service-icon"><i class="ti ti-file-text"></i></div>
-      <h3>Documenti e scadenze</h3>
-      <p>Teniamo sotto controllo assicurazioni, certificazioni e adempimenti, e ti avvisiamo prima che scadano.</p>
-    </div>
-    <div class="service-card">
-      <div class="service-icon"><i class="ti ti-checkup-list"></i></div>
-      <h3>Verifica del lavoro svolto</h3>
-      <p>Ogni intervento e controllo viene documentato: puoi rivedere cosa è stato fatto, e quando, dalla piattaforma.</p>
-    </div>
-    <div class="service-card">
-      <div class="service-icon"><i class="ti ti-map-pin"></i></div>
-      <h3>Gestione a distanza</h3>
-      <p>Non serve essere presenti: siamo noi sul posto in Sicilia, tu segui tutto comodamente da remoto.</p>
-    </div>
-    <div class="service-card">
-      <div class="service-icon"><i class="ti ti-tool"></i></div>
-      <h3>Manutenzioni e interventi</h3>
-      <p>Ti inviamo i preventivi da approvare prima di ogni intervento: decidi tu, senza sorprese in bolletta.</p>
-    </div>
-    <div class="service-card">
-      <div class="service-icon"><i class="ti ti-clipboard-check"></i></div>
-      <h3>Controlli periodici</h3>
-      <p>Verifichiamo regolarmente lo stato dell'immobile, così resta curato anche quando non lo vedi.</p>
-    </div>
-    <div class="service-card">
-      <div class="service-icon"><i class="ti ti-calendar-event"></i></div>
-      <h3>Gestione prenotazioni</h3>
-      <p>Curiamo calendario, richieste e comunicazioni con gli ospiti dall'inizio alla fine del soggiorno.</p>
-    </div>
-    <div class="service-card">
-      <div class="service-icon"><i class="ti ti-wallet"></i></div>
-      <h3>Spese &amp; guadagno</h3>
-      <p>Ogni spesa e ogni incasso è tracciato e consultabile, senza calcoli da fare a fine mese.</p>
-    </div>
-    <div class="service-card">
-      <div class="service-icon"><i class="ti ti-layout-dashboard"></i></div>
-      <h3>Dashboard trasparente</h3>
-      <p>Accedi in ogni momento alla tua area riservata per vedere stato, occupazione e attività del tuo immobile.</p>
-    </div>
-    <div class="service-card">
-      <div class="service-icon"><i class="ti ti-message-circle"></i></div>
-      <h3>Messaggistica diretta</h3>
-      <p>Un canale diretto con il nostro team per domande, richieste o aggiornamenti, quando vuoi tu.</p>
-    </div>
+  <div class="services-grid stagger">
+    <div class="service-card" style="--i:0"><div class="service-icon"><svg class="icon"><use href="#i-document"></use></svg></div><h3>Documenti e scadenze</h3><p>Teniamo sotto controllo assicurazioni, certificazioni e adempimenti, e ti avvisiamo prima che scadano.</p></div>
+    <div class="service-card" style="--i:1"><div class="service-icon"><svg class="icon"><use href="#i-verify"></use></svg></div><h3>Verifica del lavoro svolto</h3><p>Ogni intervento e controllo viene documentato: puoi rivedere cosa è stato fatto, e quando, dalla piattaforma.</p></div>
+    <div class="service-card" style="--i:2"><div class="service-icon"><svg class="icon"><use href="#i-pin"></use></svg></div><h3>Gestione a distanza</h3><p>Non serve essere presenti: siamo noi sul posto in Sicilia, tu segui tutto comodamente da remoto.</p></div>
+    <div class="service-card" style="--i:3"><div class="service-icon"><svg class="icon"><use href="#i-tool"></use></svg></div><h3>Manutenzioni e interventi</h3><p>Ti inviamo i preventivi da approvare prima di ogni intervento: decidi tu, senza sorprese in bolletta.</p></div>
+    <div class="service-card" style="--i:4"><div class="service-icon"><svg class="icon"><use href="#i-checklist"></use></svg></div><h3>Controlli periodici</h3><p>Verifichiamo regolarmente lo stato dell'immobile, così resta curato anche quando non lo vedi.</p></div>
+    <div class="service-card" style="--i:5"><div class="service-icon"><svg class="icon"><use href="#i-calendar"></use></svg></div><h3>Gestione prenotazioni</h3><p>Curiamo calendario, richieste e comunicazioni con gli ospiti dall'inizio alla fine del soggiorno.</p></div>
+    <div class="service-card" style="--i:6"><div class="service-icon"><svg class="icon"><use href="#i-wallet"></use></svg></div><h3>Spese &amp; guadagno</h3><p>Ogni spesa e ogni incasso è tracciato e consultabile, senza calcoli da fare a fine mese.</p></div>
+    <div class="service-card" style="--i:7"><div class="service-icon"><svg class="icon"><use href="#i-grid"></use></svg></div><h3>Dashboard trasparente</h3><p>Accedi in ogni momento alla tua area riservata per vedere stato, occupazione e attività del tuo immobile.</p></div>
+    <div class="service-card" style="--i:8"><div class="service-icon"><svg class="icon"><use href="#i-chat"></use></svg></div><h3>Messaggistica diretta</h3><p>Un canale diretto con il nostro team per domande, richieste o aggiornamenti, quando vuoi tu.</p></div>
   </div>
 </section>
 
-<section id="come-funziona">
+<section id="come-funziona" class="alt-bg reveal">
   <span class="section-tag">Come funziona</span>
   <h2 class="section-title">Dal contatto alla prima prenotazione</h2>
   <p class="section-sub">Un percorso semplice, pensato per farti risparmiare tempo fin dal primo giorno.</p>
-  <div class="steps">
-    <div class="step-card">
-      <span class="step-num">01</span>
-      <h3>Ci contatti</h3>
-      <p>Compili il modulo o ci scrivi su WhatsApp, anche da fuori Sicilia, con qualche informazione sul tuo immobile.</p>
-    </div>
-    <div class="step-card">
-      <span class="step-num">02</span>
-      <h3>Valutazione gratuita</h3>
-      <p>Analizziamo l'immobile, i documenti esistenti e le scadenze da monitorare, e ti proponiamo una gestione su misura.</p>
-    </div>
-    <div class="step-card">
-      <span class="step-num">03</span>
-      <h3>Attivazione</h3>
-      <p>Definiamo insieme i termini del servizio e prendiamo in carico documenti, scadenze e stato dell'immobile.</p>
-    </div>
-    <div class="step-card">
-      <span class="step-num">04</span>
-      <h3>Ti prendiamo in carico</h3>
-      <p>Da qui in poi pensiamo a tutto noi: tu verifichi ogni attività comodamente dalla tua area riservata.</p>
-    </div>
+  <div class="steps stagger">
+    <div class="step-card" style="--i:0"><span class="step-num">01</span><h3>Ci contatti</h3><p>Compili il modulo o ci scrivi su WhatsApp, anche da fuori Sicilia, con qualche informazione sul tuo immobile.</p></div>
+    <div class="step-card" style="--i:1"><span class="step-num">02</span><h3>Valutazione gratuita</h3><p>Analizziamo l'immobile, i documenti esistenti e le scadenze da monitorare, e ti proponiamo una gestione su misura.</p></div>
+    <div class="step-card" style="--i:2"><span class="step-num">03</span><h3>Attivazione</h3><p>Definiamo insieme i termini del servizio e prendiamo in carico documenti, scadenze e stato dell'immobile.</p></div>
+    <div class="step-card" style="--i:3"><span class="step-num">04</span><h3>Ti prendiamo in carico</h3><p>Da qui in poi pensiamo a tutto noi: tu verifichi ogni attività comodamente dalla tua area riservata.</p></div>
   </div>
 </section>
 
-<section class="trust-band">
-  <span class="section-tag" style="color:var(--tiffany);">Perché sceglierci</span>
-  <h2 class="section-title" style="color:var(--text-on-dark);">La tranquillità di un partner serio</h2>
+<section class="trust-band reveal">
+  <span class="section-tag" style="color:var(--sun);">Perché sceglierci</span>
+  <h2 class="section-title" style="color:#fff;">La tranquillità di un partner serio</h2>
   <div class="trust-grid">
-    <div class="trust-item">
-      <i class="ti ti-map-2"></i>
-      <h3>Presenti sul territorio</h3>
-      <p>Siamo fisicamente in Sicilia: interveniamo di persona, non solo da remoto.</p>
-    </div>
-    <div class="trust-item">
-      <i class="ti ti-shield-check"></i>
-      <h3>Documenti e scadenze sotto controllo</h3>
-      <p>Nessuna scadenza dimenticata: monitoriamo tutto e ti avvisiamo per tempo.</p>
-    </div>
-    <div class="trust-item">
-      <i class="ti ti-checkup-list"></i>
-      <h3>Lavoro sempre verificabile</h3>
-      <p>Ogni attività è tracciata: puoi controllare cosa è stato fatto in qualsiasi momento.</p>
-    </div>
-    <div class="trust-item">
-      <i class="ti ti-headset"></i>
-      <h3>Sempre raggiungibili</h3>
-      <p>Un referente dedicato per te, anche se vivi fuori dalla Sicilia.</p>
-    </div>
+    <div class="trust-item"><div class="icon-badge"><svg class="icon"><use href="#i-compass"></use></svg></div><h3>Presenti sul territorio</h3><p>Siamo fisicamente in Sicilia: interveniamo di persona, non solo da remoto.</p></div>
+    <div class="trust-item"><div class="icon-badge"><svg class="icon"><use href="#i-shield"></use></svg></div><h3>Documenti e scadenze sotto controllo</h3><p>Nessuna scadenza dimenticata: monitoriamo tutto e ti avvisiamo per tempo.</p></div>
+    <div class="trust-item"><div class="icon-badge"><svg class="icon"><use href="#i-verify"></use></svg></div><h3>Lavoro sempre verificabile</h3><p>Ogni attività è tracciata: puoi controllare cosa è stato fatto in qualsiasi momento.</p></div>
+    <div class="trust-item"><div class="icon-badge"><svg class="icon"><use href="#i-headset"></use></svg></div><h3>Sempre raggiungibili</h3><p>Un referente dedicato per te, anche se vivi fuori dalla Sicilia.</p></div>
   </div>
 </section>
 
-<section id="recensioni">
+<section id="recensioni" class="reveal">
   <span class="section-tag">Chi si è già affidato a noi</span>
   <h2 class="section-title">Cosa dicono i proprietari</h2>
   <div class="testi-grid">
@@ -433,42 +492,21 @@
   <p class="testi-note">* Testi segnaposto: sostituiscili con recensioni reali dei tuoi proprietari prima di pubblicare.</p>
 </section>
 
-<section id="faq">
+<section id="faq" class="alt-bg reveal">
   <span class="section-tag">Domande frequenti</span>
   <h2 class="section-title">Tutto quello che vuoi sapere</h2>
   <div class="faq-list">
-    <details class="faq-item">
-      <summary>Quanto costa il servizio di gestione?</summary>
-      <p>Il costo dipende dalla tipologia di immobile e dal livello di servizio richiesto. Dopo una valutazione gratuita ti proponiamo una tariffa chiara, senza costi nascosti.</p>
-    </details>
-    <details class="faq-item">
-      <summary>Devo occuparmi io delle pulizie o della manutenzione?</summary>
-      <p>No, coordiniamo noi pulizie e manutenzioni. Per gli interventi più importanti ricevi sempre un preventivo da approvare prima che venga eseguito.</p>
-    </details>
-    <details class="faq-item">
-      <summary>Posso vedere in ogni momento come va il mio immobile?</summary>
-      <p>Sì, hai accesso a un'area riservata con occupazione, prenotazioni, spese, guadagni e ogni intervento svolto, sempre aggiornati.</p>
-    </details>
-    <details class="faq-item">
-      <summary>Vivo fuori dalla Sicilia, posso comunque affidarvi l'immobile?</summary>
-      <p>Sì, è proprio il caso più frequente: siamo noi sul posto e gestiamo tutto, tu segui l'andamento e verifichi il lavoro svolto da remoto.</p>
-    </details>
-    <details class="faq-item">
-      <summary>Come gestite documenti e scadenze?</summary>
-      <p>Monitoriamo assicurazioni, certificazioni e adempimenti dell'immobile e ti avvisiamo con anticipo prima di ogni scadenza, così non rischi mai di dimenticarla.</p>
-    </details>
-    <details class="faq-item">
-      <summary>Sono obbligato ad affittare l'immobile?</summary>
-      <p>No. Puoi affidarci solo la custodia e la gestione (documenti, scadenze, manutenzioni) oppure, se lo desideri, chiederci di occuparci anche dell'affitto e degli ospiti.</p>
-    </details>
-    <details class="faq-item">
-      <summary>C'è un vincolo di durata?</summary>
-      <p>Le condizioni contrattuali vengono definite insieme durante l'attivazione del servizio, in base alle tue esigenze.</p>
-    </details>
+    <details class="faq-item"><summary>Quanto costa il servizio di gestione?</summary><p>Il costo dipende dalla tipologia di immobile e dal livello di servizio richiesto. Dopo una valutazione gratuita ti proponiamo una tariffa chiara, senza costi nascosti.</p></details>
+    <details class="faq-item"><summary>Devo occuparmi io delle pulizie o della manutenzione?</summary><p>No, coordiniamo noi pulizie e manutenzioni. Per gli interventi più importanti ricevi sempre un preventivo da approvare prima che venga eseguito.</p></details>
+    <details class="faq-item"><summary>Posso vedere in ogni momento come va il mio immobile?</summary><p>Sì, hai accesso a un'area riservata con occupazione, prenotazioni, spese, guadagni e ogni intervento svolto, sempre aggiornati.</p></details>
+    <details class="faq-item"><summary>Vivo fuori dalla Sicilia, posso comunque affidarvi l'immobile?</summary><p>Sì, è proprio il caso più frequente: siamo noi sul posto e gestiamo tutto, tu segui l'andamento e verifichi il lavoro svolto da remoto.</p></details>
+    <details class="faq-item"><summary>Come gestite documenti e scadenze?</summary><p>Monitoriamo assicurazioni, certificazioni e adempimenti dell'immobile e ti avvisiamo con anticipo prima di ogni scadenza, così non rischi mai di dimenticarla.</p></details>
+    <details class="faq-item"><summary>Sono obbligato ad affittare l'immobile?</summary><p>No. Puoi affidarci solo la custodia e la gestione (documenti, scadenze, manutenzioni) oppure, se lo desideri, chiederci di occuparci anche dell'affitto e degli ospiti.</p></details>
+    <details class="faq-item"><summary>C'è un vincolo di durata?</summary><p>Le condizioni contrattuali vengono definite insieme durante l'attivazione del servizio, in base alle tue esigenze.</p></details>
   </div>
 </section>
 
-<section id="contatti">
+<section id="contatti" class="reveal">
   <span class="section-tag">Contattaci</span>
   <h2 class="section-title">Richiedi una valutazione gratuita</h2>
   <p class="section-sub">Raccontaci qualcosa del tuo immobile: ti risponderemo con una proposta su misura.</p>
@@ -477,22 +515,22 @@
     <div class="contact-info">
       <h2>Parliamone</h2>
       <p>Puoi scriverci direttamente o compilare il modulo: ti risponderemo entro 24 ore.</p>
-      <div class="info-row"><i class="ti ti-brand-whatsapp"></i><span id="waTextLine">WhatsApp: configura il numero</span></div>
-      <div class="info-row"><i class="ti ti-mail"></i><span id="emailTextLine">Email: configura l'indirizzo</span></div>
-      <div class="info-row"><i class="ti ti-map-pin"></i><span>Gestiamo immobili sul territorio locale</span></div>
+      <div class="info-row"><svg class="icon"><use href="#i-phone"></use></svg><span id="waTextLine">WhatsApp: configura il numero</span></div>
+      <div class="info-row"><svg class="icon"><use href="#i-mail"></use></svg><span id="emailTextLine">Email: configura l'indirizzo</span></div>
+      <div class="info-row"><svg class="icon"><use href="#i-pin"></use></svg><span>Gestiamo immobili in tutta la Sicilia</span></div>
     </div>
     <div>
       <form id="leadForm">
         <div class="field-row">
-          <div class="field"><label>Nome e cognome</label><input name="nome" required></div>
-          <div class="field"><label>Telefono</label><input name="telefono" required placeholder="+39..."></div>
+          <div class="field"><label for="fNome">Nome e cognome</label><input id="fNome" name="nome" required></div>
+          <div class="field"><label for="fTel">Telefono</label><input id="fTel" name="telefono" required placeholder="+39..."></div>
         </div>
-        <div class="field"><label>Email</label><input type="email" name="email" required></div>
+        <div class="field"><label for="fEmail">Email</label><input id="fEmail" type="email" name="email" required></div>
         <div class="field-row">
-          <div class="field"><label>Città dell'immobile (Sicilia)</label><input name="citta" required></div>
+          <div class="field"><label for="fCitta">Città dell'immobile (Sicilia)</label><input id="fCitta" name="citta" required></div>
           <div class="field">
-            <label>Tipo di immobile</label>
-            <select name="tipo">
+            <label for="fTipo">Tipo di immobile</label>
+            <select id="fTipo" name="tipo">
               <option>Appartamento</option>
               <option>Villa</option>
               <option>Attico</option>
@@ -502,15 +540,15 @@
           </div>
         </div>
         <div class="field">
-          <label>Cosa ti serve?</label>
-          <select name="servizio">
+          <label for="fServizio">Cosa ti serve?</label>
+          <select id="fServizio" name="servizio">
             <option>Solo custodia e gestione (documenti, scadenze, manutenzioni)</option>
             <option>Custodia e gestione + affitto</option>
             <option>Non so ancora, vorrei essere consigliato</option>
           </select>
         </div>
-        <div class="field"><label>Messaggio (facoltativo)</label><textarea name="messaggio" placeholder="Raccontaci qualcosa in più sul tuo immobile"></textarea></div>
-        <button type="submit" class="btn-primary" style="width:100%;justify-content:center;">Invia richiesta</button>
+        <div class="field"><label for="fMsg">Messaggio (facoltativo)</label><textarea id="fMsg" name="messaggio" placeholder="Raccontaci qualcosa in più sul tuo immobile"></textarea></div>
+        <button type="submit" class="btn-primary" style="width:100%;justify-content:center;background:var(--terracotta); color:#fff; box-shadow:0 10px 26px rgba(193,80,46,.3);">Invia richiesta</button>
         <p class="form-note">Inviando il modulo verrai reindirizzato su WhatsApp con il messaggio già pronto, oppure potrai scriverci via email.</p>
       </form>
       <div class="form-success" id="formSuccess">Grazie! Apri WhatsApp per completare l'invio del messaggio.</div>
@@ -519,12 +557,12 @@
 </section>
 
 <footer>
-  <div id="footerBrand" style="font-family:'Fraunces',serif; color:var(--text-on-dark); font-size:15px; margin-bottom:10px;">Property Manager</div>
+  <div id="footerBrand" style="font-family:'Playfair Display',serif; font-weight:700; color:#fff; font-size:16px; margin-bottom:10px;">Property Manager</div>
   <div>Sei già un proprietario in gestione? <a href="index.html">Accedi alla tua area riservata</a></div>
   <div style="margin-top:10px; opacity:.7;">© <span id="year"></span> — Tutti i diritti riservati</div>
 </footer>
 
-<a class="wa-float" id="waFloat" href="#" target="_blank" rel="noopener" aria-label="Scrivici su WhatsApp"><i class="ti ti-brand-whatsapp"></i></a>
+<a class="wa-float" id="waFloat" href="#" target="_blank" rel="noopener" aria-label="Scrivici su WhatsApp"><svg class="icon"><use href="#i-phone"></use></svg></a>
 
 <script>
   // ---------------------------------------------------------------
@@ -564,6 +602,53 @@
     document.getElementById('formSuccess').style.display = 'block';
     window.open(waLink(testo), '_blank', 'noopener');
   });
+
+  // Nav condense on scroll
+  const nav = document.getElementById('siteNav');
+  window.addEventListener('scroll', function(){
+    nav.classList.toggle('scrolled', window.scrollY > 40);
+  }, {passive:true});
+
+  // Scroll reveal
+  const reduceMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+  const revealEls = document.querySelectorAll('.reveal');
+  if(reduceMotion || !('IntersectionObserver' in window)){
+    revealEls.forEach(el=>el.classList.add('in-view'));
+  } else {
+    const io = new IntersectionObserver((entries)=>{
+      entries.forEach(entry=>{
+        if(entry.isIntersecting){ entry.target.classList.add('in-view'); io.unobserve(entry.target); }
+      });
+    }, {threshold:0.12, rootMargin:'0px 0px -60px 0px'});
+    revealEls.forEach(el=>io.observe(el));
+  }
+
+  // Count-up stat
+  const countEl = document.querySelector('[data-count]');
+  if(countEl && !reduceMotion){
+    let started = false;
+    const target = parseInt(countEl.getAttribute('data-count'), 10);
+    const suffix = countEl.getAttribute('data-suffix') || '';
+    const countIo = new IntersectionObserver((entries)=>{
+      entries.forEach(entry=>{
+        if(entry.isIntersecting && !started){
+          started = true;
+          const dur = 1400, t0 = performance.now();
+          function tick(t){
+            const p = Math.min(1, (t - t0) / dur);
+            const eased = 1 - Math.pow(1 - p, 3);
+            countEl.textContent = Math.round(eased * target) + suffix;
+            if(p < 1) requestAnimationFrame(tick);
+          }
+          requestAnimationFrame(tick);
+          countIo.disconnect();
+        }
+      });
+    }, {threshold:0.5});
+    countIo.observe(countEl);
+  } else if(countEl){
+    countEl.textContent = countEl.getAttribute('data-count') + (countEl.getAttribute('data-suffix')||'');
+  }
 </script>
 </body>
 </html>

@@ -917,6 +917,14 @@ function readAndCompressImage(file){
     reader.readAsDataURL(file);
   });
 }
+function readFileAsDataUrl(file){
+  return new Promise((resolve, reject)=>{
+    const reader = new FileReader();
+    reader.onload = ()=>resolve(reader.result);
+    reader.onerror = reject;
+    reader.readAsDataURL(file);
+  });
+}
 
 function applyLinkParams(){
   try{
@@ -1348,6 +1356,17 @@ function removeFotoImmobile(propId, fotoId){
   const p = state.properties.find(x=>x.id===propId);
   p.foto = (p.foto||[]).filter(f=>typeof f!=='object' || f.id!==fotoId);
   if(p.fotoCopertina===fotoId) p.fotoCopertina = null;
+  saveData(); render();
+}
+function addDocumentoImmobile(propId, data){
+  const p = state.properties.find(x=>x.id===propId);
+  if(!p.documenti) p.documenti = [];
+  p.documenti.push({id:uid(), url:data.url, nome:data.nome||'', descrizione:data.descrizione||'', data:new Date().toISOString()});
+  saveData(); closeModal(); render();
+}
+function removeDocumentoImmobile(propId, docId){
+  const p = state.properties.find(x=>x.id===propId);
+  p.documenti = (p.documenti||[]).filter(d=>d.id!==docId);
   saveData(); render();
 }
 function setFotoCopertina(propId, fotoId){
@@ -2612,6 +2631,27 @@ function renderPrenotazioniBreviInfo(p){
   `;
 }
 
+function renderDocumentiImmobile(p){
+  const lista = p.documenti || [];
+  if(!lista.length) return `<p style="font-size:12.5px;color:var(--ink-soft);margin:-6px 0 14px 0;">Nessun documento caricato ancora.</p>`;
+  return lista.map(d=>`
+    <div class="booking-row" style="display:flex;justify-content:space-between;align-items:center;gap:12px;">
+      <div style="display:flex;align-items:center;gap:10px;min-width:0;">
+        <i class="ti ti-file-text" style="font-size:20px;color:var(--brass-deep);flex-shrink:0;"></i>
+        <div style="min-width:0;">
+          <div style="font-weight:600;font-size:13.5px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;">${d.nome || 'Documento'}</div>
+          ${d.descrizione ? `<div style="font-size:11.5px;color:var(--ink-soft);">${d.descrizione}</div>` : ''}
+          <div style="font-size:10.5px;color:var(--ink-soft);font-family:'IBM Plex Mono',monospace;">${fmtDate(d.data)}</div>
+        </div>
+      </div>
+      <div style="display:flex;gap:6px;flex-shrink:0;">
+        <a class="icon-btn" href="${d.url}" target="_blank" rel="noopener" download="${d.nome||'documento'}">Apri</a>
+        <button class="icon-btn danger" data-del-documento-immobile="${d.id}">Rimuovi</button>
+      </div>
+    </div>
+  `).join('');
+}
+
 function renderPrenotazioni(p){
   const list = [...(p.prenotazioni||[])].sort((a,b)=>new Date(b.createdAt)-new Date(a.createdAt));
   if(!list.length) return `<p style="font-size:12.5px;color:var(--ink-soft);margin:-6px 0 30px 0;">Nessuna richiesta di prenotazione ricevuta.</p>`;
@@ -3123,7 +3163,7 @@ function renderDossier(p){
           ${waButton(cliente.telefono, `Salve ${cliente.nome}, la contatto riguardo a ${p.nome}.`, 'WhatsApp')}
           <button class="icon-btn" data-action="view-cliente" data-cliente-id="${cliente.id}">Vedi scheda cliente</button>
           <button class="icon-btn" data-action="view-as-owner">Apri area proprietario</button>
-          <button class="icon-btn" data-action="send-owner-credentials">Invia credenziali</button>
+          <button class="icon-btn" data-action="send-owner-credentials">Invita il proprietario</button>
         </div>
       ` : ''}
       <p class="section-label">Caratteristiche</p>
@@ -3137,6 +3177,9 @@ function renderDossier(p){
       ${renderLocazione(p)}
       <p class="section-label" style="margin-top:24px;">Prenotazioni brevi (portale ospiti)</p>
       ${renderPrenotazioniBreviInfo(p)}
+      <p class="section-label" style="margin-top:24px;">Documenti</p>
+      ${renderDocumentiImmobile(p)}
+      <button class="add-inline" data-action="new-documento-immobile">+ Carica documento</button>
     `;
   } else if(tabAttiva==='foto'){
     tabContent = renderFotoModulo(p);
@@ -3858,6 +3901,21 @@ function renderModal(){
         <form id="fotoImmobileForm">
           <div class="field"><label>Foto</label><input type="file" name="foto" accept="image/*" required></div>
           <div class="field"><label>Descrizione</label><input name="descrizione" required placeholder="${categoria==='pubblicita' ? 'es. Soggiorno con vista mare' : 'es. Lettura contatore acqua, 21/08'}"></div>
+          <div class="modal-actions">
+            <button type="button" class="btn-secondary" data-close>Annulla</button>
+            <button type="submit" class="btn-primary">Carica</button>
+          </div>
+        </form>
+      </div></div>`;
+  }
+
+  if(type==='documentoImmobile'){
+    return `
+      <div class="overlay" data-close-overlay><div class="modal" data-stop>
+        <h2>Carica documento</h2>
+        <form id="documentoImmobileForm">
+          <div class="field"><label>File</label><input type="file" name="documento" required></div>
+          <div class="field"><label>Descrizione</label><input name="descrizione" placeholder="es. Atto di proprietà, planimetria, certificato energetico..."></div>
           <div class="modal-actions">
             <button type="button" class="btn-secondary" data-close>Annulla</button>
             <button type="submit" class="btn-primary">Carica</button>
@@ -4659,6 +4717,12 @@ function attachHandlers(){
   document.querySelectorAll('[data-set-copertina]').forEach(b=>b.addEventListener('click', ()=>setFotoCopertina(state.selectedId, b.getAttribute('data-set-copertina'))));
   document.querySelectorAll('[data-del-foto]').forEach(b=>b.addEventListener('click', ()=>removeFotoImmobile(state.selectedId, b.getAttribute('data-del-foto'))));
 
+  const newDocumentoBtn = document.querySelector('[data-action="new-documento-immobile"]');
+  if(newDocumentoBtn) newDocumentoBtn.addEventListener('click', ()=>openModal('documentoImmobile', null, state.selectedId));
+  document.querySelectorAll('[data-del-documento-immobile]').forEach(b=>b.addEventListener('click', ()=>{
+    if(confirm('Rimuovere questo documento?')) removeDocumentoImmobile(state.selectedId, b.getAttribute('data-del-documento-immobile'));
+  }));
+
   const editPropBtn = document.querySelector('[data-action="edit-property"]');
   if(editPropBtn) editPropBtn.addEventListener('click', ()=>{
     const p = state.properties.find(x=>x.id===state.selectedId);
@@ -5148,6 +5212,16 @@ function attachHandlers(){
     if(!fileInput || !fileInput.files[0]) return;
     const url = await readAndCompressImage(fileInput.files[0]);
     addFotoImmobile(state.modal.propId, { url, descrizione: fd.get('descrizione'), categoria: state.modal.context });
+  });
+
+  const documentoImmobileForm = document.getElementById('documentoImmobileForm');
+  if(documentoImmobileForm) documentoImmobileForm.addEventListener('submit', async ev=>{
+    ev.preventDefault();
+    const fd = new FormData(documentoImmobileForm);
+    const fileInput = documentoImmobileForm.querySelector('input[type=file]');
+    if(!fileInput || !fileInput.files[0]) return;
+    const url = await readFileAsDataUrl(fileInput.files[0]);
+    addDocumentoImmobile(state.modal.propId, { url, nome: fileInput.files[0].name, descrizione: fd.get('descrizione') });
   });
 
   const clienteForm = document.getElementById('clienteForm');

@@ -863,11 +863,8 @@ function fmtDate(d){
   const dt = new Date(d);
   return dt.toLocaleDateString('it-IT',{day:'2-digit',month:'short',year:'numeric'});
 }
-function catastoCode(seed){
-  let h=0; for(const c of seed) h = (h*31 + c.charCodeAt(0)) >>> 0;
-  const foglio = (h % 40) + 1;
-  const particella = (h % 900) + 100;
-  return `F.${foglio} Part.${particella}`;
+function generaCodiceImmobile(){
+  return 'IMM-' + uid().toUpperCase();
 }
 function daysUntil(dateStr){
   if(!dateStr) return Infinity;
@@ -1230,6 +1227,11 @@ async function loadData(){
     state.clienti = data.clienti || [];
     state.settings = data.settings || {nomeAgenzia:'Property Manager', telefonoGestore:''};
     state.operatori = data.operatori || [];
+    let codiciDaMigrare = false;
+    state.properties.forEach(p=>{
+      if(!p.catasto || !p.catasto.startsWith('IMM-')){ p.catasto = generaCodiceImmobile(); codiciDaMigrare = true; }
+    });
+    if(codiciDaMigrare) persistAll();
   }catch(e){
     state.properties = [];
     state.clienti = [];
@@ -1313,7 +1315,7 @@ function saveProperty(data, editingId){
     state.properties.push({
       id: uid(),
       ...data,
-      catasto: catastoCode(data.nome + data.indirizzo),
+      catasto: generaCodiceImmobile(),
       spese: [],
       manutenzioni: [],
       prenotazioni: [],

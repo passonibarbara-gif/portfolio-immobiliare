@@ -47,25 +47,28 @@
   }
 
   /* ---------- Motion ---------- */
-  @keyframes waveDrift{ from{transform:translateX(0);} to{transform:translateX(-33.33%);} }
-  @keyframes sunPulse{ 0%,100%{transform:translateX(-50%) scale(1); opacity:1;} 50%{transform:translateX(-50%) scale(1.05); opacity:.92;} }
-  @keyframes smokeRise{ 0%{transform:translateY(0) scale(.6); opacity:.55;} 100%{transform:translateY(-46px) translateX(10px) scale(1.5); opacity:0;} }
   @keyframes fadeUp{ from{opacity:0; transform:translateY(16px);} to{opacity:1; transform:translateY(0);} }
-  @keyframes tileShift{ from{background-position:0 0;} to{background-position:-120px 0;} }
   @keyframes pulseRing{ 0%{transform:scale(.75); opacity:.55;} 100%{transform:scale(1.9); opacity:0;} }
   @keyframes floatY{ 0%,50%,100%{transform:translateY(0);} 25%{transform:translateY(-6px);} 75%{transform:translateY(4px);} }
+  @keyframes wiggle{ 0%,100%{transform:rotate(0deg) translateY(0);} 25%{transform:rotate(-2deg) translateY(-3px);} 75%{transform:rotate(2deg) translateY(-3px);} }
+  @keyframes popIn{ 0%{opacity:0; transform:scale(.8) rotate(-2deg);} 60%{opacity:1; transform:scale(1.04) rotate(.5deg);} 100%{opacity:1; transform:scale(1) rotate(0);} }
+  @keyframes tickerScroll{ from{transform:translateX(0);} to{transform:translateX(-50%);} }
+  @keyframes blobDrift1{ 0%,100%{transform:translate(-8%,-8%) scale(1);} 50%{transform:translate(10%,8%) scale(1.2);} }
+  @keyframes blobDrift2{ 0%,100%{transform:translate(6%,10%) scale(1.1);} 50%{transform:translate(-10%,-6%) scale(.95);} }
+  @keyframes blobDrift3{ 0%,100%{transform:translate(0,0) scale(1);} 50%{transform:translate(-8%,10%) scale(1.15);} }
+  @keyframes confettiFall{ 0%{transform:translate(0,0) rotate(0deg); opacity:1;} 100%{transform:translate(var(--dx), var(--dy)) rotate(var(--rot)); opacity:0;} }
 
-  .reveal{opacity:0; transform:translateY(30px) scale(.98); filter:blur(6px); transition:opacity .9s cubic-bezier(.16,.8,.3,1), transform .9s cubic-bezier(.16,.8,.3,1), filter .9s ease;}
-  .reveal.in-view{opacity:1; transform:translateY(0) scale(1); filter:blur(0);}
+  .reveal{opacity:0; transform:translateY(24px) scale(.92) rotate(-1deg); transition:opacity .6s cubic-bezier(.34,1.56,.64,1), transform .6s cubic-bezier(.34,1.56,.64,1);}
+  .reveal.in-view{opacity:1; transform:translateY(0) scale(1) rotate(0deg);}
   .stagger > *{transition-delay:calc(var(--i,0) * 70ms);}
 
-  /* ---------- Tile divider ---------- */
-  .tile-divider{
-    height:30px; width:100%;
-    background-image:url("data:image/svg+xml;base64,PHN2ZyB4bWxucz0naHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmcnIHdpZHRoPSc2MCcgaGVpZ2h0PSc0MCc+PHJlY3Qgd2lkdGg9JzYwJyBoZWlnaHQ9JzQwJyBmaWxsPScjRkZGOEVDJy8+PHBhdGggZD0nTTMwIDQgTDUwIDIwIEwzMCAzNiBMMTAgMjAgWicgZmlsbD0nI0MxNTAyRScvPjxjaXJjbGUgY3g9JzMwJyBjeT0nMjAnIHI9JzYnIGZpbGw9JyNGMEE5M0EnLz48cGF0aCBkPSdNMCAyMCBMMTAgMjAnIHN0cm9rZT0nIzJDNUY4Nicgc3Ryb2tlLXdpZHRoPSczJy8+PHBhdGggZD0nTTUwIDIwIEw2MCAyMCcgc3Ryb2tlPScjMkM1Rjg2JyBzdHJva2Utd2lkdGg9JzMnLz48L3N2Zz4K");
-    background-repeat:repeat-x; background-size:120px 30px; background-position:0 0;
-    animation:tileShift 16s linear infinite;
+  /* ---------- Fun ticker banner ---------- */
+  .ticker{background:var(--terracotta); overflow:hidden; white-space:nowrap; padding:14px 0; position:relative;}
+  .ticker-track{display:inline-flex; align-items:center; animation:tickerScroll 26s linear infinite;}
+  .ticker-track span.txt{
+    font-family:'Playfair Display',serif; font-weight:700; font-style:italic; font-size:16px; color:#FFF3E2; padding:0 22px;
   }
+  .ticker-track span.dot{color:var(--sun); font-size:14px;}
 
   /* ---------- Nav ---------- */
   .site-nav{
@@ -135,42 +138,24 @@
   .hero-stat-num{font-family:'Playfair Display',serif; font-size:30px; font-weight:700; color:#fff; font-variant-numeric:tabular-nums;}
   .hero-stat-label{font-size:12px; color:#F3E7D3; letter-spacing:.02em; margin-top:2px;}
 
-  .hero-birds{position:absolute; inset:0; z-index:2; pointer-events:none;}
-  .bird{position:absolute; width:26px; height:26px; animation:floatY 4s ease-in-out infinite;}
-  .bird-1{top:22%; left:12%; animation-delay:.2s;}
-  .bird-2{top:32%; left:20%; width:19px; height:19px; animation-delay:1.1s;}
-
-  .hero-scene{position:relative; height:150px; z-index:1; margin-top:20px; perspective:600px;}
-  .hero-boat{position:absolute; left:64%; bottom:16px; width:74px; height:auto; z-index:4; animation:floatY 4.5s ease-in-out infinite; filter:drop-shadow(0 4px 6px rgba(0,0,0,.2));}
-
-  .hero-sun-wrap{position:absolute; left:50%; bottom:98px; width:0; height:0; z-index:1;}
-  .hero-rays{
-    position:absolute; top:0; left:0; width:360px; height:360px; transform:translate(-50%,-50%); border-radius:50%;
-    background:repeating-conic-gradient(from 0deg, rgba(255,231,176,.4) 0deg 4deg, transparent 4deg 20deg);
-    -webkit-mask-image:radial-gradient(circle, #000 38%, transparent 70%);
-    mask-image:radial-gradient(circle, #000 38%, transparent 70%);
-    mix-blend-mode:screen; animation:raySpin 46s linear infinite;
+  .hero-mesh{position:absolute; inset:0; z-index:0; overflow:hidden;}
+  .blob{position:absolute; border-radius:50%; filter:blur(70px); mix-blend-mode:screen; opacity:.75;}
+  .blob-1{width:480px; height:480px; background:radial-gradient(circle, var(--sea-light), transparent 70%); top:-160px; left:-100px; animation:blobDrift1 16s ease-in-out infinite;}
+  .blob-2{width:420px; height:420px; background:radial-gradient(circle, var(--sun), transparent 70%); bottom:-180px; right:-60px; animation:blobDrift2 20s ease-in-out infinite;}
+  .blob-3{width:360px; height:360px; background:radial-gradient(circle, var(--terracotta), transparent 70%); top:10%; right:18%; animation:blobDrift3 24s ease-in-out infinite;}
+  .hero-grain{
+    position:absolute; inset:0; z-index:1; pointer-events:none; opacity:.4; mix-blend-mode:overlay;
+    background:#fff; filter:url(#grainFilter);
   }
-  .hero-sun{
-    position:absolute; top:0; left:0; width:120px; height:120px; transform:translate(-50%,-50%); border-radius:50%;
-    background:radial-gradient(circle at 38% 34%, #FFF3D6 0%, #FFE7B0 22%, var(--sun) 58%, rgba(240,169,58,0) 74%);
-    box-shadow:0 0 90px 26px rgba(240,169,58,.5);
-    animation:sunPulse2 7s ease-in-out infinite;
+  .ghost-text{
+    position:absolute; top:52%; left:50%; transform:translate(-50%,-50%); z-index:1;
+    font-family:'Playfair Display',serif; font-weight:900; font-size:clamp(90px,20vw,300px); line-height:1;
+    color:transparent; -webkit-text-stroke:1.5px rgba(255,255,255,.14); white-space:nowrap; pointer-events:none; user-select:none;
   }
-  @keyframes raySpin{ from{transform:translate(-50%,-50%) rotate(0deg);} to{transform:translate(-50%,-50%) rotate(360deg);} }
-  @keyframes sunPulse2{ 0%,100%{transform:translate(-50%,-50%) scale(1); opacity:1;} 50%{transform:translate(-50%,-50%) scale(1.07); opacity:.9;} }
-
-  .hero-skyline{position:absolute; left:0; bottom:26px; width:100%; height:auto; display:block; z-index:2; filter:drop-shadow(0 10px 14px rgba(0,0,0,.18));}
-  .smoke circle{animation:smokeRise 5s ease-out infinite;}
-  .smoke circle:nth-child(2){animation-delay:1.2s;}
-  .smoke circle:nth-child(3){animation-delay:2.4s;}
-  .hero-waves{position:absolute; left:0; bottom:0; width:100%; height:60px; z-index:3; line-height:0;}
-  .hero-waves svg{position:absolute; bottom:0; left:0; width:200%; height:100%;}
-  .wave-back{animation:waveDrift 22s linear infinite; opacity:.55;}
-  .wave-front{animation:waveDrift 14s linear infinite reverse;}
-  .hero-sparkles{position:absolute; left:0; bottom:2px; width:100%; height:36px; z-index:3; pointer-events:none;}
-  .sparkle{position:absolute; bottom:6px; width:3px; height:3px; border-radius:50%; background:#FFF3D6; animation:twinkle 2.6s ease-in-out infinite;}
-  @keyframes twinkle{ 0%,100%{opacity:0; transform:scale(.5);} 50%{opacity:1; transform:scale(1.4);} }
+  .hero-spotlight{
+    position:absolute; inset:0; z-index:2; pointer-events:none;
+    background:radial-gradient(circle 280px at var(--sx,50%) var(--sy,28%), rgba(255,214,138,.22), transparent 70%);
+  }
 
   /* ---------- Section shell ---------- */
   section{padding:80px 24px;}
@@ -190,12 +175,12 @@
   /* ---------- Pain -> solution ---------- */
   .pain-grid{display:grid; grid-template-columns:1fr 1fr; gap:28px; align-items:stretch; max-width:1000px; margin:0 auto;}
   .pain-card{background:#fff; border:1px solid var(--line); border-radius:26px 26px 14px 14px; padding:30px; box-shadow:var(--shadow); transition:transform .3s ease;}
-  .pain-card:hover{transform:translateY(-4px);}
+  .pain-card:hover{animation:wiggle .5s ease;}
   .pain-card h3{font-family:'Playfair Display',serif; font-weight:700; font-size:19px; margin:0 0 14px; color:var(--terracotta); display:flex; align-items:center; gap:10px;}
   .pain-card ul{margin:0; padding-left:20px; color:var(--ink-soft); font-size:14px;}
   .pain-card li{margin-bottom:9px;}
   .solution-card{background:linear-gradient(160deg, var(--sea-deep) 0%, #123B52 100%); color:#F3E7D3; border-radius:26px 26px 14px 14px; padding:30px; box-shadow:var(--shadow); transition:transform .3s ease;}
-  .solution-card:hover{transform:translateY(-4px);}
+  .solution-card:hover{animation:wiggle .5s ease;}
   .solution-card h3{font-family:'Playfair Display',serif; font-weight:700; font-size:19px; margin:0 0 14px; color:var(--sun); display:flex; align-items:center; gap:10px;}
   .solution-card ul{margin:0; padding-left:20px; color:#E3D6BC; font-size:14px;}
   .solution-card li{margin-bottom:9px;}
@@ -247,7 +232,7 @@
   /* ---------- Testimonials ---------- */
   .testi-grid{display:grid; grid-template-columns:repeat(3,1fr); gap:22px; max-width:1100px; margin:0 auto;}
   .testi-card{background:#fff; border:1px solid var(--line); border-radius:20px; padding:26px; box-shadow:var(--shadow); transition:transform .3s ease;}
-  .testi-card:hover{transform:translateY(-4px);}
+  .testi-card:hover{animation:wiggle .5s ease;}
   .testi-stars{color:var(--sun-deep); font-size:14px; margin-bottom:12px; letter-spacing:2px;}
   .testi-card p.quote{font-size:14.5px; color:var(--ink); margin:0 0 16px; font-style:italic; font-family:'Playfair Display',serif;}
   .testi-author{font-size:12.5px; color:var(--ink-soft); font-weight:600;}
@@ -258,11 +243,12 @@
     color:#fff; font-weight:700; font-size:12px; font-family:'Playfair Display',serif;
   }
 
-  /* ---------- Decorative illustrations ---------- */
-  .deco-lemon{width:110px; height:auto; display:block; margin:0 auto 6px;}
-  .deco-lemon.flip{transform:scaleX(-1);}
-  .deco-sunface-wrap{position:absolute; top:50%; right:-60px; transform:translateY(-50%); width:340px; height:340px; opacity:.1; z-index:1; animation:spinSlow 60s linear infinite;}
-  @keyframes spinSlow{ from{transform:translateY(-50%) rotate(0deg);} to{transform:translateY(-50%) rotate(360deg);} }
+  /* ---------- Trust band mesh ---------- */
+  .trust-mesh{position:absolute; inset:0; z-index:0; overflow:hidden; pointer-events:none;}
+  .trust-mesh .blob{opacity:.5;}
+
+  /* ---------- Wiggle on hover ---------- */
+  .wiggle-hover:hover{animation:wiggle .5s ease;}
 
   /* ---------- FAQ ---------- */
   .faq-list{max-width:740px; margin:0 auto;}
@@ -328,14 +314,19 @@
     .field-row{grid-template-columns:1fr;}
     .nav-links{display:none;}
     .hero{padding-top:64px;}
-    .hero-birds, .hero-boat{display:none;}
-    .deco-sunface-wrap{width:220px; height:220px; right:-90px; opacity:.08;}
+    .ghost-text{font-size:70px;}
+    .blob{filter:blur(46px);}
+    .ticker-track span.txt{font-size:14px; padding:0 14px;}
   }
 </style>
 </head>
 <body>
 
-<svg style="display:none">
+<svg style="position:absolute; width:0; height:0; overflow:hidden;" aria-hidden="true">
+  <filter id="grainFilter">
+    <feTurbulence type="fractalNoise" baseFrequency="0.85" numOctaves="2" stitchTiles="stitch" result="noise"/>
+    <feColorMatrix in="noise" type="matrix" values="0 0 0 0 1  0 0 0 0 1  0 0 0 0 1  0 0 0 0.6 0"/>
+  </filter>
   <symbol id="i-plane" viewBox="0 0 24 24"><path d="M3 11l18-8-8 18-2-7-8-3z" stroke-width="1.7" stroke-linejoin="round"/></symbol>
   <symbol id="i-phone" viewBox="0 0 24 24"><path d="M5 4h4l2 5-2.5 2A12 12 0 0 0 13 15.5L15 13l5 2v4a2 2 0 0 1-2 2A16 16 0 0 1 3 6a2 2 0 0 1 2-2z" stroke-width="1.7" stroke-linejoin="round"/></symbol>
   <symbol id="i-alert" viewBox="0 0 24 24"><path d="M12 3 2 20h20L12 3z" stroke-width="1.7" stroke-linejoin="round"/><line x1="12" y1="9.5" x2="12" y2="14" stroke-width="1.7" stroke-linecap="round"/><circle cx="12" cy="17" r="1" fill="currentColor" stroke="none"/></symbol>
@@ -355,47 +346,6 @@
   <symbol id="i-shield" viewBox="0 0 24 24"><path d="M12 2l8 3v6c0 5-3.5 9-8 11-4.5-2-8-6-8-11V5l8-3z" stroke-width="1.7" stroke-linejoin="round"/><polyline points="8.5 12 11 14.5 15.5 9.5" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"/></symbol>
   <symbol id="i-headset" viewBox="0 0 24 24"><path d="M4 13a8 8 0 0 1 16 0" stroke-width="1.7"/><rect x="3" y="13" width="4" height="6" rx="1.5" stroke-width="1.7"/><rect x="17" y="13" width="4" height="6" rx="1.5" stroke-width="1.7"/><path d="M20 19v1a3 3 0 0 1-3 3h-4" stroke-width="1.7"/></symbol>
   <symbol id="i-mail" viewBox="0 0 24 24"><rect x="3" y="5" width="18" height="14" rx="2" stroke-width="1.7"/><path d="M3 7l9 6 9-6" stroke-width="1.7" stroke-linejoin="round"/></symbol>
-  <symbol id="deco-lemon" viewBox="0 0 140 70">
-    <defs>
-      <radialGradient id="gLemon" cx="35%" cy="30%" r="75%"><stop offset="0" stop-color="#FFE9A8"/><stop offset="55%" stop-color="#F0A93A"/><stop offset="100%" stop-color="#D6852A"/></radialGradient>
-      <linearGradient id="gLeaf" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#6FA377"/><stop offset="1" stop-color="#3F6650"/></linearGradient>
-    </defs>
-    <path d="M6 62C34 30 60 20 132 8" stroke="#4F7A5B" stroke-width="3" fill="none" stroke-linecap="round"/>
-    <ellipse cx="34" cy="42" rx="14" ry="7" fill="url(#gLeaf)" transform="rotate(-25 34 42)"/>
-    <ellipse cx="70" cy="24" rx="13" ry="6.5" fill="url(#gLeaf)" transform="rotate(-15 70 24)"/>
-    <ellipse cx="105" cy="14" rx="12" ry="6" fill="url(#gLeaf)" transform="rotate(-8 105 14)"/>
-    <ellipse cx="46" cy="52" rx="15" ry="17" fill="url(#gLemon)" stroke="#B96A1E" stroke-width="1"/>
-    <ellipse cx="41" cy="46" rx="4" ry="5" fill="#FFF6DE" opacity=".55"/>
-    <path d="M46 35v-5" stroke="#4F7A5B" stroke-width="2.5" stroke-linecap="round"/>
-    <ellipse cx="94" cy="30" rx="13" ry="15" fill="url(#gLemon)" stroke="#B96A1E" stroke-width="1"/>
-    <ellipse cx="89" cy="24" rx="3.5" ry="4.5" fill="#FFF6DE" opacity=".55"/>
-    <path d="M94 15v-5" stroke="#4F7A5B" stroke-width="2.2" stroke-linecap="round"/>
-  </symbol>
-  <symbol id="deco-sunface" viewBox="0 0 200 200">
-    <defs>
-      <radialGradient id="gSunGlow" cx="50%" cy="50%" r="50%"><stop offset="0" stop-color="#F0A93A" stop-opacity=".9"/><stop offset="100%" stop-color="#F0A93A" stop-opacity="0"/></radialGradient>
-      <radialGradient id="gFace" cx="38%" cy="32%" r="75%"><stop offset="0" stop-color="#FFF6DE"/><stop offset="100%" stop-color="#F3D9A4"/></radialGradient>
-    </defs>
-    <circle cx="100" cy="100" r="96" fill="url(#gSunGlow)"/>
-    <g stroke-linecap="round">
-      <g fill="none" stroke-width="10">
-        <line x1="100" y1="6" x2="100" y2="34" stroke="#F0A93A"/>
-        <line x1="100" y1="166" x2="100" y2="194" stroke="#F0A93A"/>
-        <line x1="6" y1="100" x2="34" y2="100" stroke="#F0A93A"/>
-        <line x1="166" y1="100" x2="194" y2="100" stroke="#F0A93A"/>
-        <line x1="34" y1="34" x2="53" y2="53" stroke="#C1502E"/>
-        <line x1="147" y1="147" x2="166" y2="166" stroke="#C1502E"/>
-        <line x1="166" y1="34" x2="147" y2="53" stroke="#C1502E"/>
-        <line x1="53" y1="147" x2="34" y2="166" stroke="#C1502E"/>
-      </g>
-      <circle cx="100" cy="100" r="58" fill="url(#gFace)" stroke="#2C5F86" stroke-width="4"/>
-      <path d="M76 92q4-8 8 0" stroke="#1E2A2E" stroke-width="4" fill="none"/>
-      <path d="M116 92q4-8 8 0" stroke="#1E2A2E" stroke-width="4" fill="none"/>
-      <circle cx="72" cy="108" r="7" fill="#E8A98F" opacity=".6"/>
-      <circle cx="128" cy="108" r="7" fill="#E8A98F" opacity=".6"/>
-      <path d="M78 118q22 20 44 0" stroke="#1E2A2E" stroke-width="4.5" fill="none" stroke-linecap="round"/>
-    </g>
-  </symbol>
 </svg>
 
 <nav class="site-nav" id="siteNav"><div class="site-nav-inner">
@@ -428,78 +378,30 @@
     </div>
   </div>
 
-  <div class="hero-birds" aria-hidden="true">
-    <svg class="bird bird-1" viewBox="0 0 24 24"><path d="M2 15q4-6 8 0 q4-6 8 0" stroke="#FCE4B8" stroke-width="1.6" fill="none" stroke-linecap="round"/></svg>
-    <svg class="bird bird-2" viewBox="0 0 24 24"><path d="M2 15q4-6 8 0 q4-6 8 0" stroke="#FCE4B8" stroke-width="1.6" fill="none" stroke-linecap="round"/></svg>
+  <div class="hero-mesh" aria-hidden="true">
+    <div class="blob blob-1"></div>
+    <div class="blob blob-2"></div>
+    <div class="blob blob-3"></div>
   </div>
-
-  <div class="hero-scene" id="heroScene" aria-hidden="true">
-    <div class="hero-sun-wrap" id="heroSunWrap"><div class="hero-rays"></div><div class="hero-sun"></div></div>
-    <svg class="hero-skyline" id="heroSkyline" viewBox="0 0 1200 140" preserveAspectRatio="none">
-      <defs>
-        <linearGradient id="gWallCream" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#FCF4E2"/><stop offset="1" stop-color="#E4D3AE"/></linearGradient>
-        <linearGradient id="gWallSand" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#FEEFCB"/><stop offset="1" stop-color="#E9CE9E"/></linearGradient>
-        <linearGradient id="gRoofTerra" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#DE7239"/><stop offset="1" stop-color="#A83F24"/></linearGradient>
-        <linearGradient id="gRoofDeep" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#CB5936"/><stop offset="1" stop-color="#8C3A1D"/></linearGradient>
-        <linearGradient id="gDome" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#E67A3F"/><stop offset="1" stop-color="#A83F24"/></linearGradient>
-        <linearGradient id="gEtna" x1="0" y1="0" x2="1" y2="0"><stop offset="0" stop-color="#4A8CAE"/><stop offset="45%" stop-color="#2C5F86"/><stop offset="100%" stop-color="#163247"/></linearGradient>
-      </defs>
-      <g class="smoke">
-        <circle cx="1058" cy="18" r="5" fill="#dfe6e8"/>
-        <circle cx="1062" cy="14" r="4" fill="#dfe6e8"/>
-        <circle cx="1055" cy="10" r="3.5" fill="#dfe6e8"/>
-      </g>
-      <polygon points="980,140 1060,20 1140,140" fill="url(#gEtna)"/>
-      <g>
-        <rect x="60" y="90" width="46" height="50" fill="url(#gWallCream)"/>
-        <polygon points="55,90 83,68 111,90" fill="url(#gRoofTerra)"/>
-        <rect x="70" y="106" width="12" height="16" fill="#2C5F86"/>
-        <rect x="90" y="106" width="10" height="10" fill="#5FB8CE"/>
-
-        <rect x="112" y="76" width="30" height="64" fill="url(#gWallSand)"/>
-        <polygon points="108,76 127,58 146,76" fill="url(#gRoofTerra)"/>
-        <rect x="120" y="90" width="8" height="10" fill="#2C5F86"/>
-
-        <rect x="150" y="100" width="60" height="40" fill="url(#gWallCream)"/>
-        <polygon points="146,100 180,84 214,100" fill="url(#gRoofDeep)"/>
-        <rect x="160" y="112" width="10" height="14" fill="#5FB8CE"/>
-        <rect x="180" y="112" width="10" height="14" fill="#5FB8CE"/>
-
-        <rect x="296" y="78" width="68" height="62" fill="url(#gWallSand)"/>
-        <circle cx="330" cy="78" r="34" fill="url(#gDome)"/>
-        <circle cx="330" cy="78" r="26" fill="#E38A4D"/>
-        <rect x="318" y="30" width="24" height="40" fill="url(#gWallCream)"/>
-        <rect x="326" y="16" width="8" height="18" fill="url(#gWallCream)"/>
-        <rect x="312" y="98" width="14" height="18" fill="#2C5F86"/>
-        <rect x="334" y="98" width="14" height="18" fill="#2C5F86"/>
-
-        <rect x="700" y="95" width="50" height="45" fill="url(#gWallCream)"/>
-        <polygon points="696,95 725,80 754,95" fill="url(#gRoofTerra)"/>
-        <rect x="712" y="110" width="10" height="14" fill="#5FB8CE"/>
-
-        <rect x="756" y="80" width="40" height="60" fill="url(#gWallSand)"/>
-        <polygon points="752,80 776,64 800,80" fill="url(#gRoofDeep)"/>
-        <rect x="766" y="94" width="9" height="12" fill="#2C5F86"/>
-        <rect x="781" y="94" width="9" height="12" fill="#2C5F86"/>
-      </g>
-    </svg>
-    <svg class="hero-boat" viewBox="0 0 60 40" aria-hidden="true"><path d="M6 30h48l-6 8H12z" fill="#F7ECD8"/><path d="M30 6v22" stroke="#F7ECD8" stroke-width="2"/><path d="M31 8 L48 26 L31 26 Z" fill="#C1502E"/><path d="M29 12 L16 26 L29 26 Z" fill="#FBE9CB"/></svg>
-    <div class="hero-waves" id="heroWaves">
-      <svg class="wave-back" viewBox="0 0 1200 60" preserveAspectRatio="none"><path d="M0 30 Q100 10 200 30 T400 30 T600 30 T800 30 T1000 30 T1200 30 V60 H0 Z" fill="#157A96"/></svg>
-      <svg class="wave-front" viewBox="0 0 1200 60" preserveAspectRatio="none"><path d="M0 38 Q100 18 200 38 T400 38 T600 38 T800 38 T1000 38 T1200 38 V60 H0 Z" fill="#0B3B4A"/></svg>
-    </div>
-    <div class="hero-sparkles" aria-hidden="true">
-      <div class="sparkle" style="left:22%; animation-delay:.2s;"></div>
-      <div class="sparkle" style="left:38%; animation-delay:1.1s;"></div>
-      <div class="sparkle" style="left:51%; animation-delay:.6s;"></div>
-      <div class="sparkle" style="left:64%; animation-delay:1.8s;"></div>
-      <div class="sparkle" style="left:74%; animation-delay:.9s;"></div>
-      <div class="sparkle" style="left:87%; animation-delay:1.4s;"></div>
-    </div>
-  </div>
+  <div class="hero-grain" aria-hidden="true"></div>
+  <div class="ghost-text" aria-hidden="true">SICILIA</div>
+  <div class="hero-spotlight" id="heroSpotlight" aria-hidden="true"></div>
 </header>
 
-<div class="tile-divider"></div>
+<div class="ticker" aria-hidden="true">
+  <div class="ticker-track">
+    <span class="txt">Niente pensieri per te</span><span class="dot">●</span>
+    <span class="txt">Documenti &amp; scadenze sotto controllo</span><span class="dot">●</span>
+    <span class="txt">Manutenzioni gestite</span><span class="dot">●</span>
+    <span class="txt">Tutto verificabile online</span><span class="dot">●</span>
+    <span class="txt">Solo in Sicilia</span><span class="dot">●</span>
+    <span class="txt">Niente pensieri per te</span><span class="dot">●</span>
+    <span class="txt">Documenti &amp; scadenze sotto controllo</span><span class="dot">●</span>
+    <span class="txt">Manutenzioni gestite</span><span class="dot">●</span>
+    <span class="txt">Tutto verificabile online</span><span class="dot">●</span>
+    <span class="txt">Solo in Sicilia</span><span class="dot">●</span>
+  </div>
+</div>
 
 <section class="reveal">
   <span class="section-tag">Il problema</span>
@@ -528,7 +430,6 @@
 </section>
 
 <section class="alt-bg reveal">
-  <svg class="deco-lemon"><use href="#deco-lemon"></use></svg>
   <span class="section-tag">Due livelli di servizio</span>
   <h2 class="section-title">Custodia sempre, affitto se lo vuoi tu</h2>
   <p class="section-sub">La gestione di base copre documenti, scadenze e manutenzioni. Se in più vuoi generare un reddito, ci occupiamo anche di affittarlo.</p>
@@ -584,7 +485,10 @@
 </section>
 
 <section class="trust-band reveal">
-  <svg class="deco-sunface-wrap" aria-hidden="true"><use href="#deco-sunface"></use></svg>
+  <div class="trust-mesh" aria-hidden="true">
+    <div class="blob blob-1"></div>
+    <div class="blob blob-3"></div>
+  </div>
   <span class="section-tag" style="color:var(--sun); position:relative; z-index:2;">Perché sceglierci</span>
   <h2 class="section-title" style="color:#fff; position:relative; z-index:2;">La tranquillità di un partner serio</h2>
   <div class="trust-grid">
@@ -633,7 +537,6 @@
 </section>
 
 <section id="contatti" class="reveal">
-  <svg class="deco-lemon flip"><use href="#deco-lemon"></use></svg>
   <span class="section-tag">Contattaci</span>
   <h2 class="section-title">Richiedi una valutazione gratuita</h2>
   <p class="section-sub">Raccontaci qualcosa del tuo immobile: ti risponderemo con una proposta su misura.</p>
@@ -727,8 +630,24 @@
       + `Telefono: ${telefono}\nEmail: ${email}`
       + (messaggio ? `\nMessaggio: ${messaggio}` : '');
     document.getElementById('formSuccess').style.display = 'block';
+    fireConfetti(document.getElementById('formSuccess'));
     window.open(waLink(testo), '_blank', 'noopener');
   });
+
+  // Fun confetti burst
+  function fireConfetti(anchorEl){
+    if(window.matchMedia('(prefers-reduced-motion: reduce)').matches) return;
+    const colors = ['#F0A93A', '#C1502E', '#157A96', '#4F7A5B'];
+    const rect = anchorEl.getBoundingClientRect();
+    const originX = rect.left + rect.width / 2, originY = rect.top + window.scrollY + 14;
+    for(let i = 0; i < 26; i++){
+      const el = document.createElement('div');
+      const angle = Math.random() * Math.PI * 2, dist = 60 + Math.random() * 90;
+      el.style.cssText = `position:absolute; left:${originX}px; top:${originY}px; width:${5+Math.random()*4}px; height:${5+Math.random()*4}px; background:${colors[i%colors.length]}; border-radius:${Math.random()>.5?'50%':'2px'}; pointer-events:none; z-index:999; --dx:${Math.cos(angle)*dist}px; --dy:${Math.sin(angle)*dist - 40}px; --rot:${(Math.random()*540-270)}deg; animation:confettiFall .9s ease-out forwards;`;
+      document.body.appendChild(el);
+      setTimeout(()=>el.remove(), 950);
+    }
+  }
 
   // Nav condense on scroll
   const nav = document.getElementById('siteNav');
@@ -739,29 +658,15 @@
   // Scroll reveal
   const reduceMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
 
-  // Hero parallax: scroll depth + mouse-move tilt
-  const heroScene = document.getElementById('heroScene');
-  const heroSkyline = document.getElementById('heroSkyline');
-  const heroSunWrap = document.getElementById('heroSunWrap');
-  const heroWaves = document.getElementById('heroWaves');
-  if(heroScene && !reduceMotion && window.matchMedia('(min-width: 521px)').matches){
-    let mx = 0, my = 0, sy = 0;
-    function applyParallax(){
-      heroSunWrap.style.transform = `translate(${mx*10}px, ${my*6 - sy*0.25}px)`;
-      heroSkyline.style.transform = `translate(${mx*4}px, ${-sy*0.12}px)`;
-      heroWaves.style.transform = `translateY(${my*4 - sy*0.05}px)`;
-    }
-    window.addEventListener('scroll', function(){
-      sy = Math.min(window.scrollY, 400);
-      applyParallax();
-    }, {passive:true});
-    heroScene.addEventListener('mousemove', function(e){
-      const r = heroScene.getBoundingClientRect();
-      mx = ((e.clientX - r.left) / r.width - 0.5) * 2;
-      my = ((e.clientY - r.top) / r.height - 0.5) * 2;
-      applyParallax();
+  // Hero spotlight follows the cursor
+  const heroHeader = document.querySelector('.hero');
+  const heroSpotlight = document.getElementById('heroSpotlight');
+  if(heroHeader && heroSpotlight && !reduceMotion && window.matchMedia('(pointer: fine)').matches){
+    heroHeader.addEventListener('mousemove', function(e){
+      const r = heroHeader.getBoundingClientRect();
+      heroSpotlight.style.setProperty('--sx', ((e.clientX - r.left) / r.width * 100) + '%');
+      heroSpotlight.style.setProperty('--sy', ((e.clientY - r.top) / r.height * 100) + '%');
     });
-    heroScene.addEventListener('mouseleave', function(){ mx = 0; my = 0; applyParallax(); });
   }
   const revealEls = document.querySelectorAll('.reveal');
   if(reduceMotion || !('IntersectionObserver' in window)){

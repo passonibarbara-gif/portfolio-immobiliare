@@ -8,25 +8,23 @@
 <link rel="icon" href="icon-192.png" sizes="192x192" type="image/png">
 <link rel="apple-touch-icon" href="apple-touch-icon.png">
 <style>
-  @import url('https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Roboto+Slab:wght@500;700&family=Archivo:wght@400;500;600;700;800&display=swap');
+  @import url('https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,500;0,600;0,700;1,500;1,600&family=Jost:wght@300;400;500;600&display=swap');
 
   :root{
-    --cream:#F7EFDD;
-    --cream-2:#EFE0BD;
-    --paper:#FFFBF0;
-    --ink:#1A2E35;
-    --ink-soft:#5C6E70;
-    --sea-deep:#0E4F5C;
-    --petrol:#1FA8A0;
-    --petrol-light:#6FD8CE;
-    --mustard:#FFC93C;
-    --mustard-deep:#F0A800;
-    --vermillion:#FF5A4E;
-    --vermillion-deep:#E23F34;
-    --forest:#2E8B6F;
-    --line:#D9C48A;
-    --shadow: 6px 6px 0 var(--ink);
-    --shadow-sm: 4px 4px 0 var(--ink);
+    --cream:#FAF6EE;
+    --cream-2:#F1E9D8;
+    --paper:#FFFDF8;
+    --ink:#2B2A28;
+    --ink-soft:#6B6559;
+    --gold:#B08D4F;
+    --gold-deep:#8C6E38;
+    --gold-soft:#E4D6B8;
+    --teal:#1F3B3C;
+    --teal-soft:#3E5C5C;
+    --terracotta:#B26B4E;
+    --sage:#7C8C6F;
+    --line:#E3D8BE;
+    --shadow: 0 18px 40px rgba(43,42,40,.10);
   }
   *{box-sizing:border-box;}
   html{scroll-behavior:smooth;}
@@ -34,267 +32,221 @@
     margin:0;
     background:var(--cream);
     color:var(--ink);
-    font-family:'Archivo',sans-serif;
+    font-family:'Jost',sans-serif;
+    font-weight:400;
     -webkit-font-smoothing:antialiased;
-    line-height:1.55;
+    line-height:1.6;
     overflow-x:hidden;
   }
   a{color:inherit;}
   img,svg{max-width:100%;}
-  .wrap{max-width:1120px; margin:0 auto; padding:0 24px;}
-  .icon{width:20px; height:20px; flex:none; vertical-align:-4px; stroke:currentColor; fill:none;}
+  .wrap{max-width:1080px; margin:0 auto; padding:0 24px;}
+  .icon{width:18px; height:18px; flex:none; vertical-align:-4px; stroke:currentColor; fill:none;}
 
   @media (prefers-reduced-motion: reduce){
     *, *::before, *::after{animation-duration:.001s !important; animation-iteration-count:1 !important; transition-duration:.001s !important; scroll-behavior:auto !important;}
   }
 
   /* ---------- Motion ---------- */
-  @keyframes fadeUp{ from{opacity:0; transform:translateY(16px);} to{opacity:1; transform:translateY(0);} }
-  @keyframes pulseRing{ 0%{transform:scale(.75); opacity:.55;} 100%{transform:scale(1.9); opacity:0;} }
-  @keyframes stampIn{ 0%{opacity:0; transform:scale(1.3) rotate(-4deg);} 55%{opacity:1; transform:scale(.94) rotate(1.5deg);} 100%{opacity:1; transform:scale(1) rotate(0deg);} }
-  @keyframes wiggle{ 0%,100%{transform:rotate(var(--r,0deg));} 25%{transform:rotate(calc(var(--r,0deg) - 3deg));} 75%{transform:rotate(calc(var(--r,0deg) + 3deg));} }
-  @keyframes tickerScroll{ from{transform:translateX(0);} to{transform:translateX(-50%);} }
-  @keyframes spinSlow{ from{transform:rotate(0deg);} to{transform:rotate(360deg);} }
-  @keyframes confettiFall{ 0%{transform:translate(0,0) rotate(0deg); opacity:1;} 100%{transform:translate(var(--dx), var(--dy)) rotate(var(--rot)); opacity:0;} }
-  @keyframes rayTurn{ from{transform:rotate(0deg);} to{transform:rotate(360deg);} }
+  @keyframes fadeUp{ from{opacity:0; transform:translateY(14px);} to{opacity:1; transform:translateY(0);} }
+  @keyframes pulseRing{ 0%{transform:scale(.75); opacity:.45;} 100%{transform:scale(1.8); opacity:0;} }
 
-  .reveal{opacity:0;}
-  .reveal.in-view{animation:stampIn .55s cubic-bezier(.22,.9,.3,1.1) forwards;}
-  .stagger > *{animation-delay:calc(var(--i,0) * 90ms) !important;}
+  .reveal{opacity:0; transform:translateY(18px); transition:opacity .8s ease, transform .8s ease;}
+  .reveal.in-view{opacity:1; transform:translateY(0);}
+  .stagger > *{transition-delay:calc(var(--i,0) * 80ms);}
 
-  /* ---------- Ticker (ticket-strip banner) ---------- */
-  .ticker{
-    background:var(--vermillion); overflow:hidden; white-space:nowrap; padding:13px 0; position:relative;
-    border-top:3px solid var(--ink); border-bottom:3px solid var(--ink);
-    box-shadow:0 0 0 4px var(--cream) inset;
-  }
-  .ticker-track{display:inline-flex; align-items:center; animation:tickerScroll 28s linear infinite;}
-  .ticker-track span.txt{
-    font-family:'Bebas Neue',sans-serif; letter-spacing:.05em; font-size:19px; color:var(--cream); padding:0 20px;
-  }
-  .ticker-track span.dot{color:var(--mustard); font-size:13px;}
+  /* ---------- Ornament divider ---------- */
+  .ornament{display:flex; align-items:center; justify-content:center; gap:16px; padding:8px 24px 0;}
+  .ornament .orn-line{flex:0 0 120px; height:1px; background:var(--gold); opacity:.55;}
+  .ornament .orn-dot{width:7px; height:7px; border:1.3px solid var(--gold); transform:rotate(45deg);}
 
   /* ---------- Nav ---------- */
   .site-nav{
     position:sticky; top:0; z-index:40;
     display:flex; justify-content:center;
-    padding:16px 24px; transition:padding .3s ease, box-shadow .3s ease;
-    background:var(--sea-deep); border-bottom:3px solid var(--ink);
+    padding:22px 24px; transition:padding .3s ease, box-shadow .3s ease, background .3s ease;
+    background:rgba(250,246,238,.92); backdrop-filter:blur(6px); border-bottom:1px solid var(--line);
   }
-  .site-nav.scrolled{padding:9px 24px;}
-  .site-nav-inner{max-width:1120px; width:100%; display:flex; justify-content:space-between; align-items:center; gap:16px; flex-wrap:wrap;}
+  .site-nav.scrolled{padding:13px 24px; box-shadow:0 4px 20px rgba(43,42,40,.06);}
+  .site-nav-inner{max-width:1080px; width:100%; display:flex; justify-content:space-between; align-items:center; gap:16px; flex-wrap:wrap;}
   .brand{
-    font-family:'Bebas Neue',sans-serif; font-size:26px; letter-spacing:.04em;
-    color:var(--cream);
+    font-family:'Cormorant Garamond',serif; font-weight:600; font-size:23px; letter-spacing:.03em; color:var(--ink);
   }
-  .brand em{font-style:normal; color:var(--mustard);}
-  .nav-links{display:flex; align-items:center; gap:22px; flex-wrap:wrap;}
-  .nav-links a{font-size:13px; font-weight:600; color:var(--cream-2); text-decoration:none; letter-spacing:.02em; transition:color .15s ease;}
-  .nav-links a:hover{color:var(--mustard);}
+  .brand em{font-style:italic; color:var(--gold-deep);}
+  .nav-links{display:flex; align-items:center; gap:26px; flex-wrap:wrap;}
+  .nav-links a{font-size:12.5px; font-weight:500; color:var(--ink-soft); text-decoration:none; letter-spacing:.04em; text-transform:uppercase; transition:color .15s ease;}
+  .nav-links a:hover{color:var(--gold-deep);}
   .nav-cta{
-    background:var(--mustard); color:var(--ink); border:2.5px solid var(--ink); padding:9px 18px; border-radius:7px;
-    font-size:12.5px; font-weight:800; text-decoration:none; letter-spacing:.02em; white-space:nowrap;
-    box-shadow:var(--shadow-sm); transition:transform .15s ease, box-shadow .15s ease;
+    background:transparent; color:var(--ink); border:1.3px solid var(--gold); padding:10px 22px; border-radius:2px;
+    font-size:11.5px; font-weight:500; text-decoration:none; letter-spacing:.08em; text-transform:uppercase; white-space:nowrap;
+    transition:background .2s ease, color .2s ease;
   }
-  .nav-cta:hover{transform:translate(4px,4px); box-shadow:0 0 0 var(--ink);}
+  .nav-cta:hover{background:var(--gold); color:#fff;}
 
   /* ---------- Hero ---------- */
-  .hero{padding:56px 24px 0;}
-  .hero-grid{max-width:1120px; margin:0 auto; display:grid; grid-template-columns:1fr 1fr; gap:40px; align-items:center;}
-  .hero-text{text-align:left;}
+  .hero{padding:76px 24px 60px; text-align:center;}
+  .hero-inner{max-width:680px; margin:0 auto;}
   .eyebrow{
-    display:inline-block; font-family:'Archivo',sans-serif; font-weight:800; font-size:11.5px; letter-spacing:.1em; text-transform:uppercase;
-    color:var(--ink); background:var(--mustard); border:2.5px solid var(--ink); border-radius:6px; padding:7px 14px; margin-bottom:20px;
-    transform:rotate(-1.5deg); box-shadow:var(--shadow-sm);
+    display:inline-block; font-family:'Jost',sans-serif; font-weight:500; font-size:11.5px; letter-spacing:.22em; text-transform:uppercase;
+    color:var(--gold-deep); margin-bottom:22px;
   }
   .hero h1{
-    font-family:'Bebas Neue',sans-serif; font-weight:400; font-size:clamp(42px,6.4vw,76px); line-height:.98; letter-spacing:.01em;
-    margin:0 0 20px; color:var(--ink);
+    font-family:'Cormorant Garamond',serif; font-weight:600; font-size:clamp(36px,5.6vw,60px); line-height:1.12;
+    margin:0 0 22px; color:var(--ink);
   }
-  .hero h1 em{font-style:normal; color:var(--vermillion);}
+  .hero h1 em{font-style:italic; color:var(--gold-deep);}
   .hero p.lead{
-    font-size:17px; color:var(--ink-soft); max-width:480px; margin:0 0 30px;
+    font-size:17px; color:var(--ink-soft); max-width:480px; margin:0 auto 34px; font-weight:300;
   }
-  .hero-ctas{display:flex; gap:14px; flex-wrap:wrap; margin-bottom:38px;}
+  .hero-ctas{display:flex; gap:16px; justify-content:center; flex-wrap:wrap; margin-bottom:46px;}
   .btn-primary, .btn-secondary{
-    font-family:'Archivo',sans-serif; font-size:14.5px; font-weight:800; letter-spacing:.01em;
-    padding:14px 24px; border-radius:8px; cursor:pointer; text-decoration:none; display:inline-flex; align-items:center; gap:9px;
-    border:2.5px solid var(--ink); transition:transform .15s ease, box-shadow .15s ease;
+    font-family:'Jost',sans-serif; font-size:12px; font-weight:500; letter-spacing:.09em; text-transform:uppercase;
+    padding:15px 30px; border-radius:2px; cursor:pointer; text-decoration:none; display:inline-flex; align-items:center; gap:10px;
+    transition:background .2s ease, color .2s ease, border-color .2s ease;
   }
-  .btn-primary{background:var(--vermillion); color:#fff; box-shadow:var(--shadow);}
-  .btn-primary:hover{transform:translate(6px,6px); box-shadow:0 0 0 var(--ink);}
-  .btn-secondary{background:var(--paper); color:var(--ink); box-shadow:var(--shadow);}
-  .btn-secondary:hover{transform:translate(6px,6px); box-shadow:0 0 0 var(--ink);}
-  .hero-stats{display:flex; gap:0;}
-  .hero-stat{padding:0 20px; border-left:2px dashed var(--ink-soft);}
-  .hero-stat:first-child{padding-left:0; border-left:none;}
-  .hero-stat-num{font-family:'Bebas Neue',sans-serif; font-size:32px; color:var(--vermillion); line-height:1; font-variant-numeric:tabular-nums;}
-  .hero-stat-label{font-size:11.5px; color:var(--ink-soft); letter-spacing:.02em; margin-top:2px; max-width:110px;}
+  .btn-primary{background:var(--ink); color:var(--cream); border:1.3px solid var(--ink);}
+  .btn-primary:hover{background:var(--gold-deep); border-color:var(--gold-deep);}
+  .btn-secondary{background:transparent; color:var(--ink); border:1.3px solid var(--ink-soft);}
+  .btn-secondary:hover{border-color:var(--ink); background:rgba(43,42,40,.04);}
+  .hero-stats{display:flex; gap:0; justify-content:center;}
+  .hero-stat{padding:0 26px; border-left:1px solid var(--line);}
+  .hero-stat:first-child{border-left:none;}
+  .hero-stat-num{font-family:'Cormorant Garamond',serif; font-weight:600; font-size:28px; color:var(--gold-deep); line-height:1; font-variant-numeric:tabular-nums;}
+  .hero-stat-label{font-size:10.5px; color:var(--ink-soft); letter-spacing:.06em; text-transform:uppercase; margin-top:6px; max-width:110px;}
 
-  /* ---------- Hero poster illustration ---------- */
-  .poster-frame{
-    position:relative; background:var(--paper); border:3px solid var(--ink); border-radius:10px; padding:14px;
-    box-shadow:var(--shadow); transform:rotate(1.2deg);
-  }
-  .poster-inner{
-    position:relative; border:2px dashed var(--ink); border-radius:4px; overflow:hidden; background:var(--sea-deep);
-    aspect-ratio:4/5;
-  }
-  .poster-inner svg{position:absolute; inset:0; width:100%; height:100%;}
-  .poster-rays{animation:rayTurn 70s linear infinite; transform-origin:50% 38%;}
-  .poster-seal{
-    position:absolute; top:-26px; right:-26px; width:92px; height:92px; z-index:4; animation:spinSlow 26s linear infinite;
-    filter:drop-shadow(3px 3px 0 var(--ink));
-  }
-  .mini-poster{
-    width:170px; margin:0 auto 40px; border:3px solid var(--ink); border-radius:10px; overflow:hidden;
-    box-shadow:var(--shadow-sm); transform:rotate(-2deg); background:var(--paper);
-  }
-  .mini-poster svg{display:block; width:100%; height:auto;}
-  .postmark-badge{width:110px; height:110px; margin-bottom:18px; animation:spinSlow 34s linear infinite;}
+  /* ---------- Hero illustration ---------- */
+  .hero-art{max-width:620px; margin:44px auto 0; padding:0 20px;}
+  .hero-art svg{display:block; width:100%; height:auto;}
 
   /* ---------- Section shell ---------- */
-  section{padding:76px 24px;}
+  section{padding:88px 24px;}
+  .section-tag-wrap{text-align:center; margin-bottom:14px;}
   .section-tag{
-    display:inline-block; font-family:'Archivo',sans-serif; font-weight:800; font-size:11px; letter-spacing:.1em; text-transform:uppercase;
-    color:var(--ink); background:var(--cream-2); border:2px solid var(--ink); border-radius:5px; padding:5px 12px; margin:0 auto 14px;
-    transform:rotate(-1deg);
+    font-family:'Jost',sans-serif; font-weight:500; font-size:11px; letter-spacing:.22em; text-transform:uppercase;
+    color:var(--gold-deep);
   }
-  .section-tag-wrap{text-align:center;}
   h2.section-title{
-    font-family:'Bebas Neue',sans-serif; font-weight:400; font-size:clamp(30px,4.4vw,50px); letter-spacing:.01em;
-    text-align:center; margin:0 0 16px; line-height:1.02;
+    font-family:'Cormorant Garamond',serif; font-weight:600; font-size:clamp(28px,3.6vw,42px);
+    text-align:center; margin:0 0 18px; line-height:1.15;
   }
   p.section-sub{
-    text-align:center; color:var(--ink-soft); max-width:580px; margin:0 auto 52px; font-size:15.5px;
+    text-align:center; color:var(--ink-soft); max-width:560px; margin:0 auto 56px; font-size:15.5px; font-weight:300;
   }
   .alt-bg{background:var(--cream-2);}
 
   /* ---------- Pain -> solution ---------- */
-  .pain-grid{display:grid; grid-template-columns:1fr 1fr; gap:30px; align-items:stretch; max-width:1000px; margin:0 auto;}
-  .pain-card{background:var(--paper); border:2.5px solid var(--ink); border-radius:10px; padding:28px; box-shadow:var(--shadow); transform:rotate(-.6deg);}
-  .pain-card h3{font-family:'Bebas Neue',sans-serif; font-weight:400; font-size:24px; letter-spacing:.02em; margin:0 0 14px; color:var(--vermillion-deep); display:flex; align-items:center; gap:10px;}
-  .pain-card ul{margin:0; padding-left:20px; color:var(--ink-soft); font-size:14px;}
-  .pain-card li{margin-bottom:9px;}
-  .solution-card{background:var(--sea-deep); color:var(--cream-2); border:2.5px solid var(--ink); border-radius:10px; padding:28px; box-shadow:var(--shadow); transform:rotate(.6deg);}
-  .solution-card h3{font-family:'Bebas Neue',sans-serif; font-weight:400; font-size:24px; letter-spacing:.02em; margin:0 0 14px; color:var(--mustard); display:flex; align-items:center; gap:10px;}
-  .solution-card ul{margin:0; padding-left:20px; color:#DCE7D8; font-size:14px;}
-  .solution-card li{margin-bottom:9px;}
+  .pain-grid{display:grid; grid-template-columns:1fr 1fr; gap:32px; align-items:stretch; max-width:960px; margin:0 auto;}
+  .pain-card{background:var(--paper); border:1px solid var(--line); border-radius:6px; padding:34px; box-shadow:var(--shadow);}
+  .pain-card h3{font-family:'Cormorant Garamond',serif; font-weight:600; font-size:22px; margin:0 0 16px; color:var(--terracotta); display:flex; align-items:center; gap:10px;}
+  .pain-card ul{margin:0; padding-left:18px; color:var(--ink-soft); font-size:14px; font-weight:300;}
+  .pain-card li{margin-bottom:10px;}
+  .solution-card{background:var(--teal); color:var(--cream-2); border-radius:6px; padding:34px; box-shadow:var(--shadow);}
+  .solution-card h3{font-family:'Cormorant Garamond',serif; font-weight:600; font-size:22px; margin:0 0 16px; color:var(--gold); display:flex; align-items:center; gap:10px;}
+  .solution-card ul{margin:0; padding-left:18px; color:#D7E0DA; font-size:14px; font-weight:300;}
+  .solution-card li{margin-bottom:10px;}
 
   /* ---------- Services grid ---------- */
-  .services-grid{display:grid; grid-template-columns:repeat(3,1fr); gap:24px; max-width:1120px; margin:0 auto;}
-  .service-card{
-    background:var(--paper); border:2.5px solid var(--ink); border-radius:12px; padding:28px 22px 22px; text-align:center;
-    box-shadow:var(--shadow-sm); transition:transform .2s ease, box-shadow .2s ease;
-  }
-  .service-card:nth-child(1){--r:-1.4deg;} .service-card:nth-child(2){--r:1deg;} .service-card:nth-child(3){--r:-.6deg;}
-  .service-card:nth-child(4){--r:1.2deg;} .service-card:nth-child(5){--r:-1deg;} .service-card:nth-child(6){--r:.8deg;}
-  .service-card:nth-child(7){--r:-1.2deg;} .service-card:nth-child(8){--r:1.4deg;} .service-card:nth-child(9){--r:-.8deg;}
-  .service-card{transform:rotate(var(--r,0deg));}
-  .service-card:hover{animation:wiggle .5s ease;}
+  .services-grid{display:grid; grid-template-columns:repeat(3,1fr); gap:36px 28px; max-width:1000px; margin:0 auto;}
+  .service-card{text-align:center; transition:transform .25s ease;}
+  .service-card:hover{transform:translateY(-4px);}
   .service-icon{
-    width:54px; height:54px; border-radius:50%; background:var(--mustard); border:2.5px solid var(--ink);
-    color:var(--ink); display:flex; align-items:center; justify-content:center; margin:0 auto 16px;
+    width:56px; height:56px; border-radius:50%; border:1.3px solid var(--gold); background:var(--paper);
+    color:var(--gold-deep); display:flex; align-items:center; justify-content:center; margin:0 auto 18px;
   }
-  .service-icon .icon{width:24px; height:24px;}
-  .service-card h3{font-family:'Bebas Neue',sans-serif; font-weight:400; font-size:19px; letter-spacing:.02em; margin:0 0 8px;}
-  .service-card p{font-size:13.5px; color:var(--ink-soft); margin:0;}
+  .service-icon .icon{width:22px; height:22px;}
+  .service-card h3{font-family:'Cormorant Garamond',serif; font-weight:600; font-size:19px; margin:0 0 8px;}
+  .service-card p{font-size:13.5px; color:var(--ink-soft); margin:0; font-weight:300;}
 
   /* ---------- How it works ---------- */
-  .steps{display:grid; grid-template-columns:repeat(4,1fr); gap:24px; max-width:1120px; margin:0 auto;}
+  .steps{display:grid; grid-template-columns:repeat(4,1fr); gap:28px; max-width:1000px; margin:0 auto;}
   .step-card{position:relative; text-align:left;}
   .step-num{
-    font-family:'Bebas Neue',sans-serif; font-size:52px; color:var(--vermillion); display:block; margin-bottom:8px; line-height:1;
+    font-family:'Cormorant Garamond',serif; font-size:38px; font-style:italic; color:var(--gold); display:block; margin-bottom:10px; line-height:1;
   }
-  .step-card h3{font-family:'Bebas Neue',sans-serif; font-weight:400; font-size:19px; letter-spacing:.02em; margin:0 0 8px;}
-  .step-card p{font-size:13.5px; color:var(--ink-soft); margin:0;}
+  .step-card h3{font-family:'Cormorant Garamond',serif; font-weight:600; font-size:18px; margin:0 0 8px;}
+  .step-card p{font-size:13.5px; color:var(--ink-soft); margin:0; font-weight:300;}
 
   /* ---------- Trust / why us ---------- */
-  .trust-band{background:var(--sea-deep); color:var(--cream-2); border-top:3px solid var(--ink); border-bottom:3px solid var(--ink);}
-  .trust-grid{display:grid; grid-template-columns:repeat(4,1fr); gap:26px; max-width:1120px; margin:0 auto;}
+  .trust-band{background:var(--teal); color:var(--cream-2);}
+  .trust-grid{display:grid; grid-template-columns:repeat(4,1fr); gap:30px; max-width:1000px; margin:0 auto;}
   .trust-item{text-align:center;}
   .trust-item .icon-badge{
-    width:56px; height:56px; border-radius:50%; background:var(--mustard); border:2.5px solid var(--cream);
-    display:flex; align-items:center; justify-content:center; margin:0 auto 14px; color:var(--ink);
+    width:52px; height:52px; border-radius:50%; border:1.3px solid var(--gold); background:transparent;
+    display:flex; align-items:center; justify-content:center; margin:0 auto 16px; color:var(--gold);
   }
-  .trust-item h3{font-family:'Bebas Neue',sans-serif; font-weight:400; font-size:18px; letter-spacing:.02em; margin:0 0 6px;}
-  .trust-item p{font-size:12.5px; color:#B9CFC9; margin:0;}
+  .trust-item h3{font-family:'Cormorant Garamond',serif; font-weight:600; font-size:17px; margin:0 0 6px;}
+  .trust-item p{font-size:12.5px; color:#B9C7C2; margin:0; font-weight:300;}
 
   /* ---------- Testimonials ---------- */
-  .testi-grid{display:grid; grid-template-columns:repeat(3,1fr); gap:22px; max-width:1120px; margin:0 auto;}
-  .testi-card{background:var(--paper); border:2.5px solid var(--ink); border-radius:10px; padding:24px; box-shadow:var(--shadow-sm);}
-  .testi-card:nth-child(1){transform:rotate(-1deg);} .testi-card:nth-child(2){transform:rotate(.8deg);} .testi-card:nth-child(3){transform:rotate(-.5deg);}
-  .testi-card:hover{animation:wiggle .5s ease;}
-  .testi-stars{color:var(--mustard-deep); font-size:14px; margin-bottom:12px; letter-spacing:2px;}
-  .testi-card p.quote{font-family:'Roboto Slab',serif; font-weight:500; font-size:14.5px; color:var(--ink); margin:0 0 16px;}
-  .testi-foot{display:flex; align-items:center; gap:10px;}
+  .testi-grid{display:grid; grid-template-columns:repeat(3,1fr); gap:26px; max-width:1000px; margin:0 auto;}
+  .testi-card{background:var(--paper); border:1px solid var(--line); border-radius:6px; padding:28px; box-shadow:var(--shadow);}
+  .testi-stars{color:var(--gold-deep); font-size:13px; margin-bottom:14px; letter-spacing:2px;}
+  .testi-card p.quote{font-family:'Cormorant Garamond',serif; font-style:italic; font-size:16.5px; color:var(--ink); margin:0 0 18px; line-height:1.5;}
+  .testi-foot{display:flex; align-items:center; gap:11px;}
   .testi-avatar{
-    width:34px; height:34px; border-radius:50%; flex:none; display:flex; align-items:center; justify-content:center;
-    color:#fff; font-weight:800; font-size:12px; font-family:'Archivo',sans-serif; border:2px solid var(--ink);
+    width:32px; height:32px; border-radius:50%; flex:none; display:flex; align-items:center; justify-content:center;
+    color:#fff; font-weight:500; font-size:11px; font-family:'Jost',sans-serif; letter-spacing:.02em;
   }
-  .testi-author{font-size:12.5px; color:var(--ink-soft); font-weight:600;}
-  .testi-note{text-align:center; font-size:11.5px; color:var(--ink-soft); margin-top:24px; opacity:.8;}
+  .testi-author{font-size:12px; color:var(--ink-soft); letter-spacing:.02em;}
+  .testi-note{text-align:center; font-size:11.5px; color:var(--ink-soft); margin-top:28px; opacity:.75; font-weight:300;}
 
   /* ---------- FAQ ---------- */
-  .faq-list{max-width:740px; margin:0 auto;}
-  .faq-item{border-bottom:2px dashed var(--line); padding:20px 0;}
+  .faq-list{max-width:700px; margin:0 auto;}
+  .faq-item{border-bottom:1px solid var(--line); padding:22px 0;}
   .faq-item summary{
-    cursor:pointer; font-weight:700; font-size:15px; list-style:none; display:flex; justify-content:space-between; align-items:center; gap:12px;
+    cursor:pointer; font-family:'Cormorant Garamond',serif; font-weight:600; font-size:18px; list-style:none;
+    display:flex; justify-content:space-between; align-items:center; gap:12px;
   }
   .faq-item summary::-webkit-details-marker{display:none;}
-  .faq-item summary::after{content:'+'; font-size:22px; color:var(--vermillion); font-weight:400; transition:transform .25s ease;}
+  .faq-item summary::after{content:'+'; font-family:'Jost',sans-serif; font-size:20px; font-weight:300; color:var(--gold-deep); transition:transform .25s ease;}
   .faq-item[open] summary::after{transform:rotate(135deg);}
-  .faq-item p{font-size:13.5px; color:var(--ink-soft); margin:14px 0 0;}
+  .faq-item p{font-size:14px; color:var(--ink-soft); margin:14px 0 0; font-weight:300;}
 
   /* ---------- Contact / form ---------- */
   .contact-shell{
-    max-width:980px; margin:0 auto; background:var(--paper); border:3px solid var(--ink);
-    border-radius:14px; padding:44px; display:grid; grid-template-columns:1fr 1.1fr; gap:44px; box-shadow:var(--shadow);
+    max-width:940px; margin:0 auto; background:var(--paper); border:1px solid var(--line);
+    border-radius:8px; padding:48px; display:grid; grid-template-columns:1fr 1.1fr; gap:48px; box-shadow:var(--shadow);
   }
-  .contact-info h2{font-family:'Bebas Neue',sans-serif; font-weight:400; font-size:30px; margin:0 0 14px;}
-  .contact-info p{font-size:14px; color:var(--ink-soft); margin:0 0 24px;}
-  .contact-info .info-row{display:flex; align-items:center; gap:11px; font-size:13.5px; margin-bottom:13px;}
-  .contact-info .info-row .icon{color:var(--vermillion-deep);}
-  .field{margin-bottom:14px;}
-  .field label{display:block; font-size:12px; font-weight:700; margin-bottom:6px; color:var(--ink-soft);}
+  .contact-info h2{font-family:'Cormorant Garamond',serif; font-weight:600; font-size:27px; margin:0 0 16px;}
+  .contact-info p{font-size:14px; color:var(--ink-soft); margin:0 0 26px; font-weight:300;}
+  .contact-info .info-row{display:flex; align-items:center; gap:12px; font-size:13.5px; margin-bottom:14px; color:var(--ink-soft);}
+  .contact-info .info-row .icon{color:var(--gold-deep);}
+  .field{margin-bottom:16px;}
+  .field label{display:block; font-size:11px; font-weight:500; letter-spacing:.05em; text-transform:uppercase; margin-bottom:7px; color:var(--ink-soft);}
   .field input, .field select, .field textarea{
-    width:100%; padding:11px 13px; border:2px solid var(--ink); border-radius:7px; font-size:14px;
-    font-family:'Archivo',sans-serif; background:var(--cream); color:var(--ink); transition:box-shadow .15s ease;
+    width:100%; padding:12px 4px; border:none; border-bottom:1px solid var(--line); border-radius:0; font-size:14px;
+    font-family:'Jost',sans-serif; background:transparent; color:var(--ink); transition:border-color .15s ease;
   }
-  .field input:focus, .field select:focus, .field textarea:focus{outline:none; box-shadow:3px 3px 0 var(--ink);}
-  .field textarea{resize:vertical; min-height:80px;}
-  .field-row{display:grid; grid-template-columns:1fr 1fr; gap:12px;}
-  .form-note{font-size:11.5px; color:var(--ink-soft); margin-top:10px;}
+  .field input:focus, .field select:focus, .field textarea:focus{outline:none; border-color:var(--gold-deep);}
+  .field textarea{resize:vertical; min-height:70px;}
+  .field-row{display:grid; grid-template-columns:1fr 1fr; gap:16px;}
+  .form-note{font-size:11.5px; color:var(--ink-soft); margin-top:12px; font-weight:300;}
   .form-success{
-    display:none; text-align:center; padding:20px; background:var(--forest); border:2.5px solid var(--ink); border-radius:10px; color:#fff; font-size:14px; font-weight:700;
+    display:none; text-align:center; padding:22px; background:var(--cream-2); border-radius:6px; color:var(--teal); font-size:14px; font-weight:500;
   }
 
   /* ---------- Footer ---------- */
-  footer{background:var(--sea-deep); color:#B9CFC9; padding:44px 24px; text-align:center; font-size:12.5px; border-top:3px solid var(--ink);}
-  footer a{color:var(--mustard); text-decoration:none;}
+  footer{background:var(--teal); color:#B9C7C2; padding:48px 24px; text-align:center; font-size:12.5px; font-weight:300;}
+  footer a{color:var(--gold); text-decoration:none;}
   .wa-float{
-    position:fixed; bottom:24px; right:24px; z-index:50; background:#25D366; color:#fff; width:56px; height:56px;
-    border-radius:50%; display:flex; align-items:center; justify-content:center; text-decoration:none; border:2.5px solid var(--ink);
-    box-shadow:var(--shadow-sm);
+    position:fixed; bottom:24px; right:24px; z-index:50; background:#25D366; color:#fff; width:54px; height:54px;
+    border-radius:50%; display:flex; align-items:center; justify-content:center; text-decoration:none;
+    box-shadow:0 8px 22px rgba(0,0,0,.22);
   }
-  .wa-float .icon{width:26px; height:26px;}
+  .wa-float .icon{width:24px; height:24px;}
   .wa-float::before{
     content:''; position:absolute; inset:0; border-radius:50%; background:#25D366;
-    animation:pulseRing 2.2s ease-out infinite; z-index:-1;
+    animation:pulseRing 2.4s ease-out infinite; z-index:-1;
   }
 
   @media (max-width: 860px){
-    .hero-grid{grid-template-columns:1fr; gap:32px;}
-    .hero-text{text-align:center;}
-    .hero-ctas, .hero-stats{justify-content:center;}
-    .poster-frame{max-width:380px; margin:0 auto;}
     .pain-grid, .contact-shell{grid-template-columns:1fr;}
     .services-grid{grid-template-columns:repeat(2,1fr);}
     .steps{grid-template-columns:repeat(2,1fr);}
     .trust-grid{grid-template-columns:repeat(2,1fr);}
     .testi-grid{grid-template-columns:1fr;}
-    .contact-shell{padding:30px;}
-    section{padding:60px 20px;}
+    .contact-shell{padding:32px;}
+    section{padding:64px 20px;}
   }
   @media (max-width: 520px){
     .services-grid{grid-template-columns:1fr;}
@@ -304,133 +256,67 @@
     .nav-links{display:none;}
     .hero-stats{flex-wrap:wrap; gap:10px;}
     .hero-stat{border-left:none; padding:0 14px 0 0;}
-    .ticker-track span.txt{font-size:15px; padding:0 14px;}
   }
 </style>
 </head>
 <body>
 
 <svg style="position:absolute; width:0; height:0; overflow:hidden;" aria-hidden="true">
-  <symbol id="i-plane" viewBox="0 0 24 24"><path d="M3 11l18-8-8 18-2-7-8-3z" stroke-width="1.8" stroke-linejoin="round"/></symbol>
-  <symbol id="i-phone" viewBox="0 0 24 24"><path d="M5 4h4l2 5-2.5 2A12 12 0 0 0 13 15.5L15 13l5 2v4a2 2 0 0 1-2 2A16 16 0 0 1 3 6a2 2 0 0 1 2-2z" stroke-width="1.8" stroke-linejoin="round"/></symbol>
-  <symbol id="i-alert" viewBox="0 0 24 24"><path d="M12 3 2 20h20L12 3z" stroke-width="1.8" stroke-linejoin="round"/><line x1="12" y1="9.5" x2="12" y2="14" stroke-width="1.8" stroke-linecap="round"/><circle cx="12" cy="17" r="1" fill="currentColor" stroke="none"/></symbol>
-  <symbol id="i-check" viewBox="0 0 24 24"><polyline points="4 13 9 18 20 6" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/></symbol>
-  <symbol id="i-house-check" viewBox="0 0 24 24"><path d="M4 11 12 4l8 7" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/><path d="M6 10v11h12V10" stroke-width="1.8" stroke-linejoin="round"/><polyline points="9 15 11 17 15 12" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></symbol>
-  <symbol id="i-key" viewBox="0 0 24 24"><circle cx="8" cy="15" r="4" stroke-width="1.8"/><path d="M11 12l9-9" stroke-width="1.8" stroke-linecap="round"/><path d="M16 7l3 3" stroke-width="1.8" stroke-linecap="round"/><path d="M13 10l2 2" stroke-width="1.8" stroke-linecap="round"/></symbol>
-  <symbol id="i-document" viewBox="0 0 24 24"><path d="M6 2h9l5 5v15H6z" stroke-width="1.8" stroke-linejoin="round"/><path d="M15 2v5h5" stroke-width="1.8" stroke-linejoin="round"/><line x1="9" y1="13" x2="17" y2="13" stroke-width="1.8" stroke-linecap="round"/><line x1="9" y1="17" x2="17" y2="17" stroke-width="1.8" stroke-linecap="round"/></symbol>
-  <symbol id="i-checklist" viewBox="0 0 24 24"><rect x="5" y="4" width="14" height="17" rx="2" stroke-width="1.8"/><path d="M9 4V2h6v2" stroke-width="1.8"/><polyline points="8.5 13 11 15.5 16 10" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></symbol>
-  <symbol id="i-verify" viewBox="0 0 24 24"><line x1="4" y1="6" x2="14" y2="6" stroke-width="1.8" stroke-linecap="round"/><line x1="4" y1="12" x2="14" y2="12" stroke-width="1.8" stroke-linecap="round"/><line x1="4" y1="18" x2="10" y2="18" stroke-width="1.8" stroke-linecap="round"/><polyline points="15 16 18 19 22 13" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></symbol>
-  <symbol id="i-pin" viewBox="0 0 24 24"><path d="M12 22s7-7.58 7-12A7 7 0 0 0 5 10c0 4.42 7 12 7 12z" stroke-width="1.8" stroke-linejoin="round"/><circle cx="12" cy="10" r="2.4" stroke-width="1.8"/></symbol>
-  <symbol id="i-tool" viewBox="0 0 24 24"><path d="M14.7 6.3a4 4 0 0 1-5.4 5.4L4 17l3 3 5.3-5.3a4 4 0 0 1 5.4-5.4l-3.6 3.6-2-2z" stroke-width="1.8" stroke-linejoin="round"/></symbol>
-  <symbol id="i-calendar" viewBox="0 0 24 24"><rect x="3" y="5" width="18" height="16" rx="2" stroke-width="1.8"/><line x1="3" y1="10" x2="21" y2="10" stroke-width="1.8"/><line x1="8" y1="3" x2="8" y2="7" stroke-width="1.8" stroke-linecap="round"/><line x1="16" y1="3" x2="16" y2="7" stroke-width="1.8" stroke-linecap="round"/><circle cx="12" cy="15" r="1.6" fill="currentColor" stroke="none"/></symbol>
-  <symbol id="i-wallet" viewBox="0 0 24 24"><path d="M3 7a2 2 0 0 1 2-2h13a1 1 0 0 1 1 1v3H5" stroke-width="1.8" stroke-linejoin="round"/><rect x="3" y="7" width="18" height="12" rx="2" stroke-width="1.8"/><circle cx="16.5" cy="13" r="1.4" fill="currentColor" stroke="none"/></symbol>
-  <symbol id="i-grid" viewBox="0 0 24 24"><rect x="3" y="3" width="8" height="10" rx="1.5" stroke-width="1.8"/><rect x="13" y="3" width="8" height="6" rx="1.5" stroke-width="1.8"/><rect x="13" y="11" width="8" height="10" rx="1.5" stroke-width="1.8"/><rect x="3" y="15" width="8" height="6" rx="1.5" stroke-width="1.8"/></symbol>
-  <symbol id="i-chat" viewBox="0 0 24 24"><path d="M4 12a8 8 0 1 1 3 6.2L3 20l1.3-4.3A8 8 0 0 1 4 12z" stroke-width="1.8" stroke-linejoin="round"/></symbol>
-  <symbol id="i-compass" viewBox="0 0 24 24"><circle cx="12" cy="12" r="9" stroke-width="1.8"/><polygon points="15 9 13 13 9 15 11 11" stroke-width="1.8" stroke-linejoin="round"/></symbol>
-  <symbol id="i-shield" viewBox="0 0 24 24"><path d="M12 2l8 3v6c0 5-3.5 9-8 11-4.5-2-8-6-8-11V5l8-3z" stroke-width="1.8" stroke-linejoin="round"/><polyline points="8.5 12 11 14.5 15.5 9.5" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></symbol>
-  <symbol id="i-headset" viewBox="0 0 24 24"><path d="M4 13a8 8 0 0 1 16 0" stroke-width="1.8"/><rect x="3" y="13" width="4" height="6" rx="1.5" stroke-width="1.8"/><rect x="17" y="13" width="4" height="6" rx="1.5" stroke-width="1.8"/><path d="M20 19v1a3 3 0 0 1-3 3h-4" stroke-width="1.8"/></symbol>
-  <symbol id="i-mail" viewBox="0 0 24 24"><rect x="3" y="5" width="18" height="14" rx="2" stroke-width="1.8"/><path d="M3 7l9 6 9-6" stroke-width="1.8" stroke-linejoin="round"/></symbol>
-  <symbol id="poster-art" viewBox="0 0 400 500">
-    <rect width="400" height="500" fill="#0E4F5C"/>
-    <g class="poster-rays">
-      <g fill="#FFC93C">
-        <rect x="196" y="10" width="8" height="90"/>
-        <rect x="196" y="10" width="8" height="90" transform="rotate(30 200 190)"/>
-        <rect x="196" y="10" width="8" height="90" transform="rotate(60 200 190)"/>
-        <rect x="196" y="10" width="8" height="90" transform="rotate(90 200 190)"/>
-        <rect x="196" y="10" width="8" height="90" transform="rotate(120 200 190)"/>
-        <rect x="196" y="10" width="8" height="90" transform="rotate(150 200 190)"/>
-        <rect x="196" y="10" width="8" height="90" transform="rotate(180 200 190)"/>
-        <rect x="196" y="10" width="8" height="90" transform="rotate(210 200 190)"/>
-        <rect x="196" y="10" width="8" height="90" transform="rotate(240 200 190)"/>
-        <rect x="196" y="10" width="8" height="90" transform="rotate(270 200 190)"/>
-        <rect x="196" y="10" width="8" height="90" transform="rotate(300 200 190)"/>
-        <rect x="196" y="10" width="8" height="90" transform="rotate(330 200 190)"/>
-      </g>
-      <circle cx="200" cy="190" r="78" fill="#FF5A4E"/>
-      <circle cx="200" cy="190" r="60" fill="#FFC93C"/>
+  <symbol id="i-plane" viewBox="0 0 24 24"><path d="M3 11l18-8-8 18-2-7-8-3z" stroke-width="1.5" stroke-linejoin="round"/></symbol>
+  <symbol id="i-phone" viewBox="0 0 24 24"><path d="M5 4h4l2 5-2.5 2A12 12 0 0 0 13 15.5L15 13l5 2v4a2 2 0 0 1-2 2A16 16 0 0 1 3 6a2 2 0 0 1 2-2z" stroke-width="1.5" stroke-linejoin="round"/></symbol>
+  <symbol id="i-alert" viewBox="0 0 24 24"><path d="M12 3 2 20h20L12 3z" stroke-width="1.5" stroke-linejoin="round"/><line x1="12" y1="9.5" x2="12" y2="14" stroke-width="1.5" stroke-linecap="round"/><circle cx="12" cy="17" r="1" fill="currentColor" stroke="none"/></symbol>
+  <symbol id="i-check" viewBox="0 0 24 24"><polyline points="4 13 9 18 20 6" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></symbol>
+  <symbol id="i-house-check" viewBox="0 0 24 24"><path d="M4 11 12 4l8 7" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/><path d="M6 10v11h12V10" stroke-width="1.5" stroke-linejoin="round"/><polyline points="9 15 11 17 15 12" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></symbol>
+  <symbol id="i-key" viewBox="0 0 24 24"><circle cx="8" cy="15" r="4" stroke-width="1.5"/><path d="M11 12l9-9" stroke-width="1.5" stroke-linecap="round"/><path d="M16 7l3 3" stroke-width="1.5" stroke-linecap="round"/><path d="M13 10l2 2" stroke-width="1.5" stroke-linecap="round"/></symbol>
+  <symbol id="i-document" viewBox="0 0 24 24"><path d="M6 2h9l5 5v15H6z" stroke-width="1.5" stroke-linejoin="round"/><path d="M15 2v5h5" stroke-width="1.5" stroke-linejoin="round"/><line x1="9" y1="13" x2="17" y2="13" stroke-width="1.5" stroke-linecap="round"/><line x1="9" y1="17" x2="17" y2="17" stroke-width="1.5" stroke-linecap="round"/></symbol>
+  <symbol id="i-verify" viewBox="0 0 24 24"><line x1="4" y1="6" x2="14" y2="6" stroke-width="1.5" stroke-linecap="round"/><line x1="4" y1="12" x2="14" y2="12" stroke-width="1.5" stroke-linecap="round"/><line x1="4" y1="18" x2="10" y2="18" stroke-width="1.5" stroke-linecap="round"/><polyline points="15 16 18 19 22 13" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></symbol>
+  <symbol id="i-pin" viewBox="0 0 24 24"><path d="M12 22s7-7.58 7-12A7 7 0 0 0 5 10c0 4.42 7 12 7 12z" stroke-width="1.5" stroke-linejoin="round"/><circle cx="12" cy="10" r="2.4" stroke-width="1.5"/></symbol>
+  <symbol id="i-tool" viewBox="0 0 24 24"><path d="M14.7 6.3a4 4 0 0 1-5.4 5.4L4 17l3 3 5.3-5.3a4 4 0 0 1 5.4-5.4l-3.6 3.6-2-2z" stroke-width="1.5" stroke-linejoin="round"/></symbol>
+  <symbol id="i-calendar" viewBox="0 0 24 24"><rect x="3" y="5" width="18" height="16" rx="2" stroke-width="1.5"/><line x1="3" y1="10" x2="21" y2="10" stroke-width="1.5"/><line x1="8" y1="3" x2="8" y2="7" stroke-width="1.5" stroke-linecap="round"/><line x1="16" y1="3" x2="16" y2="7" stroke-width="1.5" stroke-linecap="round"/><circle cx="12" cy="15" r="1.5" fill="currentColor" stroke="none"/></symbol>
+  <symbol id="i-wallet" viewBox="0 0 24 24"><path d="M3 7a2 2 0 0 1 2-2h13a1 1 0 0 1 1 1v3H5" stroke-width="1.5" stroke-linejoin="round"/><rect x="3" y="7" width="18" height="12" rx="2" stroke-width="1.5"/><circle cx="16.5" cy="13" r="1.3" fill="currentColor" stroke="none"/></symbol>
+  <symbol id="i-grid" viewBox="0 0 24 24"><rect x="3" y="3" width="8" height="10" rx="1.5" stroke-width="1.5"/><rect x="13" y="3" width="8" height="6" rx="1.5" stroke-width="1.5"/><rect x="13" y="11" width="8" height="10" rx="1.5" stroke-width="1.5"/><rect x="3" y="15" width="8" height="6" rx="1.5" stroke-width="1.5"/></symbol>
+  <symbol id="i-chat" viewBox="0 0 24 24"><path d="M4 12a8 8 0 1 1 3 6.2L3 20l1.3-4.3A8 8 0 0 1 4 12z" stroke-width="1.5" stroke-linejoin="round"/></symbol>
+  <symbol id="i-compass" viewBox="0 0 24 24"><circle cx="12" cy="12" r="9" stroke-width="1.5"/><polygon points="15 9 13 13 9 15 11 11" stroke-width="1.5" stroke-linejoin="round"/></symbol>
+  <symbol id="i-shield" viewBox="0 0 24 24"><path d="M12 2l8 3v6c0 5-3.5 9-8 11-4.5-2-8-6-8-11V5l8-3z" stroke-width="1.5" stroke-linejoin="round"/><polyline points="8.5 12 11 14.5 15.5 9.5" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></symbol>
+  <symbol id="i-headset" viewBox="0 0 24 24"><path d="M4 13a8 8 0 0 1 16 0" stroke-width="1.5"/><rect x="3" y="13" width="4" height="6" rx="1.5" stroke-width="1.5"/><rect x="17" y="13" width="4" height="6" rx="1.5" stroke-width="1.5"/><path d="M20 19v1a3 3 0 0 1-3 3h-4" stroke-width="1.5"/></symbol>
+  <symbol id="i-mail" viewBox="0 0 24 24"><rect x="3" y="5" width="18" height="14" rx="2" stroke-width="1.5"/><path d="M3 7l9 6 9-6" stroke-width="1.5" stroke-linejoin="round"/></symbol>
+  <symbol id="line-villa" viewBox="0 0 400 300">
+    <circle cx="200" cy="60" r="26" stroke="#B08D4F" stroke-width="1.3" fill="none"/>
+    <g stroke="#B08D4F" stroke-width="1.1" stroke-linecap="round">
+      <line x1="200" y1="18" x2="200" y2="6"/>
+      <line x1="200" y1="102" x2="200" y2="114"/>
+      <line x1="158" y1="60" x2="146" y2="60"/>
+      <line x1="242" y1="60" x2="254" y2="60"/>
+      <line x1="169" y1="29" x2="161" y2="21"/>
+      <line x1="231" y1="29" x2="239" y2="21"/>
+      <line x1="169" y1="91" x2="161" y2="99"/>
+      <line x1="231" y1="91" x2="239" y2="99"/>
     </g>
-    <g fill="#2E8B6F">
-      <ellipse cx="70" cy="330" rx="10" ry="60"/>
-      <ellipse cx="100" cy="345" rx="9" ry="48"/>
-      <ellipse cx="305" cy="335" rx="10" ry="58"/>
-      <ellipse cx="335" cy="350" rx="8" ry="42"/>
+    <path d="M0 168 Q80 140 170 160 T400 150" stroke="#B08D4F" stroke-width="1.2" fill="none" opacity=".5"/>
+    <g stroke="#2B2A28" stroke-width="1.2" fill="none" stroke-linecap="round">
+      <path d="M56 220 C46 196 46 156 56 124 C66 156 66 196 56 220 Z"/>
+      <line x1="56" y1="220" x2="56" y2="238"/>
+      <path d="M336 224 C326 198 326 154 336 118 C346 154 346 198 336 224 Z"/>
+      <line x1="336" y1="224" x2="336" y2="242"/>
+      <path d="M312 228 C304 208 304 178 312 156 C320 178 320 208 312 228 Z"/>
+      <line x1="312" y1="228" x2="312" y2="240"/>
     </g>
-    <rect x="0" y="330" width="400" height="34" fill="#F0A800"/>
-    <rect x="0" y="364" width="400" height="30" fill="#2E8B6F"/>
-    <rect x="160" y="270" width="34" height="94" fill="#FFFBF0"/>
-    <polygon points="153,270 177,240 201,270" fill="#FF5A4E"/>
-    <rect x="171" y="290" width="12" height="16" fill="#0E4F5C"/>
-    <rect x="0" y="394" width="400" height="106" fill="#1FA8A0"/>
-    <g fill="#6FD8CE">
-      <polygon points="0,394 40,394 20,414 0,414"/>
-      <polygon points="40,394 80,394 60,414 20,414"/>
-      <polygon points="80,394 120,394 100,414 60,414"/>
-      <polygon points="120,394 160,394 140,414 100,414"/>
-      <polygon points="160,394 200,394 180,414 140,414"/>
-      <polygon points="200,394 240,394 220,414 180,414"/>
-      <polygon points="240,394 280,394 260,414 220,414"/>
-      <polygon points="280,394 320,394 300,414 260,414"/>
-      <polygon points="320,394 360,394 340,414 300,414"/>
-      <polygon points="360,394 400,394 380,414 340,414"/>
+    <g stroke="#2B2A28" stroke-width="1.3" fill="none" stroke-linejoin="round" stroke-linecap="round">
+      <rect x="148" y="176" width="104" height="64"/>
+      <path d="M140 176 L200 142 L260 176"/>
+      <path d="M182 240 v-30 a18 18 0 0 1 36 0 v30"/>
+      <rect x="162" y="190" width="18" height="18"/>
+      <rect x="220" y="190" width="18" height="18"/>
+      <line x1="171" y1="190" x2="171" y2="208"/>
+      <line x1="162" y1="199" x2="180" y2="199"/>
+      <line x1="229" y1="190" x2="229" y2="208"/>
+      <line x1="220" y1="199" x2="238" y2="199"/>
     </g>
-    <g fill="#FFFBF0" opacity=".85">
-      <polygon points="0,424 40,424 20,444 0,444"/>
-      <polygon points="80,424 120,424 100,444 60,444"/>
-      <polygon points="160,424 200,424 180,444 140,444"/>
-      <polygon points="240,424 280,424 260,444 220,444"/>
-      <polygon points="320,424 360,424 340,444 300,444"/>
+    <g stroke="#B08D4F" stroke-width="1.1" fill="none" stroke-linecap="round" opacity=".8">
+      <path d="M20 262 Q60 254 100 262 T180 262 T260 262 T340 262 T400 262"/>
+      <path d="M10 276 Q50 268 90 276 T170 276 T250 276 T330 276 T400 276"/>
     </g>
-  </symbol>
-  <symbol id="poster-seal" viewBox="0 0 100 100">
-    <circle cx="50" cy="50" r="46" fill="#FFC93C" stroke="#1A2E35" stroke-width="3"/>
-    <circle cx="50" cy="50" r="36" fill="none" stroke="#1A2E35" stroke-width="1.5" stroke-dasharray="2 3"/>
-    <path id="sealCirclePath" d="M50,14 A36,36 0 1 1 49.9,14" fill="none"/>
-    <text font-family="Archivo, sans-serif" font-weight="800" font-size="8.2" fill="#1A2E35" letter-spacing="1.5">
-      <textPath href="#sealCirclePath" startOffset="2">SOLO IN SICILIA • SEMPRE VERIFICABILE •</textPath>
-    </text>
-    <path d="M38 52l8 8 16-18" fill="none" stroke="#1A2E35" stroke-width="4" stroke-linecap="round" stroke-linejoin="round"/>
-  </symbol>
-  <symbol id="poster-villa" viewBox="0 0 300 320">
-    <rect width="300" height="320" fill="#1FA8A0"/>
-    <circle cx="248" cy="56" r="30" fill="#FFC93C"/>
-    <rect x="0" y="250" width="300" height="70" fill="#F0A800"/>
-    <rect x="0" y="278" width="300" height="42" fill="#2E8B6F"/>
-    <rect x="60" y="150" width="130" height="110" fill="#FFFBF0"/>
-    <polygon points="52,150 125,102 198,150" fill="#FF5A4E"/>
-    <rect x="145" y="112" width="26" height="20" fill="#1A2E35"/>
-    <path d="M110 260v-46a15 15 0 0 1 30 0v46z" fill="#1A2E35"/>
-    <rect x="76" y="176" width="24" height="24" fill="#1FA8A0"/>
-    <rect x="152" y="176" width="24" height="24" fill="#1FA8A0"/>
-    <rect x="70" y="170" width="36" height="36" fill="none" stroke="#1A2E35" stroke-width="4"/>
-    <rect x="146" y="170" width="36" height="36" fill="none" stroke="#1A2E35" stroke-width="4"/>
-    <g>
-      <rect x="220" y="210" width="10" height="70" fill="#1A2E35"/>
-      <circle cx="225" cy="180" r="46" fill="#2E8B6F"/>
-      <circle cx="196" cy="168" r="7" fill="#FFC93C"/>
-      <circle cx="238" cy="152" r="7" fill="#FFC93C"/>
-      <circle cx="252" cy="188" r="7" fill="#FFC93C"/>
-      <circle cx="210" cy="204" r="7" fill="#FFC93C"/>
-    </g>
-    <g>
-      <rect x="30" y="230" width="8" height="50" fill="#1A2E35"/>
-      <circle cx="34" cy="212" r="30" fill="#2E8B6F"/>
-      <circle cx="22" cy="206" r="5" fill="#FFC93C"/>
-      <circle cx="44" cy="216" r="5" fill="#FFC93C"/>
-    </g>
-  </symbol>
-  <symbol id="postmark" viewBox="0 0 120 120">
-    <circle cx="60" cy="60" r="52" fill="none" stroke="#1A2E35" stroke-width="3"/>
-    <circle cx="60" cy="60" r="44" fill="none" stroke="#1A2E35" stroke-width="1.5" stroke-dasharray="1 4"/>
-    <path id="postmarkPath" d="M60,16 A44,44 0 1 1 59.9,16" fill="none"/>
-    <text font-family="Archivo, sans-serif" font-weight="800" font-size="9" fill="#1A2E35" letter-spacing="2">
-      <textPath href="#postmarkPath" startOffset="2">SICILIA • VIA MARE E VIA TERRA •</textPath>
-    </text>
-    <line x1="10" y1="60" x2="30" y2="55" stroke="#1A2E35" stroke-width="2"/>
-    <line x1="10" y1="68" x2="30" y2="63" stroke="#1A2E35" stroke-width="2"/>
-    <line x1="90" y1="55" x2="110" y2="60" stroke="#1A2E35" stroke-width="2"/>
-    <line x1="90" y1="63" x2="110" y2="68" stroke="#1A2E35" stroke-width="2"/>
-    <path d="M42 66l12 12 24-26" fill="none" stroke="#FF5A4E" stroke-width="5" stroke-linecap="round" stroke-linejoin="round"/>
+    <path d="M300 42 q5 -7 10 0 q5 -7 10 0" stroke="#2B2A28" stroke-width="1.1" fill="none" stroke-linecap="round"/>
   </symbol>
 </svg>
 
@@ -445,45 +331,25 @@
   <a class="nav-cta" href="#contatti">Richiedi una valutazione</a>
 </div></nav>
 
-<header class="hero">
-  <div class="hero-grid">
-    <div class="hero-text">
-      <div class="eyebrow">Gestione immobili in Sicilia, per proprietari fuori sede</div>
-      <h1>Hai un immobile<br>in Sicilia ma<br><em>non puoi seguirlo?</em></h1>
-      <p class="lead">Documenti, scadenze, manutenzioni e ospiti: gestiamo tutto noi, anche se vivi lontano. Tu controlli ogni cosa — e ogni lavoro svolto — dalla tua area riservata.</p>
-      <div class="hero-ctas">
-        <a class="btn-primary" href="#contatti"><svg class="icon"><use href="#i-plane"></use></svg>Richiedi una valutazione</a>
-        <a class="btn-secondary" id="waHeroBtn" href="#" target="_blank" rel="noopener"><svg class="icon"><use href="#i-phone"></use></svg>WhatsApp</a>
-      </div>
-      <div class="hero-stats">
-        <div class="hero-stat"><div class="hero-stat-num" data-count="100" data-suffix="%">0%</div><div class="hero-stat-label">gestione a distanza</div></div>
-        <div class="hero-stat"><div class="hero-stat-num">0</div><div class="hero-stat-label">scadenze dimenticate</div></div>
-        <div class="hero-stat"><div class="hero-stat-num">24/7</div><div class="hero-stat-label">lavoro verificabile</div></div>
-      </div>
+<header class="hero reveal">
+  <div class="hero-inner">
+    <div class="eyebrow">Gestione immobili in Sicilia, per proprietari fuori sede</div>
+    <h1>Hai un immobile in Sicilia<br>ma <em>non puoi seguirlo?</em></h1>
+    <p class="lead">Documenti, scadenze, manutenzioni e ospiti: gestiamo tutto noi, anche se vivi lontano. Tu controlli ogni cosa — e ogni lavoro svolto — dalla tua area riservata.</p>
+    <div class="hero-ctas">
+      <a class="btn-primary" href="#contatti"><svg class="icon"><use href="#i-plane"></use></svg>Richiedi una valutazione</a>
+      <a class="btn-secondary" id="waHeroBtn" href="#" target="_blank" rel="noopener"><svg class="icon"><use href="#i-phone"></use></svg>WhatsApp</a>
     </div>
-    <div class="poster-frame">
-      <svg class="poster-seal" viewBox="0 0 100 100" aria-hidden="true"><use href="#poster-seal"></use></svg>
-      <div class="poster-inner">
-        <svg viewBox="0 0 400 500" aria-hidden="true"><use href="#poster-art"></use></svg>
-      </div>
+    <div class="hero-stats">
+      <div class="hero-stat"><div class="hero-stat-num" data-count="100" data-suffix="%">0%</div><div class="hero-stat-label">Gestione a distanza</div></div>
+      <div class="hero-stat"><div class="hero-stat-num">0</div><div class="hero-stat-label">Scadenze dimenticate</div></div>
+      <div class="hero-stat"><div class="hero-stat-num">24/7</div><div class="hero-stat-label">Lavoro verificabile</div></div>
     </div>
   </div>
+  <div class="hero-art"><svg viewBox="0 0 400 300" aria-hidden="true"><use href="#line-villa"></use></svg></div>
 </header>
 
-<div class="ticker" aria-hidden="true">
-  <div class="ticker-track">
-    <span class="txt">Niente pensieri per te</span><span class="dot">★</span>
-    <span class="txt">Documenti &amp; scadenze sotto controllo</span><span class="dot">★</span>
-    <span class="txt">Manutenzioni gestite</span><span class="dot">★</span>
-    <span class="txt">Tutto verificabile online</span><span class="dot">★</span>
-    <span class="txt">Solo in Sicilia</span><span class="dot">★</span>
-    <span class="txt">Niente pensieri per te</span><span class="dot">★</span>
-    <span class="txt">Documenti &amp; scadenze sotto controllo</span><span class="dot">★</span>
-    <span class="txt">Manutenzioni gestite</span><span class="dot">★</span>
-    <span class="txt">Tutto verificabile online</span><span class="dot">★</span>
-    <span class="txt">Solo in Sicilia</span><span class="dot">★</span>
-  </div>
-</div>
+<div class="ornament" aria-hidden="true"><span class="orn-line"></span><span class="orn-dot"></span><span class="orn-line"></span></div>
 
 <section class="reveal">
   <div class="section-tag-wrap"><span class="section-tag">Il problema</span></div>
@@ -491,7 +357,7 @@
   <p class="section-sub">Tra documenti da rinnovare, scadenze da non dimenticare e manutenzioni da seguire, gestire un immobile a distanza è complicato. Basta un imprevisto non seguito per creare problemi seri.</p>
   <div class="pain-grid">
     <div class="pain-card">
-      <h3><svg class="icon" style="width:22px;height:22px;color:var(--vermillion)"><use href="#i-alert"></use></svg> Senza un gestore</h3>
+      <h3><svg class="icon" style="width:20px;height:20px;color:var(--terracotta)"><use href="#i-alert"></use></svg> Senza un gestore</h3>
       <ul>
         <li>Scadenze fiscali, assicurative o amministrative rischiano di sfuggirti</li>
         <li>Non sai chi controlla davvero l'immobile quando è vuoto</li>
@@ -500,7 +366,7 @@
       </ul>
     </div>
     <div class="solution-card">
-      <h3><svg class="icon" style="width:22px;height:22px;color:var(--mustard)"><use href="#i-check"></use></svg> Con noi</h3>
+      <h3><svg class="icon" style="width:20px;height:20px;color:var(--gold)"><use href="#i-check"></use></svg> Con noi</h3>
       <ul>
         <li>Teniamo traccia di documenti e scadenze e ti avvisiamo per tempo</li>
         <li>Controlli periodici regolari, anche quando l'immobile è vuoto</li>
@@ -515,10 +381,9 @@
   <div class="section-tag-wrap"><span class="section-tag">Due livelli di servizio</span></div>
   <h2 class="section-title">Custodia sempre, affitto se lo vuoi tu</h2>
   <p class="section-sub">La gestione di base copre documenti, scadenze e manutenzioni. Se in più vuoi generare un reddito, ci occupiamo anche di affittarlo.</p>
-  <div class="mini-poster"><svg viewBox="0 0 300 320" aria-hidden="true"><use href="#poster-villa"></use></svg></div>
   <div class="pain-grid">
-    <div class="pain-card" style="border-color:var(--ink);">
-      <h3 style="color:var(--petrol);"><svg class="icon" style="width:22px;height:22px;color:var(--petrol)"><use href="#i-house-check"></use></svg> Custodia e gestione</h3>
+    <div class="pain-card">
+      <h3 style="color:var(--teal-soft);"><svg class="icon" style="width:20px;height:20px;color:var(--teal-soft)"><use href="#i-house-check"></use></svg> Custodia e gestione</h3>
       <ul>
         <li>Documenti, assicurazioni e scadenze sempre monitorati</li>
         <li>Controlli periodici e manutenzione programmata</li>
@@ -527,7 +392,7 @@
       </ul>
     </div>
     <div class="solution-card">
-      <h3><svg class="icon" style="width:22px;height:22px;color:var(--mustard)"><use href="#i-key"></use></svg> Vuoi anche affittarlo?</h3>
+      <h3><svg class="icon" style="width:20px;height:20px;color:var(--gold)"><use href="#i-key"></use></svg> Vuoi anche affittarlo?</h3>
       <ul>
         <li>In più, gestiamo prenotazioni, calendario e ospiti per te</li>
         <li>Assistenza agli ospiti 24/7, dall'accoglienza alla partenza</li>
@@ -568,7 +433,7 @@
 </section>
 
 <section class="trust-band reveal">
-  <div class="section-tag-wrap"><span class="section-tag" style="background:var(--mustard);">Perché sceglierci</span></div>
+  <div class="section-tag-wrap"><span class="section-tag" style="color:var(--gold);">Perché sceglierci</span></div>
   <h2 class="section-title" style="color:#fff;">La tranquillità di un partner serio</h2>
   <div class="trust-grid">
     <div class="trust-item"><div class="icon-badge"><svg class="icon"><use href="#i-compass"></use></svg></div><h3>Presenti sul territorio</h3><p>Siamo fisicamente in Sicilia: interveniamo di persona, non solo da remoto.</p></div>
@@ -585,17 +450,17 @@
     <div class="testi-card">
       <div class="testi-stars">★★★★★</div>
       <p class="quote">"Vivo fuori dalla Sicilia e non riuscivo a seguire scadenze e manutenzioni del mio appartamento. Ora ricevo solo i report da controllare."</p>
-      <div class="testi-foot"><div class="testi-avatar" style="background:var(--petrol)">M.R.</div><div class="testi-author">Esempio di testimonianza</div></div>
+      <div class="testi-foot"><div class="testi-avatar" style="background:var(--teal-soft)">M.R.</div><div class="testi-author">Esempio di testimonianza</div></div>
     </div>
     <div class="testi-card">
       <div class="testi-stars">★★★★★</div>
       <p class="quote">"Finalmente so sempre cosa succede al mio immobile, anche vivendo lontano: ogni intervento è documentato sulla piattaforma."</p>
-      <div class="testi-foot"><div class="testi-avatar" style="background:var(--vermillion)">A.C.</div><div class="testi-author">Esempio di testimonianza</div></div>
+      <div class="testi-foot"><div class="testi-avatar" style="background:var(--terracotta)">A.C.</div><div class="testi-author">Esempio di testimonianza</div></div>
     </div>
     <div class="testi-card">
       <div class="testi-stars">★★★★★</div>
       <p class="quote">"Non dovevo più preoccuparmi di documenti e scadenze: mi avvisano loro prima che sia un problema."</p>
-      <div class="testi-foot"><div class="testi-avatar" style="background:var(--forest)">G.T.</div><div class="testi-author">Esempio di testimonianza</div></div>
+      <div class="testi-foot"><div class="testi-avatar" style="background:var(--sage)">G.T.</div><div class="testi-author">Esempio di testimonianza</div></div>
     </div>
   </div>
   <p class="testi-note">* Testi segnaposto: sostituiscili con recensioni reali dei tuoi proprietari prima di pubblicare.</p>
@@ -622,7 +487,6 @@
 
   <div class="contact-shell">
     <div class="contact-info">
-      <svg class="postmark-badge" viewBox="0 0 120 120" aria-hidden="true"><use href="#postmark"></use></svg>
       <h2>Parliamone</h2>
       <p>Puoi scriverci direttamente o compilare il modulo: ti risponderemo entro 24 ore.</p>
       <div class="info-row"><svg class="icon"><use href="#i-phone"></use></svg><span id="waTextLine">WhatsApp: configura il numero</span></div>
@@ -667,7 +531,7 @@
 </section>
 
 <footer>
-  <div id="footerBrand" style="font-family:'Bebas Neue',sans-serif; font-size:22px; color:#fff; margin-bottom:10px; letter-spacing:.03em;">Property Manager</div>
+  <div id="footerBrand" style="font-family:'Cormorant Garamond',serif; font-weight:600; font-size:20px; color:#fff; margin-bottom:12px; letter-spacing:.02em;">Property Manager</div>
   <div>Sei già un proprietario in gestione? <a href="index.html">Accedi alla tua area riservata</a></div>
   <div style="margin-top:10px; opacity:.7;">© <span id="year"></span> — Tutti i diritti riservati</div>
 </footer>
@@ -710,24 +574,8 @@
       + `Telefono: ${telefono}\nEmail: ${email}`
       + (messaggio ? `\nMessaggio: ${messaggio}` : '');
     document.getElementById('formSuccess').style.display = 'block';
-    fireConfetti(document.getElementById('formSuccess'));
     window.open(waLink(testo), '_blank', 'noopener');
   });
-
-  // Fun confetti burst
-  function fireConfetti(anchorEl){
-    if(window.matchMedia('(prefers-reduced-motion: reduce)').matches) return;
-    const colors = ['#FFC93C', '#FF5A4E', '#1FA8A0', '#2E8B6F'];
-    const rect = anchorEl.getBoundingClientRect();
-    const originX = rect.left + rect.width / 2, originY = rect.top + window.scrollY + 14;
-    for(let i = 0; i < 26; i++){
-      const el = document.createElement('div');
-      const angle = Math.random() * Math.PI * 2, dist = 60 + Math.random() * 90;
-      el.style.cssText = `position:absolute; left:${originX}px; top:${originY}px; width:${5+Math.random()*4}px; height:${5+Math.random()*4}px; background:${colors[i%colors.length]}; border:1.5px solid #1A2E35; border-radius:${Math.random()>.5?'50%':'1px'}; pointer-events:none; z-index:999; --dx:${Math.cos(angle)*dist}px; --dy:${Math.sin(angle)*dist - 40}px; --rot:${(Math.random()*540-270)}deg; animation:confettiFall .9s ease-out forwards;`;
-      document.body.appendChild(el);
-      setTimeout(()=>el.remove(), 950);
-    }
-  }
 
   // Nav condense on scroll
   const nav = document.getElementById('siteNav');

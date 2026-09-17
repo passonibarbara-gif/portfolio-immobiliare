@@ -2403,9 +2403,9 @@ function renderSpesaCard(e, role){
     </div>` : '';
 
   const azioniGestore = isGestore ? `
-    <div style="display:flex;gap:8px;margin-top:10px;flex-wrap:wrap;">
+    <div style="display:flex;align-items:center;gap:8px;margin-top:10px;flex-wrap:wrap;">
       ${stato==='approvata' ? `<button class="icon-btn" data-paga-spesa="${e.id}">Segna come pagata</button>` : ''}
-      <button class="link-btn" data-del-expense="${e.id}">rimuovi</button>
+      <button class="icon-btn danger" data-del-expense="${e.id}" title="Rimuovi spesa" style="margin-left:auto;"><i class="ti ti-trash"></i></button>
     </div>` : '';
 
   const storico = (e.storico||[]).slice().reverse();

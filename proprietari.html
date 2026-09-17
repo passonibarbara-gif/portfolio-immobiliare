@@ -56,23 +56,29 @@
   .reveal.in-view{opacity:1; transform:translateY(0);}
   .stagger > *{transition-delay:calc(var(--i,0) * 80ms);}
 
-  /* ---------- Nav ---------- */
+  /* ---------- Nav (transparent over the hero photo, solid once scrolled) ---------- */
   .site-nav{
-    position:sticky; top:0; z-index:40;
+    position:fixed; top:0; left:0; right:0; z-index:40;
     display:flex; justify-content:center;
-    padding:20px 24px; transition:padding .3s ease, box-shadow .3s ease;
-    background:var(--paper); border-bottom:1px solid var(--line);
+    padding:26px 24px; transition:padding .3s ease, background .3s ease, box-shadow .3s ease, border-color .3s ease;
+    background:transparent; border-bottom:1px solid transparent;
   }
-  .site-nav.scrolled{padding:12px 24px; box-shadow:0 4px 20px rgba(31,59,44,.06);}
+  .site-nav.scrolled{
+    padding:12px 24px; background:var(--paper); border-bottom:1px solid var(--line); box-shadow:0 4px 20px rgba(31,59,44,.06);
+  }
   .site-nav-inner{max-width:1160px; width:100%; display:flex; justify-content:space-between; align-items:center; gap:16px; flex-wrap:wrap;}
   .brand-lockup{display:flex; align-items:center; gap:10px;}
-  .brand-mark{width:26px; height:26px; flex:none; color:var(--green-deep);}
+  .brand-mark{width:26px; height:26px; flex:none; color:#fff; transition:color .3s ease;}
+  .site-nav.scrolled .brand-mark{color:var(--green-deep);}
   .brand-text{display:flex; flex-direction:column; line-height:1;}
-  .brand{font-family:'Jost',sans-serif; font-weight:700; font-size:22px; letter-spacing:.03em; color:var(--green-deep);}
-  .brand-sub{font-size:9.5px; font-weight:500; letter-spacing:.32em; color:var(--gold-deep); margin-top:5px;}
+  .brand{font-family:'Jost',sans-serif; font-weight:700; font-size:22px; letter-spacing:.03em; color:#fff; transition:color .3s ease;}
+  .site-nav.scrolled .brand{color:var(--green-deep);}
+  .brand-sub{font-size:9.5px; font-weight:500; letter-spacing:.32em; color:var(--gold-soft); margin-top:5px; transition:color .3s ease;}
+  .site-nav.scrolled .brand-sub{color:var(--gold-deep);}
   .nav-links{display:flex; align-items:center; gap:26px; flex-wrap:wrap;}
-  .nav-links a{font-size:12px; font-weight:500; color:var(--ink-soft); text-decoration:none; letter-spacing:.05em; text-transform:uppercase; transition:color .15s ease;}
-  .nav-links a:hover{color:var(--gold-deep);}
+  .nav-links a{font-size:12px; font-weight:500; color:rgba(255,255,255,.85); text-decoration:none; letter-spacing:.05em; text-transform:uppercase; transition:color .15s ease;}
+  .site-nav.scrolled .nav-links a{color:var(--ink-soft);}
+  .nav-links a:hover{color:var(--gold);}
   .nav-cta{
     background:var(--green-deep); color:var(--cream); border:none; padding:11px 22px; border-radius:100px;
     font-size:11.5px; font-weight:600; text-decoration:none; letter-spacing:.06em; text-transform:uppercase; white-space:nowrap;

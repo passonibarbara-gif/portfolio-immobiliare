@@ -24,6 +24,7 @@
     --terracotta:#B26B4E;
     --sage:#7C8C6F;
     --line:#DED0B0;
+    --tiffany:#0ABAB5;
     --shadow: 0 18px 40px rgba(31,59,44,.12);
 
     /* PLACEHOLDER: sostituisci con l'URL della tua foto reale (Sicilia / immobile) */
@@ -79,6 +80,9 @@
   .nav-links a{font-size:12px; font-weight:500; color:rgba(255,255,255,.85); text-decoration:none; letter-spacing:.05em; text-transform:uppercase; transition:color .15s ease;}
   .site-nav.scrolled .nav-links a{color:var(--ink-soft);}
   .nav-links a:hover{color:var(--gold);}
+  .nav-links a.link-accedi{color:var(--tiffany); display:inline-flex; align-items:center; gap:6px;}
+  .nav-links a.link-accedi::before{content:''; width:6px; height:6px; border-radius:50%; background:var(--tiffany); flex:none;}
+  .nav-links a.link-accedi:hover{color:var(--tiffany); opacity:.8;}
   .nav-cta{
     background:var(--green-deep); color:var(--cream); border:none; padding:11px 22px; border-radius:100px;
     font-size:11.5px; font-weight:600; text-decoration:none; letter-spacing:.06em; text-transform:uppercase; white-space:nowrap;
@@ -297,6 +301,7 @@
   /* ---------- Footer ---------- */
   footer{background:var(--green-deep); color:#BFC9BB; padding:48px 24px; text-align:center; font-size:12.5px; font-weight:300;}
   footer a{color:var(--gold); text-decoration:none;}
+  footer a.link-accedi{color:var(--tiffany);}
   .wa-float{
     position:fixed; bottom:24px; right:24px; z-index:50; background:#25D366; color:#fff; width:54px; height:54px;
     border-radius:50%; display:flex; align-items:center; justify-content:center; text-decoration:none;
@@ -382,7 +387,7 @@
     <a href="#servizi">Servizi</a>
     <a href="#come-funziona">Come funziona</a>
     <a href="#faq">Domande frequenti</a>
-    <a href="index.html">Sei già cliente? Accedi</a>
+    <a href="index.html" class="link-accedi">Sei già cliente? Accedi</a>
   </div>
   <a class="nav-cta" href="#contatti">Richiedi una valutazione</a>
 </div></nav>
@@ -606,7 +611,7 @@
 
 <footer>
   <div id="footerBrand" style="font-family:'Playfair Display',serif; font-weight:700; font-size:20px; color:#fff; margin-bottom:12px; letter-spacing:.02em;">ViverePM</div>
-  <div>Sei già un proprietario in gestione? <a href="index.html">Accedi alla tua area riservata</a></div>
+  <div>Sei già un proprietario in gestione? <a href="index.html" class="link-accedi">Accedi alla tua area riservata</a></div>
   <div style="margin-top:10px; opacity:.7;">© <span id="year"></span> — Tutti i diritti riservati</div>
 </footer>
 

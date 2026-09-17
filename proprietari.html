@@ -65,7 +65,9 @@
   }
   .site-nav.scrolled{padding:12px 24px; box-shadow:0 4px 20px rgba(31,59,44,.06);}
   .site-nav-inner{max-width:1160px; width:100%; display:flex; justify-content:space-between; align-items:center; gap:16px; flex-wrap:wrap;}
-  .brand-lockup{display:flex; flex-direction:column; line-height:1;}
+  .brand-lockup{display:flex; align-items:center; gap:10px;}
+  .brand-mark{width:26px; height:26px; flex:none; color:var(--green-deep);}
+  .brand-text{display:flex; flex-direction:column; line-height:1;}
   .brand{font-family:'Jost',sans-serif; font-weight:700; font-size:22px; letter-spacing:.03em; color:var(--green-deep);}
   .brand-sub{font-size:9.5px; font-weight:500; letter-spacing:.32em; color:var(--gold-deep); margin-top:5px;}
   .nav-links{display:flex; align-items:center; gap:26px; flex-wrap:wrap;}
@@ -117,6 +119,17 @@
   }
   .hero-feat .feat-badge .icon{width:19px; height:19px;}
   .hero-feat span.txt{font-size:13px; color:#F3F0E4; line-height:1.35;}
+  .rent-callout{
+    display:flex; align-items:center; gap:16px; max-width:560px; margin:0 0 28px; padding:14px;
+    background:rgba(255,252,245,.94); border-radius:14px; opacity:0; animation:fadeUp .8s ease .52s forwards;
+  }
+  .rent-callout-photo{
+    width:76px; height:76px; flex:none; border-radius:9px; background-size:cover; background-position:center;
+    background-color:var(--cream-2); display:flex; align-items:center; justify-content:center; color:var(--ink-soft);
+  }
+  .rent-callout-title{font-family:'Playfair Display',serif; font-weight:700; font-size:16.5px; color:var(--green-deep); line-height:1.25;}
+  .rent-callout-title .gold{display:block; color:var(--gold-deep);}
+  .rent-callout-text p{margin:4px 0 0; font-size:12.5px; color:var(--ink-soft); font-weight:400; line-height:1.4;}
   .hero-ctas{display:flex; gap:14px; flex-wrap:wrap; align-items:center; opacity:0; animation:fadeUp .8s ease .58s forwards;}
   .btn-primary{
     background:var(--green-deep); color:#fff; border:none; padding:16px 28px; border-radius:100px;
@@ -312,10 +325,19 @@
   <symbol id="i-camera" viewBox="0 0 24 24"><path d="M4 8h3l2-3h6l2 3h3a1 1 0 0 1 1 1v10a1 1 0 0 1-1 1H4a1 1 0 0 1-1-1V9a1 1 0 0 1 1-1z" stroke-width="1.5" stroke-linejoin="round"/><circle cx="12" cy="14" r="4" stroke-width="1.5"/></symbol>
   <symbol id="i-handshake" viewBox="0 0 24 24"><path d="M2 12l4-4 4 3 2-2 3 1 3-2 4 4" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/><path d="M6 11l4 5 2-1 2 1 4-5" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></symbol>
   <symbol id="i-leaf" viewBox="0 0 24 24"><path d="M4 20C4 10 12 4 20 4c0 8-6 16-16 16z" stroke-width="1.5" stroke-linejoin="round"/><path d="M5 19C10 14 14 10 19 5" stroke-width="1.5" stroke-linecap="round"/></symbol>
+  <symbol id="i-arrow" viewBox="0 0 24 24"><line x1="4" y1="12" x2="20" y2="12" stroke-width="1.8" stroke-linecap="round"/><polyline points="14 6 20 12 14 18" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></symbol>
+  <symbol id="logo-mark" viewBox="0 0 32 32">
+    <path d="M4 16 16 6l12 10" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"/>
+    <path d="M8 14v12h16V14" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"/>
+    <circle cx="16" cy="21" r="1.6" fill="currentColor" stroke="none"/>
+  </symbol>
 </svg>
 
 <nav class="site-nav" id="siteNav"><div class="site-nav-inner">
-  <div class="brand-lockup"><div class="brand" id="brandName">Property Manager</div><div class="brand-sub">PROPERTY MANAGEMENT</div></div>
+  <div class="brand-lockup">
+    <svg class="brand-mark"><use href="#logo-mark"></use></svg>
+    <div class="brand-text"><div class="brand" id="brandName">Property Manager</div><div class="brand-sub">PROPERTY MANAGEMENT</div></div>
+  </div>
   <div class="nav-links">
     <a href="#servizi">Servizi</a>
     <a href="#come-funziona">Come funziona</a>
@@ -342,10 +364,18 @@
         <div class="hero-feat"><div class="feat-badge"><svg class="icon"><use href="#i-camera"></use></svg></div><span class="txt">Foto e report delle attività</span></div>
         <div class="hero-feat"><div class="feat-badge"><svg class="icon"><use href="#i-pin"></use></svg></div><span class="txt">Gestione a distanza, ovunque tu sia</span></div>
       </div>
+      <div class="rent-callout">
+        <div class="rent-callout-photo" id="rentCalloutPhoto"><svg class="icon" style="width:20px;height:20px"><use href="#i-camera"></use></svg></div>
+        <div class="rent-callout-text">
+          <div class="rent-callout-title"><span>Se lo vuoi affittare,</span><span class="gold">ci pensiamo noi.</span></div>
+          <p>Gestiamo permessi, prenotazioni, pulizie e tutto il necessario sotto la tua supervisione.</p>
+        </div>
+      </div>
       <div class="hero-ctas">
         <a class="btn-primary" id="waHeroBtn" href="#" target="_blank" rel="noopener">
           <svg class="icon"><use href="#i-phone"></use></svg>
           <span class="btn-primary-sub"><b>Contattaci ora</b><small>Per una prima valutazione gratuita</small></span>
+          <svg class="icon" style="margin-left:6px;"><use href="#i-arrow"></use></svg>
         </a>
       </div>
       <div class="hero-trust">
@@ -554,7 +584,8 @@
     nomeAgenzia: 'Property Manager',       // nome della tua agenzia/attività
     telefonoWhatsApp: '390000000000',      // numero WhatsApp, solo cifre con prefisso internazionale (es. 39 per l'Italia)
     email: 'info@tuaagenzia.it',           // email di contatto
-    fotoHero: ''                            // URL della foto reale per lo sfondo della hero (es. 'foto-sicilia.jpg'). Lascia vuoto per usare il colore di riserva.
+    fotoHero: '',                           // URL della foto reale per lo sfondo della hero (es. 'foto-sicilia.jpg'). Lascia vuoto per usare il colore di riserva.
+    fotoAffitto: ''                         // URL della foto per il riquadro "Se lo vuoi affittare" (es. 'foto-camera.jpg'). Lascia vuoto per l'icona segnaposto.
   };
   // ---------------------------------------------------------------
 
@@ -566,6 +597,10 @@
     document.documentElement.style.setProperty('--hero-photo', `url('${CONFIG.fotoHero}')`);
     const note = document.getElementById('heroPhotoNote');
     if(note) note.remove();
+  }
+  if(CONFIG.fotoAffitto){
+    const ph = document.getElementById('rentCalloutPhoto');
+    if(ph){ ph.style.backgroundImage = `url('${CONFIG.fotoAffitto}')`; ph.innerHTML = ''; }
   }
 
   function waLink(testo){

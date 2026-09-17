@@ -2935,7 +2935,7 @@ function renderOverview(){
   const alertPortfolio = calcolaAlertPortfolio();
   const alertBanner = alertPortfolio.totale>0 ? `
     <div class="alert-banner">
-      <div class="alert-banner-title"><i class="ti ti-alert-triangle"></i> ${alertPortfolio.totale} cosa${alertPortfolio.totale>1?'e':''} da controllare</div>
+      <div class="alert-banner-title"><i class="ti ti-alert-triangle"></i> ${alertPortfolio.totale} cos${alertPortfolio.totale>1?'e':'a'} da controllare</div>
       ${alertPortfolio.prenotazioniPendenti>0 ? `<div class="alert-banner-item clickable" data-goto-alert="prenotazioni"><b>${alertPortfolio.prenotazioniPendenti}</b> richiest${alertPortfolio.prenotazioniPendenti>1?'e':'a'} di prenotazione da confermare o rifiutare</div>` : ''}
       ${alertPortfolio.spesePagare>0 ? `<div class="alert-banner-item clickable" data-goto-alert="spese"><b>${alertPortfolio.spesePagare}</b> spes${alertPortfolio.spesePagare>1?'e':'a'} approvat${alertPortfolio.spesePagare>1?'e':'a'} da pagare</div>` : ''}
       ${alertPortfolio.controlliRitardo>0 ? `<div class="alert-banner-item clickable" data-goto-alert="controlli"><b>${alertPortfolio.controlliRitardo}</b> immobil${alertPortfolio.controlliRitardo>1?'i':'e'} con controllo periodico in ritardo</div>` : ''}
@@ -3379,7 +3379,7 @@ function renderProprietariView(){
     const alertProprietario = calcolaAlertProprietario(p);
     const alertBannerProprietario = alertProprietario.totale>0 ? `
       <div class="alert-banner">
-        <div class="alert-banner-title"><i class="ti ti-alert-triangle"></i> ${alertProprietario.totale} cosa${alertProprietario.totale>1?'e':''} da controllare</div>
+        <div class="alert-banner-title"><i class="ti ti-alert-triangle"></i> ${alertProprietario.totale} cos${alertProprietario.totale>1?'e':'a'} da controllare</div>
         ${alertProprietario.preventiviInAttesa>0 ? `<div class="alert-banner-item clickable" data-goto-owner-alert="interventi"><b>${alertProprietario.preventiviInAttesa}</b> preventiv${alertProprietario.preventiviInAttesa>1?'i':'o'} in attesa della tua approvazione</div>` : ''}
         ${alertProprietario.speseInAttesa>0 ? `<div class="alert-banner-item clickable" data-goto-owner-alert="spese"><b>${alertProprietario.speseInAttesa}</b> spes${alertProprietario.speseInAttesa>1?'e':'a'} in attesa della tua approvazione</div>` : ''}
         ${alertProprietario.controlloInRitardo>0 ? `<div class="alert-banner-item clickable" data-goto-owner-alert="controlli">Controllo periodico in ritardo</div>` : ''}

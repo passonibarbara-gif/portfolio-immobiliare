@@ -184,6 +184,8 @@
 
   /* ---------- Services grid ---------- */
   .services-grid{display:grid; grid-template-columns:repeat(3,1fr); gap:36px 28px; max-width:1040px; margin:0 auto;}
+  .showcase-frame{max-width:1040px; margin:56px auto 0; border-radius:14px; overflow:hidden; box-shadow:var(--shadow); border:1px solid var(--line);}
+  .showcase-frame img{display:block; width:100%; height:auto;}
   .service-card{text-align:center; transition:transform .25s ease;}
   .service-card:hover{transform:translateY(-4px);}
   .service-icon{
@@ -456,6 +458,7 @@
     <div class="service-card" style="--i:7"><div class="service-icon"><svg class="icon"><use href="#i-grid"></use></svg></div><h3>Dashboard trasparente</h3><p>Accedi in ogni momento alla tua area riservata per vedere stato, occupazione e attività del tuo immobile.</p></div>
     <div class="service-card" style="--i:8"><div class="service-icon"><svg class="icon"><use href="#i-chat"></use></svg></div><h3>Messaggistica diretta</h3><p>Un canale diretto con il nostro team per domande, richieste o aggiornamenti, quando vuoi tu.</p></div>
   </div>
+  <div class="showcase-frame"><img src="collage-servizi.jpg" alt="Panoramica dei servizi di gestione: verifiche, manutenzione, pulizie, prenotazioni, report e valorizzazione dell'immobile"></div>
 </section>
 
 <section id="come-funziona" class="alt-bg reveal">
@@ -584,8 +587,8 @@
     nomeAgenzia: 'Property Manager',       // nome della tua agenzia/attività
     telefonoWhatsApp: '390000000000',      // numero WhatsApp, solo cifre con prefisso internazionale (es. 39 per l'Italia)
     email: 'info@tuaagenzia.it',           // email di contatto
-    fotoHero: '',                           // URL della foto reale per lo sfondo della hero (es. 'foto-sicilia.jpg'). Lascia vuoto per usare il colore di riserva.
-    fotoAffitto: ''                         // URL della foto per il riquadro "Se lo vuoi affittare" (es. 'foto-camera.jpg'). Lascia vuoto per l'icona segnaposto.
+    fotoHero: 'hero-terrazza.jpg',           // URL della foto reale per lo sfondo della hero. Lascia vuoto per usare il colore di riserva.
+    fotoAffitto: 'tramonto-cefalu.jpg'       // URL della foto per il riquadro "Se lo vuoi affittare". Lascia vuoto per l'icona segnaposto.
   };
   // ---------------------------------------------------------------
 

@@ -89,10 +89,15 @@
   /* ---------- Hero (full-bleed photo background) ---------- */
   .hero{
     position:relative; min-height:76vh; display:flex; align-items:flex-end; overflow:hidden;
-    background: var(--hero-photo, linear-gradient(155deg, var(--green-deep) 0%, var(--green) 55%, var(--gold-deep) 130%)) center/cover no-repeat;
   }
+  .hero-bg{
+    position:absolute; inset:0; z-index:0;
+    background: var(--hero-photo, linear-gradient(155deg, var(--green-deep) 0%, var(--green) 55%, var(--gold-deep) 130%)) center/cover no-repeat;
+    animation:kenBurns 26s ease-in-out infinite alternate;
+  }
+  @keyframes kenBurns{ from{transform:scale(1);} to{transform:scale(1.09);} }
   .hero::before{
-    content:''; position:absolute; inset:0;
+    content:''; position:absolute; inset:0; z-index:1;
     background:
       linear-gradient(90deg, rgba(12,18,10,.72) 0%, rgba(12,18,10,.5) 38%, rgba(12,18,10,.12) 68%, rgba(12,18,10,0) 100%),
       linear-gradient(0deg, rgba(12,18,10,.62) 0%, rgba(12,18,10,.32) 45%, rgba(12,18,10,.18) 70%, rgba(12,18,10,.32) 100%);
@@ -182,7 +187,9 @@
   .service-icon{
     width:56px; height:56px; border-radius:50%; background:var(--cream-2);
     color:var(--green-deep); display:flex; align-items:center; justify-content:center; margin:0 auto 18px;
+    transition:transform .3s cubic-bezier(.2,.8,.3,1), background .3s ease;
   }
+  .service-card:hover .service-icon{transform:scale(1.1) rotate(-6deg); background:var(--gold-soft);}
   .service-icon .icon{width:22px; height:22px;}
   .service-card h3{font-family:'Playfair Display',serif; font-weight:700; font-size:18px; margin:0 0 8px;}
   .service-card p{font-size:13.5px; color:var(--ink-soft); margin:0; font-weight:300;}
@@ -199,13 +206,18 @@
   /* ---------- Trust / why us ---------- */
   .photo-break{
     position:relative; min-height:420px; display:flex; align-items:center; justify-content:center; text-align:center;
-    background:url('tramonto-cefalu.jpg') center 65%/cover no-repeat, var(--green-deep); padding:60px 24px;
+    overflow:hidden; background:var(--green-deep); padding:60px 24px;
+  }
+  .photo-break-bg{
+    position:absolute; inset:0; z-index:0;
+    background:url('tramonto-cefalu.jpg') center 65%/cover no-repeat;
+    animation:kenBurns 30s ease-in-out infinite alternate-reverse;
   }
   .photo-break::before{
-    content:''; position:absolute; inset:0;
+    content:''; position:absolute; inset:0; z-index:1;
     background:radial-gradient(ellipse 60% 70% at 50% 50%, rgba(15,20,12,.55) 0%, rgba(15,20,12,.15) 70%, rgba(15,20,12,0) 100%);
   }
-  .photo-break-quote{position:relative; z-index:1; color:#fff;}
+  .photo-break-quote{position:relative; z-index:2; color:#fff;}
   .photo-break-quote .eyebrow{display:block; margin-bottom:14px; text-shadow:0 1px 4px rgba(0,0,0,.4);}
   .photo-break-quote p{
     font-family:'Playfair Display',serif; font-weight:700; font-style:italic; font-size:clamp(24px,3.6vw,36px);
@@ -217,7 +229,9 @@
   .trust-item .icon-badge{
     width:52px; height:52px; border-radius:50%; border:1.3px solid var(--gold); background:transparent;
     display:flex; align-items:center; justify-content:center; margin:0 auto 16px; color:var(--gold);
+    transition:transform .3s cubic-bezier(.2,.8,.3,1), background .3s ease;
   }
+  .trust-item:hover .icon-badge{transform:scale(1.1) rotate(-6deg); background:rgba(199,154,75,.14);}
   .trust-item h3{font-family:'Playfair Display',serif; font-weight:700; font-size:16.5px; margin:0 0 6px;}
   .trust-item p{font-size:12.5px; color:#BFC9BB; margin:0; font-weight:300;}
 
@@ -244,6 +258,11 @@
   .faq-item summary::-webkit-details-marker{display:none;}
   .faq-item summary::after{content:'+'; font-family:'Jost',sans-serif; font-size:20px; font-weight:300; color:var(--gold-deep); transition:transform .25s ease;}
   .faq-item[open] summary::after{transform:rotate(135deg);}
+  .faq-item .faq-body{
+    display:block; max-height:0; overflow:hidden; opacity:0;
+    transition:max-height .4s cubic-bezier(.2,.8,.3,1), opacity .3s ease;
+  }
+  .faq-item[open] .faq-body{max-height:220px; opacity:1;}
   .faq-item p{font-size:14px; color:var(--ink-soft); margin:14px 0 0; font-weight:300;}
 
   /* ---------- Contact / form ---------- */
@@ -283,7 +302,13 @@
     animation:pulseRing 2.4s ease-out infinite; z-index:-1;
   }
 
-  @media (max-width: 980px){
+  @media (max-width: 1180px){
+    .site-nav-inner{flex-wrap:nowrap;}
+    .nav-links{gap:16px;}
+    .nav-links a{font-size:11px;}
+    .nav-cta{padding:10px 16px; font-size:11px;}
+  }
+  @media (max-width: 760px){
     .nav-links{display:none;}
   }
   @media (max-width: 860px){
@@ -357,6 +382,7 @@
 </div></nav>
 
 <header class="hero reveal">
+  <div class="hero-bg"></div>
   <span class="hero-photo-note" id="heroPhotoNote"><svg class="icon" style="width:13px;height:13px"><use href="#i-camera"></use></svg>Sostituisci con una foto reale (vedi CONFIG)</span>
   <div class="hero-inner">
     <div class="hero-grid">
@@ -467,6 +493,7 @@
 </section>
 
 <section class="photo-break reveal">
+  <div class="photo-break-bg"></div>
   <div class="photo-break-quote">
     <span class="eyebrow" style="color:var(--gold-soft);">Il tramonto sulla baia</span>
     <p>Ogni tramonto ti aspetta,<br>senza pensieri.</p>
@@ -511,13 +538,13 @@
   <div class="section-tag-wrap"><span class="section-tag">Domande frequenti</span></div>
   <h2 class="section-title">Tutto quello che vuoi sapere</h2>
   <div class="faq-list">
-    <details class="faq-item"><summary>Quanto costa il servizio di gestione?</summary><p>Il costo dipende dalla tipologia di immobile e dal livello di servizio richiesto. Dopo una valutazione gratuita ti proponiamo una tariffa chiara, senza costi nascosti.</p></details>
-    <details class="faq-item"><summary>Devo occuparmi io delle pulizie o della manutenzione?</summary><p>No, coordiniamo noi pulizie e manutenzioni. Per gli interventi più importanti ricevi sempre un preventivo da approvare prima che venga eseguito.</p></details>
-    <details class="faq-item"><summary>Posso vedere in ogni momento come va il mio immobile?</summary><p>Sì, hai accesso a un'area riservata con occupazione, prenotazioni, spese, guadagni e ogni intervento svolto, sempre aggiornati.</p></details>
-    <details class="faq-item"><summary>Vivo fuori dalla Sicilia, posso comunque affidarvi l'immobile?</summary><p>Sì, è proprio il caso più frequente: siamo noi sul posto e gestiamo tutto, tu segui l'andamento e verifichi il lavoro svolto da remoto.</p></details>
-    <details class="faq-item"><summary>Come gestite documenti e scadenze?</summary><p>Monitoriamo assicurazioni, certificazioni e adempimenti dell'immobile e ti avvisiamo con anticipo prima di ogni scadenza, così non rischi mai di dimenticarla.</p></details>
-    <details class="faq-item"><summary>Sono obbligato ad affittare l'immobile?</summary><p>No. Puoi affidarci solo la custodia e la gestione (documenti, scadenze, manutenzioni) oppure, se lo desideri, chiederci di occuparci anche dell'affitto e degli ospiti.</p></details>
-    <details class="faq-item"><summary>C'è un vincolo di durata?</summary><p>Le condizioni contrattuali vengono definite insieme durante l'attivazione del servizio, in base alle tue esigenze.</p></details>
+    <details class="faq-item"><summary>Quanto costa il servizio di gestione?</summary><div class="faq-body"><p>Il costo dipende dalla tipologia di immobile e dal livello di servizio richiesto. Dopo una valutazione gratuita ti proponiamo una tariffa chiara, senza costi nascosti.</p></div></details>
+    <details class="faq-item"><summary>Devo occuparmi io delle pulizie o della manutenzione?</summary><div class="faq-body"><p>No, coordiniamo noi pulizie e manutenzioni. Per gli interventi più importanti ricevi sempre un preventivo da approvare prima che venga eseguito.</p></div></details>
+    <details class="faq-item"><summary>Posso vedere in ogni momento come va il mio immobile?</summary><div class="faq-body"><p>Sì, hai accesso a un'area riservata con occupazione, prenotazioni, spese, guadagni e ogni intervento svolto, sempre aggiornati.</p></div></details>
+    <details class="faq-item"><summary>Vivo fuori dalla Sicilia, posso comunque affidarvi l'immobile?</summary><div class="faq-body"><p>Sì, è proprio il caso più frequente: siamo noi sul posto e gestiamo tutto, tu segui l'andamento e verifichi il lavoro svolto da remoto.</p></div></details>
+    <details class="faq-item"><summary>Come gestite documenti e scadenze?</summary><div class="faq-body"><p>Monitoriamo assicurazioni, certificazioni e adempimenti dell'immobile e ti avvisiamo con anticipo prima di ogni scadenza, così non rischi mai di dimenticarla.</p></div></details>
+    <details class="faq-item"><summary>Sono obbligato ad affittare l'immobile?</summary><div class="faq-body"><p>No. Puoi affidarci solo la custodia e la gestione (documenti, scadenze, manutenzioni) oppure, se lo desideri, chiederci di occuparci anche dell'affitto e degli ospiti.</p></div></details>
+    <details class="faq-item"><summary>C'è un vincolo di durata?</summary><div class="faq-body"><p>Le condizioni contrattuali vengono definite insieme durante l'attivazione del servizio, in base alle tue esigenze.</p></div></details>
   </div>
 </section>
 

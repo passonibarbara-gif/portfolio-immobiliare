@@ -90,6 +90,7 @@
     background:var(--paper-raised); border:1px solid var(--line-soft); border-radius:10px; padding:6px;
     box-shadow:0 14px 34px rgba(28,26,23,.22);
     opacity:0; transform:translateY(-8px) scale(.95); pointer-events:none;
+    max-height:420px; overflow-y:auto;
   }
   .notif-panel.show{animation:notifIn .35s cubic-bezier(.22,1.4,.4,1) forwards; pointer-events:auto;}
   @keyframes notifIn{ 0%{opacity:0; transform:translateY(-10px) scale(.92);} 100%{opacity:1; transform:translateY(0) scale(1);} }
@@ -573,7 +574,7 @@
   .preventivo-box .importo{font-family:'Fraunces',serif; font-weight:600; font-size:17px; color:var(--brass-deep);}
   .btn-approva{background:var(--sage); color:#fff; border:none; padding:8px 16px; border-radius:8px; font-size:12.5px; font-weight:600; cursor:pointer; margin-right:8px;}
   .btn-rifiuta{background:none; border:1px solid var(--terracotta); color:var(--terracotta); padding:8px 16px; border-radius:8px; font-size:12.5px; cursor:pointer;}
-  .storico-list{margin-top:10px; padding-top:10px; border-top:1px dashed var(--line);}
+  .storico-list{margin-top:10px; padding-top:10px; border-top:1px dashed var(--line); max-height:220px; overflow-y:auto;}
   .storico-item{font-size:11.5px; color:var(--ink-soft); padding:3px 0;}
   .storico-item .storico-data{font-family:'IBM Plex Mono',monospace; color:var(--brass-deep); margin-right:6px;}
 
@@ -2816,7 +2817,7 @@ function renderClienteCRM(c){
     <button class="add-inline" data-action="new-immobile-cliente">+ Aggiungi un immobile a questo cliente</button>
 
     <p class="section-label">Attività recente su tutti gli immobili</p>
-    <div class="chart-card">${eventiHtml}</div>
+    <div class="chart-card" style="max-height:420px;overflow-y:auto;">${eventiHtml}</div>
   `;
 }
 

@@ -93,7 +93,9 @@
   }
   .hero::before{
     content:''; position:absolute; inset:0;
-    background:linear-gradient(0deg, rgba(20,31,20,.72) 0%, rgba(20,31,20,.38) 42%, rgba(20,31,20,.12) 68%, rgba(20,31,20,.28) 100%);
+    background:
+      linear-gradient(90deg, rgba(12,18,10,.72) 0%, rgba(12,18,10,.5) 38%, rgba(12,18,10,.12) 68%, rgba(12,18,10,0) 100%),
+      linear-gradient(0deg, rgba(12,18,10,.62) 0%, rgba(12,18,10,.32) 45%, rgba(12,18,10,.18) 70%, rgba(12,18,10,.32) 100%);
   }
   .hero-photo-note{
     position:absolute; top:18px; right:18px; z-index:3; background:rgba(255,255,255,.9); color:var(--ink);
@@ -105,14 +107,17 @@
   .eyebrow{
     display:inline-block; font-family:'Jost',sans-serif; font-weight:500; font-size:11px; letter-spacing:.24em; text-transform:uppercase;
     color:var(--gold-soft); margin-bottom:18px; opacity:0; animation:fadeUp .7s ease .1s forwards;
+    text-shadow:0 1px 3px rgba(0,0,0,.6), 0 2px 10px rgba(0,0,0,.4);
   }
   .hero h1{
     font-family:'Playfair Display',serif; font-weight:700; font-size:clamp(34px,5.4vw,58px); line-height:1.08;
     margin:0 0 22px; max-width:640px; opacity:0; animation:fadeUp .8s ease .22s forwards;
+    text-shadow:0 2px 4px rgba(0,0,0,.55), 0 6px 24px rgba(0,0,0,.4);
   }
   .hero h1 .gold-line{display:block; color:var(--gold);}
   .hero p.lead{
     font-size:16.5px; color:#EAE6D8; max-width:460px; margin:0 0 32px; font-weight:300; opacity:0; animation:fadeUp .8s ease .34s forwards;
+    text-shadow:0 1px 3px rgba(0,0,0,.6), 0 3px 12px rgba(0,0,0,.35);
   }
   .hero-ctas{display:flex; gap:14px; flex-wrap:wrap; align-items:center; opacity:0; animation:fadeUp .8s ease .46s forwards;}
   .btn-primary{
@@ -356,7 +361,7 @@
       <h1>La tua casa è qui.<span class="gold-line">Tu puoi essere ovunque.</span></h1>
       <p class="lead">Ci occupiamo del tuo immobile in Sicilia — documenti, scadenze, manutenzioni e ospiti — così tu puoi vivere senza pensieri, con ogni lavoro verificabile dalla tua area riservata.</p>
       <div class="hero-ctas">
-        <a class="btn-primary" id="waHeroBtn" href="#" target="_blank" rel="noopener">
+        <a class="btn-primary" href="#contatti">
           <svg class="icon"><use href="#i-phone"></use></svg>
           <span class="btn-primary-sub"><b>Contattaci ora</b><small>Per una prima valutazione gratuita</small></span>
           <svg class="icon" style="margin-left:6px;"><use href="#i-arrow"></use></svg>
@@ -598,7 +603,6 @@
     return `https://wa.me/${digits}?text=${encodeURIComponent(testo||'')}`;
   }
   const waIntro = `Ciao ${CONFIG.nomeAgenzia}, vorrei ricevere una valutazione gratuita per il mio immobile.`;
-  document.getElementById('waHeroBtn').href = waLink(waIntro);
   document.getElementById('waFloat').href = waLink(waIntro);
   document.getElementById('waTextLine').textContent = 'WhatsApp: +' + (CONFIG.telefonoWhatsApp||'').replace(/\D/g,'');
   document.getElementById('emailTextLine').textContent = 'Email: ' + CONFIG.email;

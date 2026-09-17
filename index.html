@@ -366,6 +366,9 @@
   .status-pill.programmata{background:var(--brass-soft); color:var(--brass-deep);}
   .status-pill.in-corso{background:#F1DAD1; color:var(--terracotta);}
   .status-pill.completata{background:#DCE6DE; color:var(--sage);}
+  .status-pill.clickable{display:inline-flex; align-items:center; gap:3px; cursor:pointer; border:1px solid transparent; transition:filter .15s ease;}
+  .status-pill.clickable:hover{filter:brightness(0.93);}
+  .status-pill.clickable i{font-size:10px;}
 
   .add-inline{
     background:none; border:1px dashed var(--brass-soft); color:var(--brass-deep);
@@ -2517,13 +2520,13 @@ function renderInterventoCard(m, p, role){
   const storicoBlock = storico.length ? `<div class="storico-list">${storico.map(s=>`<div class="storico-item"><span class="storico-data">${fmtDate(s.data)}</span>${s.testo}</div>`).join('')}</div>` : '';
 
   const azioniGestore = isGestore ? `
-    <div style="display:flex;gap:8px;margin-top:10px;flex-wrap:wrap;">
-      <span class="status-pill ${m.stato}" data-cycle-status="${m.id}" style="cursor:pointer">${m.stato.replace('-',' ')}</span>
+    <div style="display:flex;align-items:center;gap:8px;margin-top:10px;flex-wrap:wrap;">
+      <span class="status-pill ${m.stato} clickable" data-cycle-status="${m.id}" title="Clicca per cambiare stato">${m.stato.replace('-',' ')}<i class="ti ti-chevron-down"></i></span>
       <button class="icon-btn" data-add-foto-intervento="${m.id}">+ Foto</button>
       ${!m.preventivo ? `<button class="icon-btn" data-add-preventivo="${m.id}">+ Aggiungi preventivo</button>` : ''}
       ${m.stato!=='completata' ? `<button class="icon-btn" data-programma-intervento="${m.id}"><i class="ti ti-calendar"></i> Programma</button>` : ''}
       ${m.stato!=='completata' ? `<button class="icon-btn" data-complete-intervento="${m.id}">Segna completato</button>` : ''}
-      <button class="link-btn" data-del-maint="${m.id}">rimuovi</button>
+      <button class="icon-btn danger" data-del-maint="${m.id}" title="Rimuovi intervento" style="margin-left:auto;"><i class="ti ti-trash"></i></button>
     </div>` : '';
 
   return `<div class="intervento-card">

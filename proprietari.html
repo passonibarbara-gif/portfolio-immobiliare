@@ -190,12 +190,15 @@
     position:relative; min-height:420px; display:flex; align-items:center; justify-content:center; text-align:center;
     background:url('tramonto-cefalu.jpg') center 65%/cover no-repeat, var(--green-deep); padding:60px 24px;
   }
-  .photo-break::before{content:''; position:absolute; inset:0; background:linear-gradient(0deg, rgba(20,25,15,.55) 0%, rgba(20,25,15,.15) 100%);}
+  .photo-break::before{
+    content:''; position:absolute; inset:0;
+    background:radial-gradient(ellipse 60% 70% at 50% 50%, rgba(15,20,12,.55) 0%, rgba(15,20,12,.15) 70%, rgba(15,20,12,0) 100%);
+  }
   .photo-break-quote{position:relative; z-index:1; color:#fff;}
-  .photo-break-quote .eyebrow{display:block; margin-bottom:14px;}
+  .photo-break-quote .eyebrow{display:block; margin-bottom:14px; text-shadow:0 1px 4px rgba(0,0,0,.4);}
   .photo-break-quote p{
     font-family:'Playfair Display',serif; font-weight:700; font-style:italic; font-size:clamp(24px,3.6vw,36px);
-    line-height:1.3; margin:0; text-shadow:0 2px 14px rgba(0,0,0,.25);
+    line-height:1.3; margin:0; text-shadow:0 1px 3px rgba(0,0,0,.5), 0 4px 18px rgba(0,0,0,.35);
   }
   .trust-band{background:var(--green-deep); color:#E7E3D3;}
   .trust-grid{display:grid; grid-template-columns:repeat(4,1fr); gap:30px; max-width:1040px; margin:0 auto;}
@@ -452,7 +455,7 @@
 <section class="photo-break reveal">
   <div class="photo-break-quote">
     <span class="eyebrow" style="color:var(--gold-soft);">Il tramonto sulla baia</span>
-    <p>La Sicilia come la ami,<br>senza pensieri.</p>
+    <p>Ogni tramonto ti aspetta,<br>senza pensieri.</p>
   </div>
 </section>
 

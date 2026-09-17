@@ -138,16 +138,14 @@
   .btn-primary-sub b{font-size:13.5px;}
   .btn-primary-sub small{font-size:10px; letter-spacing:.05em; text-transform:uppercase; font-weight:400; opacity:.85;}
   .hero-quote{
-    position:absolute; bottom:44px; right:40px; z-index:2; text-align:right; color:#fff; max-width:270px;
-    padding:16px 24px 14px 20px;
-    background:rgba(20,28,18,.28); backdrop-filter:blur(8px); -webkit-backdrop-filter:blur(8px);
-    border-right:2px solid var(--gold); border-radius:2px;
-    box-shadow:0 12px 30px rgba(0,0,0,.18);
-    font-family:'Caveat',cursive; font-weight:600; font-size:clamp(26px,3vw,34px); line-height:1.2;
-    text-shadow:0 2px 10px rgba(0,0,0,.4);
-    opacity:0; animation:fadeUp .8s ease .9s forwards;
+    position:absolute; bottom:46px; right:40px; z-index:2; text-align:right; color:#fff; max-width:280px;
+    font-family:'Caveat',cursive; font-weight:600; font-size:clamp(28px,3.4vw,38px); line-height:1.2;
+    text-shadow:0 2px 6px rgba(0,0,0,.5), 0 8px 22px rgba(0,0,0,.35);
+    transform-origin:right bottom;
+    opacity:0; animation:fadeUpTilt .8s ease .9s forwards;
   }
-  .hero-quote .underline{display:block; width:70px; height:1px; background:var(--gold); margin:10px 0 0 auto;}
+  @keyframes fadeUpTilt{ from{opacity:0; transform:translateY(14px) rotate(-4deg);} to{opacity:1; transform:translateY(0) rotate(-4deg);} }
+  .hero-quote .underline{display:block; width:78px; height:1px; background:var(--gold); margin:8px 0 0 auto;}
 
   /* ---------- Trust strip (below hero, solid background) ---------- */
   .trust-strip{background:var(--paper); border-bottom:1px solid var(--line); padding:22px 24px;}
@@ -327,10 +325,7 @@
     .testi-grid{grid-template-columns:1fr;}
     .contact-shell{padding:32px;}
     section{padding:64px 20px;}
-    .hero-quote{
-      position:static; margin-top:28px; text-align:left; max-width:none;
-      border-right:none; border-left:2px solid var(--gold); background:rgba(20,28,18,.22);
-    }
+    .hero-quote{position:static; margin-top:28px; text-align:left; max-width:none;}
     .hero-quote .underline{margin-left:0;}
   }
   @media (max-width: 520px){

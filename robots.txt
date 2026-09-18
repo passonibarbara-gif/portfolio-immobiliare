@@ -1,0 +1,10 @@
+# PLACEHOLDER: sostituisci https://www.viverepm.it con il tuo dominio reale
+User-agent: *
+Allow: /proprietari.html
+Allow: /proprietari-en.html
+Allow: /proprietari-fr.html
+Allow: /proprietari-es.html
+Allow: /proprietari-mt.html
+Disallow: /index.html
+
+Sitemap: https://www.viverepm.it/sitemap.xml

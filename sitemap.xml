@@ -1,0 +1,60 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- PLACEHOLDER: sostituisci https://www.viverepm.it con il tuo dominio reale in tutto il file -->
+<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9"
+        xmlns:xhtml="http://www.w3.org/1999/xhtml">
+  <url>
+    <loc>https://www.viverepm.it/proprietari.html</loc>
+    <xhtml:link rel="alternate" hreflang="it" href="https://www.viverepm.it/proprietari.html"/>
+    <xhtml:link rel="alternate" hreflang="en" href="https://www.viverepm.it/proprietari-en.html"/>
+    <xhtml:link rel="alternate" hreflang="fr" href="https://www.viverepm.it/proprietari-fr.html"/>
+    <xhtml:link rel="alternate" hreflang="es" href="https://www.viverepm.it/proprietari-es.html"/>
+    <xhtml:link rel="alternate" hreflang="mt" href="https://www.viverepm.it/proprietari-mt.html"/>
+    <xhtml:link rel="alternate" hreflang="x-default" href="https://www.viverepm.it/proprietari.html"/>
+    <changefreq>monthly</changefreq>
+    <priority>1.0</priority>
+  </url>
+  <url>
+    <loc>https://www.viverepm.it/proprietari-en.html</loc>
+    <xhtml:link rel="alternate" hreflang="it" href="https://www.viverepm.it/proprietari.html"/>
+    <xhtml:link rel="alternate" hreflang="en" href="https://www.viverepm.it/proprietari-en.html"/>
+    <xhtml:link rel="alternate" hreflang="fr" href="https://www.viverepm.it/proprietari-fr.html"/>
+    <xhtml:link rel="alternate" hreflang="es" href="https://www.viverepm.it/proprietari-es.html"/>
+    <xhtml:link rel="alternate" hreflang="mt" href="https://www.viverepm.it/proprietari-mt.html"/>
+    <xhtml:link rel="alternate" hreflang="x-default" href="https://www.viverepm.it/proprietari.html"/>
+    <changefreq>monthly</changefreq>
+    <priority>0.9</priority>
+  </url>
+  <url>
+    <loc>https://www.viverepm.it/proprietari-fr.html</loc>
+    <xhtml:link rel="alternate" hreflang="it" href="https://www.viverepm.it/proprietari.html"/>
+    <xhtml:link rel="alternate" hreflang="en" href="https://www.viverepm.it/proprietari-en.html"/>
+    <xhtml:link rel="alternate" hreflang="fr" href="https://www.viverepm.it/proprietari-fr.html"/>
+    <xhtml:link rel="alternate" hreflang="es" href="https://www.viverepm.it/proprietari-es.html"/>
+    <xhtml:link rel="alternate" hreflang="mt" href="https://www.viverepm.it/proprietari-mt.html"/>
+    <xhtml:link rel="alternate" hreflang="x-default" href="https://www.viverepm.it/proprietari.html"/>
+    <changefreq>monthly</changefreq>
+    <priority>0.9</priority>
+  </url>
+  <url>
+    <loc>https://www.viverepm.it/proprietari-es.html</loc>
+    <xhtml:link rel="alternate" hreflang="it" href="https://www.viverepm.it/proprietari.html"/>
+    <xhtml:link rel="alternate" hreflang="en" href="https://www.viverepm.it/proprietari-en.html"/>
+    <xhtml:link rel="alternate" hreflang="fr" href="https://www.viverepm.it/proprietari-fr.html"/>
+    <xhtml:link rel="alternate" hreflang="es" href="https://www.viverepm.it/proprietari-es.html"/>
+    <xhtml:link rel="alternate" hreflang="mt" href="https://www.viverepm.it/proprietari-mt.html"/>
+    <xhtml:link rel="alternate" hreflang="x-default" href="https://www.viverepm.it/proprietari.html"/>
+    <changefreq>monthly</changefreq>
+    <priority>0.9</priority>
+  </url>
+  <url>
+    <loc>https://www.viverepm.it/proprietari-mt.html</loc>
+    <xhtml:link rel="alternate" hreflang="it" href="https://www.viverepm.it/proprietari.html"/>
+    <xhtml:link rel="alternate" hreflang="en" href="https://www.viverepm.it/proprietari-en.html"/>
+    <xhtml:link rel="alternate" hreflang="fr" href="https://www.viverepm.it/proprietari-fr.html"/>
+    <xhtml:link rel="alternate" hreflang="es" href="https://www.viverepm.it/proprietari-es.html"/>
+    <xhtml:link rel="alternate" hreflang="mt" href="https://www.viverepm.it/proprietari-mt.html"/>
+    <xhtml:link rel="alternate" hreflang="x-default" href="https://www.viverepm.it/proprietari.html"/>
+    <changefreq>monthly</changefreq>
+    <priority>0.9</priority>
+  </url>
+</urlset>
